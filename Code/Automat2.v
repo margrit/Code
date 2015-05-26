@@ -2,7 +2,9 @@ Require Import Arith.
 Require Import Fin.
 (*Require Import Ensembles.*)
 
-Parameters A B: Set.
+Section definitions.
+
+Variable A B: Set.
 
 (*Definition t: Q -> Q.
 Proof.
@@ -31,7 +33,7 @@ with Word : Set :=
 
 
 (* Definition endliche Menge *)
-Inductive Finite_Set : nat -> Type :=
+Inductive Finite_Set : nat -> Set :=
   F1 : forall n, Finite_Set (S n)
 | FS : forall n, Finite_Set n -> Finite_Set (S n).
 
@@ -82,26 +84,37 @@ Definition surjective (f: A -> B) :=
 Definition notInjective (f: A -> B) :=
   exists x y : A, (f x = f y /\ (not (x = y))).
 
-Lemma lala : forall f : A -> B , (notInjective f) -> (not (injective f)).
+
+End definitions.
+Section lemmas.
+
+Lemma notInjImplNot_Inj : forall (A B : Set) (f : A -> B) , (notInjective A B f) -> (not (injective A B f)).
 Proof.
   intros.
-  unfold not.
-  intro.
   unfold notInjective in H.
-  unfold injective in H0.
+  unfold not.
+  unfold injective.
+  destruct H as [x H1].
+  destruct H1 as [y P].
+  destruct P as [Eqf Neq].
+  intro.
+  unfold not in Neq.
+  elim Neq.
+  apply H.
+  trivial.
+Qed.
+
+Lemma Not_InjImplNotInj : forall (n m : nat)  (f : (Finite_Set n) -> (Finite_Set m)) , 
+  (not (injective (Finite_Set n) (Finite_Set m) f)) -> (notInjective (Finite_Set n) (Finite_Set m) f).
+Proof.
+  intros.
+  unfold notInjective.
+  unfold not in H.
+  unfold injective in H.
+  induction n.
   elim H.
-  intro.
-  intro.
-  elim H1.
-  intro.
-  elim H0 with x x0.
-  intro.
-  elim H2.
-  intro.
-  intro.
-  elim H4.
-  reflexivity.
-Abort.  
+  intros.
+Abort.
 
 
 
@@ -119,14 +132,24 @@ Inductive Word :=
 | cons : Set -> Word -> Word.
 
 (* -- Tendenz induktive Definition --*)  
+(*
 Definition delta (a:Automat) :=
   match a with
   empty : states -> nil -> states
 | word : states -> Word -> list states
   end.
+*)
 
+(* nicht klar, was Du hier genau willst, aber falls Du die Übergangsfunktion von
+einem Automaten a haben willst, kannst Du die mit "transitions" bekommen, die Definition mit
+"record" macht das...:*)
 
+Check transitions.
+
+(*
 Definition Language_A : Type := 
   forall w: Word, 
   ex delta (initial,w) : Set -> Set.
+*)
+
 
