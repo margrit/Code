@@ -2,9 +2,7 @@ Require Import Arith.
 Require Import Fin.
 (*Require Import Ensembles.*)
 
-Section definitions.
-
-Variable A B: Set.
+Parameters A B: Set.
 
 (*Definition t: Q -> Q.
 Proof.
@@ -33,13 +31,12 @@ with Word : Set :=
 
 
 (* Definition endliche Menge *)
-Inductive Finite_Set : nat -> Set :=
+Inductive Finite_Set : nat -> Type :=
   F1 : forall n, Finite_Set (S n)
 | FS : forall n, Finite_Set n -> Finite_Set (S n).
 
 (* Definition Injektivitaet aus Fin
 --!!!-- Problem Match x mit n --!!!--
-
 Definition FS_injective : forall (n : nat) (x y : t n),
   FS x = FS y -> x=y.
 *)
@@ -56,7 +53,7 @@ Inductive Automat: Type :=
 (* Automat allgemein *)
 (* http://stackoverflow.com/questions/22475373/modelisation-of-an-automaton-with-coq *)
 Record Automat: Type :=
-  mk_automat{
+  mk_auto{
   states: Type;
   alphabet: Type;
   initial: states;
@@ -65,18 +62,15 @@ Record Automat: Type :=
   }.
 
 
-Definition testNEA : Automat := mk_automat (Finite_Set 2) (Finite_Set 2) 
-                                (F1 1) ((FS 1 (F1 0))::nil) (fun x y => nil).
+Definition testNEA : Automat := 
+  mk_auto (Finite_Set 2) (Finite_Set 2) (F1 1) ((FS 1 (F1 0))::nil) (fun x y => nil).
 
-(* ?? Finite_Set 2 steht für -- Warum 2 -- ?? *)
+Definition mk_NEA (s: nat) (a: nat) (ini: (Finite_Set s)) (final: (list (Finite_Set s))) (trans : ((Finite_Set s) -> (Finite_Set a) -> (list (Finite_Set s)))) : Automat := mk_auto (Finite_Set s) (Finite_Set a) ini final trans.  
 
-Definition mk_NEA (s: nat) (a: nat) 
-           (ini: (Finite_Set s)) 
-           (final: (list (Finite_Set s))) 
-           (trans : ((Finite_Set s) -> (Finite_Set a) -> (list (Finite_Set s)))) : 
-           Automat := mk_automat (Finite_Set s) (Finite_Set a) ini final trans.  
+Definition test2NEA : Automat := 
+  mk_NEA 3 4 (F1 2) nil (fun q x => nil).
 
-Definition test2NEA : Automat := mk_NEA 3 4 (F1 2) nil (fun q x => nil).
+
 
 (* Definition Injektivitaet 
    - Elemente aus Menge A werden eindeutig, durch f, in Menge B abgebildet *)
@@ -89,60 +83,82 @@ Definition surjective (f: A -> B) :=
 Definition notInjective (f: A -> B) :=
   exists x y : A, (f x = f y /\ (not (x = y))).
 
-End definitions.
-Section lemmas.
-
-Lemma notInjImplNot_Inj : forall (A B : Set) (f : A -> B) , 
-                          (notInjective A B f) -> (not (injective A B f)).
+(*
+Lemma lulu : forall f : A -> B, (not (injective f)) -> (notInjective f).
 Proof.
   intros.
+  unfold notInjective.
+  unfold injective in H.
+  elim H.
+  intro.
+  intro.
+  intro.
+  
+z.z. x=y
+*)
+
+Lemma lala : forall f : A -> B , (notInjective f) -> (not (injective f)).
+Proof.
+  intros.
+  (*
   unfold notInjective in H.
   unfold not.
   unfold injective.
-  destruct H as [x H1].
-  destruct H1 as [y P].
-  destruct P as [Eqf Neq].
-  intro.
-  unfold not in Neq.
-  elim Neq.
-  apply H.
-  trivial.
-Qed.
-
-(* notInjImplNot_Inj arbeitet auf Set und nicht auf Finite_Set *)
-
-Lemma Not_InjImplNotInj1 : forall (A B : Set)(f : A -> B),
-                           (not (injective A B f)) -> (notInjective A B f).
-Proof.
-  intros.
-  unfold not in H.
-  unfold notInjective.
-  unfold injective in H.
-  unfold not.
-  induction H.
-  intros.
-  apply H.
-
-Lemma Not_InjImplNotInj : forall (n m : nat)  (f : (Finite_Set n) -> (Finite_Set m)) , 
-                          (not (injective (Finite_Set n) (Finite_Set m) f)) 
-                          -> (notInjective (Finite_Set n) (Finite_Set m) f).
-Proof.
-  intros.
-  unfold notInjective.
-  unfold not in H.
-  unfold injective in H.
-  induction n.
   elim H.
-  intros.
+  intro.
+  intro.
+  *)
+(*
+  unfold not.
+  unfold notInjective in H.
+  unfold injective.
+  elim H.
+  intro.
+*)
+
+(* Loesung von Tim und Nuria *)
+  unfold not.
+  intro.
+  unfold notInjective in H.
+  unfold injective in H0.
+  elim H.
+  intro.
+  intro.
+  elim H1.
+  intro.
+  elim H0 with x x0.
+  intro.
+  elim H2.
+  intro.
+  intro.
+  elim H4.
+  reflexivity.
+
+(* irgendwie muss es weiter gehen *)
+
+  intuition.
   
-  (* injective_projections. *)
   
 
-(*x=y->fx=fy kann man mit f_equal oder injection zeigen. Problem, man kann nicht sagen 
-ob f terminiert, daher geht es nicht so einfach anders herum. *)
+  assert (x = x0).
+  intuition.
+  SearchRewrite ( _ _ = _ _).
+  generalize x x0.
+  generalize f x0.
+  intro.
+  apply le_trans.
   
-  
-Abort.
+(* Sowohl x als auch x0 sind Hypothesen und vom Typ A  
+   - muss man nur matchen *)
+  simpl.
+  symmetry.
+  reflexivity.
+
+  discriminate.
+  apply x0.
+  assumption.
+
+Abort.  
 
 
 
@@ -155,29 +171,18 @@ Definition bijective (f: A -> B /\ g: B -> A) :=
    - muss fuer Finite_Set und Finite_Sub gelten
 *)
 
-Inductive word : Set :=
-  nil : word
-| cons : word -> word -> word.
+Inductive Word :=
+  nil : Word
+| cons : Set -> Word -> Word.
 
 (* -- Tendenz induktive Definition --*)  
-(*
 Definition delta (a:Automat) :=
   match a with
   empty : states -> nil -> states
 | word : states -> Word -> list states
   end.
-*)
 
-(* nicht klar, was Du hier genau willst, aber falls Du die Übergangsfunktion von
-einem Automaten a haben willst, kannst Du die mit "transitions" bekommen, die Definition mit
-"record" macht das...:*)
 
-Check transitions.
-
-(*
 Definition Language_A : Type := 
   forall w: Word, 
   ex delta (initial,w) : Set -> Set.
-*)
-
-
