@@ -4,14 +4,6 @@ Require Import Fin.
 
 Section definitions.
 
-Variable A B: Set.
-
-(*Definition t: Q -> Q.
-Proof.
-intros.
-assumption.
-Qed.*)
-
 (* -- Definition einer endlichen Menge aus der User Distribution -- 
    http://www.lix.polytechnique.fr/coq/V8.2pl1/contribs/Automata.Ensf_types.html#
    -- mit Elt = Elem --
@@ -39,10 +31,19 @@ Inductive Finite_Set : nat -> Set :=
 
 (* Definition Injektivitaet aus Fin
 --!!!-- Problem Match x mit n --!!!--
+*)
+
+Variable Q: Set.
+
+Definition t: Q -> Q.
+Proof.
+intros.
+assumption.
+Qed.
 
 Definition FS_injective : forall (n : nat) (x y : t n),
   FS x = FS y -> x=y.
-*)
+
 
 (*
 Inductive Automat: Type :=
