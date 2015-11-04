@@ -79,8 +79,11 @@ Proof.
   
   (* n = S n; *)
   intros q xs H.
-  simpl. dfa_rew. rewrite H. 
-  apply IHn'. assumption.
+  simpl. 
+  dfa_rew. 
+  rewrite H. 
+  apply IHn'. 
+  assumption.
 Qed.
 
 Fixpoint inits {X: Type} (l: list X) :list (list X) :=
@@ -110,7 +113,8 @@ Theorem inits_dec_1:
    inits l = xs ++ (y::ys) -> 
     exists zs: list X, l = y ++ zs.
 Proof.
-  intros X l. induction l as [|h l'].
+  intros X l. 
+  induction l as [|h l'].
   
   (* l is nil *)
   intros y xs ys H.
@@ -119,15 +123,23 @@ Proof.
   simpl in H.
 
   assert (xs = nil) as Hxs.
-  destruct xs ; auto. destruct xs ; auto ; simpl in * ; inversion H.
-  subst xs. simpl in H. inversion H. exists nil. auto.
+  destruct xs.
+  trivial.
+  destruct xs; trivial; simpl in * ; inversion H.
+  subst xs. 
+  simpl in H. 
+  inversion H. 
+  exists nil. 
+  trivial.
 
   (* l is h :: l' *)
   intros y xs ys H.
   simpl in H.
   destruct xs.
   simpl in H.
-  inversion H. exists (h :: l'). auto.
+  inversion H. 
+  exists (h :: l'). 
+  trivial.
 
   simpl in H ; inversion H.
   
@@ -141,8 +153,10 @@ Proof.
   apply IHl' in H0.
   destruct H0 as [zs].
   inversion H3.
-  simpl. exists zs.
-  subst. auto.
+  simpl. 
+  exists zs.
+  subst. 
+  trivial.
 Qed.
 
 
@@ -154,7 +168,8 @@ Theorem inits_dec_2:
    inits l = xs ++ (y::ys) ++ (z::zs) -> 
     exists ds: list X, z = y ++ ds /\ length ds > 0.
 Proof.
-  intros X l. induction l as [|h l'].
+  intros X l. 
+  induction l as [|h l'].
   intros y z xs ys zs H.
   
   (* Impossible case, inits nil has 1 elem,
@@ -162,13 +177,17 @@ Proof.
   destruct xs.
   simpl in H.
   inversion H.
-  subst y. simpl in *.
+  subst y. 
+  simpl in *.
   inversion H.
   destruct ys ; simpl in * ; inversion H1.
-  simpl in *. inversion H.
-  subst l. inversion H.
+  simpl in *. 
+  inversion H.
+  subst l. 
+  inversion H.
   destruct xs.
-  simpl in *. inversion H2.
+  simpl in *. 
+  inversion H2.
   simpl in *; inversion H1.
   
   (* l = h :: l' *)
@@ -186,9 +205,15 @@ Proof.
   simpl in *.
   inversion H1.
   exists (h :: nil).
-  split ; auto.
+  split.
+  trivial.
+  simpl.
+  auto. (*an dieser Stelle muss noch mal was verändert werden - auto weg*)
+
   inversion H1.
-  simpl in *. clear H2. clear H.
+  simpl in *. 
+  clear H2. 
+  clear H.
   destruct ys ; simpl in * ; inversion H4.
   inversion H.
   destruct xs.
@@ -208,32 +233,46 @@ Proof.
   destruct xs.
   simpl in *; inversion H.
 
-  exists z. split; auto.
+  exists z. 
+  split.
+  simpl.
+  trivial.
+
   apply map_dec_2 in H2.
   destruct H2 as [xss].
   destruct H0 as [yss].
-  destruct H0. destruct H2.
+  destruct H0. 
+  destruct H2.
   destruct yss ; simpl in * ; inversion H3.
-  simpl ; auto with arith.
+  simpl.
+  auto with arith. (*evaluieren was hier genau passiert*)
 
   simpl in *.
   inversion H.
-  subst l0. clear H.
+  subst l0. 
+  clear H.
 
   assert (map (cons h) (inits l) = xs ++ (y::ys) ++ (z::zs)).
-  simpl ; auto.
+  simpl.
+  assumption.
   apply map_dec_3 in H.
   destruct H as [xss].
   destruct H as [yss].
   destruct H as [zss].
-  destruct H. destruct H0. destruct H1.
+  destruct H. 
+  destruct H0. 
+  destruct H1.
   destruct yss ; simpl in * ; inversion H1.
   destruct zss ; simpl in * ; inversion H3.
 
   apply IHl' in H.
   destruct H as [ds].
   destruct H.
-  exists ds. split ; subst ; auto.
+  exists ds. 
+  split.
+  subst.
+  trivial.
+  assumption.
 Qed.
 
 Theorem inits_dec: forall X: Type, forall l: list X,
@@ -250,11 +289,13 @@ Proof.
   split.
   exists ds.
   destruct H.
-  split ; try split ; auto.
+  split ; try split.
+  apply H. 
+  apply H0.
   rewrite app_assoc in H2.
-  eapply inits_dec_1. eauto.
+  eapply inits_dec_1.
+  apply H2.
 Qed. 
-
 
 Definition prefixes (q: Q) (l: list Sigma) : list Q :=
   map (ext q) (inits l).
@@ -262,7 +303,9 @@ Definition prefixes (q: Q) (l: list Sigma) : list Q :=
 Lemma prefixes_len: forall l: list Sigma, forall q: Q,
   length (prefixes q l) = S (length l).
 Proof.
-  intros ; unfold prefixes ; dfa_rew.
+  intros.
+  unfold prefixes.
+  dfa_rew.
 Qed.
 
 (* Now we can state the pumping lemma: *)
@@ -283,33 +326,52 @@ Proof.
   set (pref := prefixes q0 w).
 
   assert (Hpref: Q_size < length pref).
-  unfold pref. rewrite prefixes_len. auto with arith.
+  unfold pref. 
+  rewrite prefixes_len. 
+  auto with arith. (*Sieht oben "auto with arith"*)
 
   assert (HRep: repeats pref).
-  apply states_size. auto.
+  apply states_size.
+  apply Hpref.
 
   set (Hx := repeats_decomp Q pref HRep).
-  destruct Hx. destruct H. destruct H. destruct H. 
-  unfold pref in H. unfold prefixes in H.
+  destruct Hx. 
+  destruct H. 
+  destruct H. 
+  destruct H. 
+  unfold pref in H. 
+  unfold prefixes in H.
   
   set (Hx := map_dec_3 (list Sigma) Q (ext q0)
       (inits w) x0 (x::x1) (x::x2) H).
-  destruct Hx. destruct H0. destruct H0. destruct H0.
-  destruct H1. destruct H2.
+  destruct Hx. 
+  destruct H0. 
+  destruct H0. 
+  destruct H0.
+  destruct H1. 
+  destruct H2.
 
   (* x4 and x5 can;t be nil *)
-  destruct x4 as [|y x4]. inversion H2.
-  destruct x5 as [|y2 x5]. inversion H3.
+  destruct x4 as [|y x4]. 
+  inversion H2.
+  destruct x5 as [|y2 x5]. 
+  inversion H3.
   
   set (Hx := inits_dec _ w y y2 x3 x4 x5 H0).
-  destruct Hx. destruct H4. destruct H5.
+  destruct Hx. 
+  destruct H4. 
+  destruct H5.
   destruct  H4.
-  exists y. exists x6. exists x7.
+  exists y. 
+  exists x6. 
+  exists x7.
   split ; try split.
-  auto.
+  apply H6.
 
-  subst y2. rewrite H5. rewrite app_assoc. auto.
-
+  subst y2. 
+  rewrite H5. 
+  rewrite app_assoc. 
+  trivial.
   
   unfold accepted_word in *.
   intros n.
@@ -319,16 +381,18 @@ Proof.
   inversion H2.
   simpl in H3.
   inversion H3.
-
   
   assert (ext (ext q0 y) x6 = ext q0 y).
-  pattern (ext q0 y) at 2. rewrite H8.
+  pattern (ext q0 y) at 2. 
+  rewrite H8.
   rewrite <- H10.
   rewrite H4.
   dfa_rew.
   
-  rewrite ext_loop ; auto.
-  rewrite H5. dfa_rew.
+  rewrite ext_loop; auto. (*Hier muss auto noch ungeschrieben werden.*)
+  rewrite H5. 
+  dfa_rew.
 
-  rewrite H7. auto.
+  rewrite H7. 
+  apply acc.
 Qed.
