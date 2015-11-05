@@ -17,34 +17,52 @@ Lemma appears_in_app : forall {X:Type} (xs ys : list X) (x:X),
 Proof.
   intros X xs ys x.
   induction xs. 
-  simpl. intros ; right ; trivial.
+  simpl. intros.
+  right.
+  assumption.
 
   intros H.
   inversion H.
   left ; constructor.
   apply IHxs in H1.
   inversion H1.
-  left ; repeat constructor. trivial.
+  left.
+  apply ai_later.
+  assumption.
   right ; assumption.
 Qed.
 
 Lemma app_l_nil: forall {X:Type} (l: list X),
   l ++ nil = l.
-Proof. induction l ; simpl ; try congruence.
+Proof.
+  induction l.
+  - simpl.
+    reflexivity.
+  - simpl.
+    rewrite IHl.
+    reflexivity.
 Qed.
 
 Lemma app_appears_in : forall {X:Type} (xs ys : list X) (x:X), 
      appears_in x xs \/ appears_in x ys -> appears_in x (xs ++ ys).
 Proof.
   intros X xs ys x H.
+  (*inversion H.*)
   destruct H.
-  induction xs. inversion H.
-  inversion H.
-  constructor.
-  simpl. constructor 2. auto.
-  induction xs.
-  simpl; trivial.
-  simpl ; constructor 2. auto.
+  + induction xs.
+    - inversion H.
+    - inversion H.
+      apply ai_here.
+      simpl.
+      apply ai_later.
+      apply IHxs.
+      assumption.
+  + induction xs.
+    - simpl.
+      assumption.
+    - simpl.
+      apply ai_later.
+      assumption.
 Qed.
   
   
