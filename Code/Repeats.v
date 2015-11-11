@@ -17,15 +17,15 @@ Lemma appears_in_app : forall {X:Type} (xs ys : list X) (x:X),
 Proof.
   intros X xs ys x.
   induction xs. 
-  + simpl. 
+  - simpl. 
     intros.
     right.
     assumption.
-  + intros H.
+  - intros H.
     inversion H.
-    - left.
+    + left.
       apply ai_here.
-    - apply IHxs in H1.
+    + apply IHxs in H1.
       inversion H1.
       * left.
         apply ai_later.
@@ -38,9 +38,9 @@ Lemma app_l_nil: forall {X:Type} (l: list X),
   l ++ nil = l.
 Proof.
   induction l.
-  + simpl.
+  - simpl.
     reflexivity.
-  + simpl.
+  - simpl.
     rewrite IHl.
     reflexivity.
 Qed.
@@ -50,18 +50,18 @@ Lemma app_appears_in : forall {X:Type} (xs ys : list X) (x:X),
 Proof.
   intros X xs ys x H.
   destruct H.
-  + induction xs.
-    - inversion H.
-    - inversion H.
+  - induction xs.
+    + inversion H.
+    + inversion H.
       * apply ai_here.
       * simpl.
         apply ai_later.
         apply IHxs.
         assumption.
-  + induction xs.
-    - simpl.
+  - induction xs.
+    + simpl.
       assumption.
-    - simpl.
+    + simpl.
       apply ai_later.
       assumption.
 Qed.
@@ -72,11 +72,11 @@ Lemma appears_in_app_split : forall {X:Type} (x:X) (l:list X),
 Proof.
   intros X x l A.
   induction A.
-  + exists nil. 
+  - exists nil. 
     exists l. 
     simpl.
     reflexivity.
-  + destruct IHA as [x0]. 
+  - destruct IHA as [x0]. 
     destruct H as [x1].
     exists (b::x0).
     exists (x1).
@@ -101,7 +101,7 @@ Lemma repeats_decomp: forall X: Type, forall l: list X,
 Proof.
   intros X l H.
   induction H.
-  + inversion IHrepeats.
+  - inversion IHrepeats.
     inversion H0.
     inversion H1.
     inversion H2.
@@ -112,7 +112,7 @@ Proof.
     exists x3.
     simpl in *. 
     congruence.
-  + apply appears_in_app_split in H.
+  - apply appears_in_app_split in H.
     destruct H as [l1].
     destruct H as [l2].
     rewrite H.
@@ -129,9 +129,9 @@ Lemma length_app_2 : forall X:Type, forall x:X, forall xs ys: list X,
   length (xs ++ x :: ys) = length (x :: xs ++ ys).
 Proof.
   induction xs.
-  + simpl. 
+  - simpl. 
     reflexivity.
-  + intros. 
+  - intros. 
     simpl. 
     rewrite IHxs. 
     simpl.
@@ -145,78 +145,77 @@ Proof.
   intros X Y f. 
   induction l.
   (* l = [] *)
-  + intros. 
+  - intros. 
     exists nil.
     exists nil.
     simpl in H.
     split.
-    simpl.
-    reflexivity.
-    assert (xs = nil).
-    destruct xs. 
-    reflexivity. 
-    inversion H.
-    subst. 
-    simpl in *. 
-    split. 
-    - reflexivity.
-    - apply H.
-
+    + simpl.
+      reflexivity.
+    + assert (xs = nil).
+      * { destruct xs. 
+          - reflexivity. 
+          - inversion H. 
+        }
+      * { subst. 
+          simpl in *. 
+          split.  
+          - reflexivity.
+          - apply H.
+        }
   (* l~ = a :: l *)
-  + intros xs ys H.
+  - intros xs ys H.
     simpl in H.
     destruct xs as [|x xs].
-
     (* xs = nil *)
-    - simpl in H.
+    + simpl in H.
       destruct ys.
-  
       (* ys = nil *)
-      * inversion H.
-
+      * { inversion H. }
       (* ys = y :: ys *)
-      * assert (map f l = ys). 
-        inversion H. 
-        reflexivity.
-
-        set (Hx := IHl nil ys H0).
-        destruct Hx as [xs'].
-        destruct H1 as [ys'].
-        clear IHl.
-        destruct H1.
-        destruct H2.
-        exists nil.
-        simpl in *.
-        exists (a :: l).
-        split.
-        reflexivity.
-        split.
-        reflexivity.
-        simpl.
-        apply H.  
-  
+      * { assert (map f l = ys). 
+          - inversion H. 
+            reflexivity.
+          - set (Hx := IHl nil ys H0).
+            destruct Hx as [xs'].
+            destruct H1 as [ys'].
+            clear IHl.
+            destruct H1.
+            destruct H2.
+            exists nil.
+            simpl in *.
+            exists (a :: l).
+            split.
+            + reflexivity.
+            + split.
+              * { reflexivity. }
+              * { simpl.
+                  apply H.  
+                } }
     (* xs = x :: xs *)
-    - simpl in H.
+    + simpl in H.
       assert (map f l = xs ++ ys). 
-      * inversion H. 
-        reflexivity.
-      * set (Hx := IHl xs ys H0).
-        destruct Hx as [xs'].
-        destruct H1 as [ys'].
-        destruct H1. 
-        destruct H2. 
-        clear IHl.
-        exists (a :: xs').
-        exists ys'.
-        subst. 
-        split.
-        simpl.
-        reflexivity.
-        split.
-        simpl.
-        inversion H.
-        reflexivity.
-        reflexivity.
+      * { inversion H. 
+          reflexivity.
+        }
+      * { set (Hx := IHl xs ys H0).
+          destruct Hx as [xs'].
+          destruct H1 as [ys'].
+          destruct H1. 
+          destruct H2. 
+          clear IHl.
+          exists (a :: xs').
+          exists ys'.
+          subst. 
+          split.
+            - simpl.
+              reflexivity.
+            - split.
+              + simpl.
+                inversion H.
+                reflexivity.
+              + reflexivity.
+        } 
 Qed.
 
 Lemma map_dec_3 : forall X Y:Type, forall f: X->Y, forall l: list X,
@@ -248,10 +247,10 @@ Proof.
   exists x2.
   subst. 
   split.
-  + reflexivity.
-  + split.
-    - reflexivity.
-    - split.
-      * reflexivity.
-      * reflexivity.
+  - reflexivity.
+  - split.
+    + reflexivity.
+    + split.
+      * { reflexivity. }
+      * { reflexivity. }
 Qed.
