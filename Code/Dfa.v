@@ -6,64 +6,15 @@
  *)
 
 Require Import List.
-Load Repeats.
+Load Definitions.
 Section Transitions.
-(*Load Automat2.*)
-
-(*
- * 
- * The basic components of an automata 
- *
- *)
-
-(* The type of states *)
-Variable Q: Type.
-
-(* The number of possible states *)
-(* Or as the states_size axiom states, any upper bound on
-   the number of possible states *)
-Variable Q_size : nat.
-
-(* The type of alfabet's symbols *)
-Variable Sigma: Type.
-
-(* The transition function *)
-Parameter d: Q -> Sigma -> Q.
-
-(* A function that decides if the given state is an accepting state *)
-Parameter is_accepting: Q -> Prop.
-
-(* The initial state *)
-Variable q0 : Q.
-
-Axiom states_size: forall l: list Q, length l > Q_size ->
-  repeats l.
-
-(* Extension of a transition function *)
-Fixpoint ext (q: Q) (l: list Sigma) : Q :=
-  match l with
-  | nil => q
-  | h :: t => ext (d q h) t
-  end.
-
-Theorem ext_app: forall xs ys: list Sigma, forall q: Q,
-  ext q (xs ++ ys) = ext (ext q xs) ys.
-Proof.
-  induction xs.
-  - simpl.  
-    congruence.
-  - simpl.
-    congruence.
-Qed.
-
-(* Defines when a word is accepted *)
-Definition accepted_word (w: list Sigma) :=
-  is_accepting (ext q0 w).
 
 Ltac dfa_rew := autorewrite with dfa_trans ; try congruence ; auto.
 
 Hint Rewrite ext_app : dfa_trans.
 Hint Rewrite map_length : dfa_trans.
+
+(* Print Rewrite HintDb dfa_trans. *)
 
 Fixpoint word_replicate (n: nat) (l: list Sigma) : list Sigma :=
   match n with
@@ -71,8 +22,8 @@ Fixpoint word_replicate (n: nat) (l: list Sigma) : list Sigma :=
   | S n' => l ++ word_replicate n' l
   end.
 
-(* If there is a loop in the automata, then we can exploit it,
-   by duplicating the word that is looping it *)
+(* Wenn es eine Schleife im Automaten gibt, kann man diese nutzen,
+um das Wort aufzublähen an dieser Stelle. *)
 Theorem ext_loop: forall n:nat, forall q: Q, forall xs: list Sigma,
   ext q xs = q -> ext q (word_replicate n xs) = q.
 Proof.
@@ -84,8 +35,8 @@ Proof.
   - intros q xs H.
     simpl.
     dfa_rew. (*muss umgeschrieben werden*) 
-    rewrite H. 
-    apply IHn'. 
+    rewrite H.
+    apply IHn'.
     assumption.
 Qed.
 
@@ -111,19 +62,19 @@ Qed.
 
 Hint Rewrite inits_len : dfa_trans.
 
-Theorem inits_dec_1: 
-  forall X: Type, 
+Theorem inits_dec_1:
+  forall X: Type,
   forall l:list X,
   forall y: list X, 
   forall xs ys: list (list X),
-   inits l = xs ++ (y::ys) -> 
+   inits l = xs ++ (y::ys) ->
     exists zs: list X, l = y ++ zs.
 Proof.
-  intros X l. 
+  intros X l.
   induction l as [|h l'].
-  (* l is nil *)
-  - intros y xs ys H.  
-    (* y has to be nil *)
+  (* l ist nil *)
+  - intros y xs ys H.
+    (* y muss nil sein *)
     simpl in H.
     assert (xs = nil) as Hxs.
     + destruct xs.
@@ -134,19 +85,19 @@ Proof.
           - simpl in H.
             inversion H.
         }
-    + subst xs. 
-      simpl in H. 
-      inversion H. 
-      exists nil. 
-      simpl.  
+    + subst xs.
+      simpl in H.
+      inversion H.
+      exists nil.
+      simpl.
       reflexivity.
-  (* l is h :: l' *)
+  (* l ist h :: l' *)
   - intros y xs ys H.
     simpl in H.
     destruct xs.
     + simpl in H.
-      inversion H. 
-      exists (h :: l'). 
+      inversion H.
+      exists (h :: l').
       simpl.
       reflexivity.
     + simpl in H.
@@ -154,7 +105,7 @@ Proof.
       apply map_dec_2 in H2.
       destruct H2 as [xss].
       destruct H0 as [yss].
-      destruct H0. 
+      destruct H0.
       destruct H2.
       destruct yss as [|y0 yss].
       * { inversion H3. }
@@ -162,46 +113,45 @@ Proof.
           apply IHl' in H0.
           destruct H0 as [zs].
           inversion H3.
-          simpl. 
+          simpl.
           exists zs.
-          subst. 
+          subst.
           reflexivity.
         }
 Qed.
 
-
-Theorem inits_dec_2: 
-  forall X: Type, 
+Theorem inits_dec_2:
+  forall X: Type,
   forall l: list X,
-  forall y z: list X, 
+  forall y z: list X,
   forall xs ys zs: list (list X),
-   inits l = xs ++ (y::ys) ++ (z::zs) -> 
+   inits l = xs ++ (y::ys) ++ (z::zs) ->
     exists ds: list X, z = y ++ ds /\ length ds > 0.
 Proof.
-  intros X l. 
+  intros X l.
   induction l as [|h l'].
-  - intros y z xs ys zs H.  
+  - intros y z xs ys zs H.
   (* Impossible case, inits nil has 1 elem,
      the list on RHO has >= 2 elems *)
     destruct xs.
     + simpl in H.
       inversion H.
-      subst y. 
+      subst y.
       simpl in *.
       inversion H.
       destruct ys.
-      * { simpl in *. 
+      * { simpl in *.
           inversion H1.
         }
       * { simpl in *.
           inversion H1.
         }
-    + simpl in *. 
+    + simpl in *.
       inversion H.
-      subst l. 
+      subst l.
       inversion H.
       destruct xs.
-      * { simpl in *. 
+      * { simpl in *.
           inversion H2.
         }
       * { simpl in *.
@@ -226,8 +176,8 @@ Proof.
             + simpl.
               auto. (*an dieser Stelle muss noch mal was verändert werden - auto weg*)
           - inversion H1.
-            simpl in *. 
-            clear H2. 
+            simpl in *.
+            clear H2.
             clear H.
             destruct ys.
             * { simpl in *.
@@ -260,14 +210,14 @@ Proof.
       destruct xs.
       * { simpl in *.
           inversion H.
-          exists z. 
+          exists z.
           split.
           - simpl.
           reflexivity.
           - apply map_dec_2 in H2.
             destruct H2 as [xss].
             destruct H0 as [yss].
-            destruct H0. 
+            destruct H0.
             destruct H2.
             destruct yss.
             + simpl in *.
@@ -315,9 +265,9 @@ Qed.
 
 Theorem inits_dec: forall X: Type, forall l: list X,
   forall b c: list X, forall ass bs cs: list (list X),
-  inits l = ass ++ (b::bs) ++ (c::cs) -> 
-  (exists ds: list X, c = b ++ ds /\ 
-    length ds > 0) /\ 
+  inits l = ass ++ (b::bs) ++ (c::cs) ->
+  (exists ds: list X, c = b ++ ds /\
+    length ds > 0) /\
   exists es: list X, l = c ++ es.
 Proof.
   intros X l b c ass bs cs H.
@@ -347,16 +297,16 @@ Proof.
   dfa_rew. (*muss umgeschrieben werden*)
 Qed.
 
-(* Now we can state the pumping lemma: *)
+(* Pumping Lemma: *)
 Theorem pumping_lemma: forall w: list Sigma,
-  accepted_word w -> Q_size <= length w -> 
+  accepted_word w -> Q_size <= length w ->
   exists xs : list Sigma,
   exists ys : list Sigma,
-  exists zs : list Sigma, 
+  exists zs : list Sigma,
   length ys > 0 /\
  (* length ys < Q_size -> *)
   w = xs ++ ys ++ zs /\
-  forall n:nat, 
+  forall n:nat,
   accepted_word (xs ++ (word_replicate n ys) ++ zs).
 Proof.
   intros w acc len_w.
@@ -364,32 +314,32 @@ Proof.
   epsilon, w0, w0w1, .. w. *)
   set (pref := prefixes q0 w).
   assert (Hpref: Q_size < length pref).
-  - unfold pref. 
-    rewrite prefixes_len. 
-    auto with arith. (*bearbeiten mit len_w*)
+  - unfold pref.
+    rewrite prefixes_len.
+    auto with arith. (* bearbeiten mit len_w *)
   - assert (HRep: repeats pref).
     + apply states_size.
       apply Hpref.
     + set (Hx := repeats_decomp Q pref HRep).
-      destruct Hx. 
-      destruct H. 
-      destruct H. 
-      destruct H. 
-      unfold pref in H. 
-      unfold prefixes in H. 
+      destruct Hx.
+      destruct H.
+      destruct H.
+      destruct H.
+      unfold pref in H.
+      unfold prefixes in H.
       set (Hx := map_dec_3 (list Sigma) Q (ext q0)
       (inits w) x0 (x::x1) (x::x2) H).
-      destruct Hx. 
-      destruct H0. 
-      destruct H0. 
+      destruct Hx.
       destruct H0.
-      destruct H1. 
+      destruct H0.
+      destruct H0.
+      destruct H1.
       destruct H2.
-      (* x4 and x5 can;t be nil *)
-      destruct x4 as [|y x4]. 
+      (* x4 und x5 können nicht nil sein *)
+      destruct x4 as [|y x4].
       * { inversion H2. }
-      * { destruct x5 as [|y2 x5]. 
-          - inversion H3.  
+      * { destruct x5 as [|y2 x5].
+          - inversion H3.
           - set (Hx := inits_dec _ w y y2 x3 x4 x5 H0).
             destruct Hx.
             destruct H4.
@@ -401,7 +351,7 @@ Proof.
             split.
             + apply H6.
             + split.
-              * { subst y2. 
+              * { subst y2.
                   rewrite H5.
                   rewrite app_assoc.
                   reflexivity.
