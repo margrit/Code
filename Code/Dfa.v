@@ -14,7 +14,7 @@ Ltac dfa_rew := autorewrite with dfa_trans ; try congruence ; auto.
 Hint Rewrite ext_app : dfa_trans.
 Hint Rewrite map_length : dfa_trans.
 
-(* Print Rewrite HintDb dfa_trans. *)
+Print Rewrite HintDb dfa_trans.
 
 Fixpoint word_replicate (n: nat) (l: list Sigma) : list Sigma :=
   match n with

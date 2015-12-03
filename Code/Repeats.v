@@ -24,7 +24,7 @@ Proof.
     + left.
       apply ai_here.
     + apply IHxs in H1.
-      inversion H1.
+       inversion H1.
       * { left.
            apply ai_later.
            assumption.
