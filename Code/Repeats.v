@@ -52,6 +52,7 @@ Lemma app_appears_in : forall {X:Type} (xs ys : list X) (x:X),
      appears_in x xs \/ appears_in x ys -> appears_in x (xs ++ ys).
 Proof.
   intros X xs ys x H.
+  (*inversion H.*)
   destruct H.
   - induction xs.
     + inversion H.
