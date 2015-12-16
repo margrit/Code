@@ -6,21 +6,24 @@
 (* Require Import String. *)
 
 Load Repeats.
+Load Finite_Set.
 Require Import Fin.
 
+(* Q, Sigma, Q_size waren als Variablen erst angegeben und dann zu Parametern geändert. *)
 (* Typen der Zustaende *)
-Variable Q: Type.
+Parameter Q : Finite_Set.
+Print Q.
 
 (* Anzahl der moeglichen Zustaende *)
-Variable Q_size : nat.
+Parameter Q_size : nat.
 
 (* Der Typ des Alphabets und dessen Symbole *)
-Variable Sigma: Type.
+Parameter Sigma: Finite_Set.
 
 (* zum Testen...: Let Sigma := string. *)
 
 (* Die Transitionsfunktion - delta *)
-Parameter d: Q -> Sigma -> Q.
+Definition q := Q -> Sigma -> Q.
 
 (* Funktion die entscheidet, ob ein Zustand ein akzeptierender Zustand ist *)
 Parameter is_accepting: Q -> Prop.
