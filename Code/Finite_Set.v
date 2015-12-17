@@ -3,7 +3,7 @@
    -- mit Elt = Elem --
 *)
 
-
+(*
 Inductive Finite_Set : Set :=
 | empty : Finite_Set
 | add : Elem -> Finite_Set -> Finite_Set
@@ -15,19 +15,21 @@ with Elem : Set :=
 with Word : Set :=
 | nil : Word
 | cons : Elem -> Word -> Word.
+*)
 
 (* Definition endliche Menge *)
-Inductive Finite_Set_1 : nat -> Set :=
-  F1 : forall n, Finite_Set_1 (S n)
-| FS : forall n, Finite_Set_1 n -> Finite_Set_1 (S n).
+Inductive Finite_Set : nat -> Set :=
+  F1 : forall n, Finite_Set (S n)
+| FS : forall n, Finite_Set n -> Finite_Set (S n).
 
-Parameter A : Finite_Set.
-Parameter B : Finite_Set.
+Parameters a b : nat.
+Parameter A : Finite_Set a.
+Parameter B : Finite_Set b.
 Print A.
-
+(*
 Definition abb A B := A -> B.
 Print abb.
-
+*)
 (*
 Axiom states_size: forall l: list Q, length l > Q_size ->
   repeats l.

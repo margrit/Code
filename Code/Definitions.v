@@ -8,28 +8,33 @@
 Load Repeats.
 Load Finite_Set.
 Require Import Fin.
+Require Import Arith.
 
 (* Q, Sigma, Q_size waren als Variablen erst angegeben und dann zu Parametern geändert. *)
 (* Typen der Zustaende *)
-Parameter Q : Finite_Set.
-Print Q.
-
 (* Anzahl der moeglichen Zustaende *)
 Parameter Q_size : nat.
+Definition Q := Finite_Set Q_size.
+Print Q.
 
 (* Der Typ des Alphabets und dessen Symbole *)
-Parameter Sigma: Finite_Set.
+Parameter S_size : nat.
+Definition Sigma := Finite_Set S_size.
+Print Sigma.
 
 (* zum Testen...: Let Sigma := string. *)
 
 (* Die Transitionsfunktion - delta *)
-Definition q := Q -> Sigma -> Q.
+Parameter delta : Q -> Sigma -> Q.
+Print delta.
 
 (* Funktion die entscheidet, ob ein Zustand ein akzeptierender Zustand ist *)
 Parameter is_accepting: Q -> Prop.
+Print is_accepting.
 
 (* Startzustand *)
-Variable q0 : Q.
+Parameter q0 : Q.
+Print q0.
 
 (* Um zu definieren, wann ein Wort akzeptiert wird, muessen noch 
 einige Vorueberlegungen getroffen werden. Hierzu braucht man die 
@@ -37,14 +42,33 @@ erweiterte Transitionsfunktion ext.
 accepted_word (w: list Sigma) := is_accepting (ext q0 w). *)
 
 (* Keine Verwendung von Axiomen. *)
-Axiom states_size: forall l: list Q, length l > Q_size ->
+Theorem states_size: forall l: list Q, length l > Q_size ->
   repeats l.
+Proof.
+induction l.
+- intros.
+  simpl in H.
+  inversion H.
+- simpl.
+  intros.
+  unfold gt in H.
+  unfold lt in H.
+  apply le_S_n in H.
+  induction H.
+(*  + apply rp_ext.
+     apply IHl.
+     .
+*)
+Show 2.
+  apply rp_ext.
+
+
 
 (* Erweiterte Transitionsfunktion - ext *)
-Fixpoint ext (q: Q) (l: list Sigma) : Q :=
+Fixpoint ext (q : Q) (l : list Sigma) : Q :=
   match l with
-  | nil => q
-  | h :: t => ext (d q h) t
+    | nil     => q
+    | h :: t  => ext (delta q h) t
   end.
 
 Theorem ext_app: forall xs ys: list Sigma, forall q: Q,
@@ -62,3 +86,4 @@ Qed.
 (* Definiert, wann ein Wort akzeptiert wird. *)
 Definition accepted_word (w: list Sigma) :=
   is_accepting (ext q0 w).
+Print accepted_word.
