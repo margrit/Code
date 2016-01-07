@@ -1,16 +1,15 @@
 (*Quelle: https://github.com/wjzz/PumpingLemma/blob/master/Repeats.v*)
 
 Require Import List.
-(* Require Import Arith. *)
 
 (* Vorkommen von x in einer Liste. *)
-Inductive appears_in {X:Type} (a:X) : list X -> Prop :=
-  | ai_here : forall l, appears_in a (a::l)
-  | ai_later : forall b l, appears_in a l -> appears_in a (b::l).
+Inductive appears_in {X : Type} (a : X) : list X -> Prop :=
+  | ai_here : forall l, appears_in a (a :: l)
+  | ai_later : forall b l, appears_in a l -> appears_in a (b :: l).
 
 (* Wenn x in der Konkatenation von zwei Listen vorkommt, 
 dann kommt x auch entweder in Liste 1 oder Liste 2 vor. *)
-Lemma appears_in_app : forall {X:Type} (xs ys : list X) (x:X),
+Lemma appears_in_app : forall {X : Type} (xs ys : list X) (x : X),
      appears_in x (xs ++ ys) -> appears_in x xs \/ appears_in x ys.
 Proof.
   intros X xs ys x.
@@ -35,7 +34,7 @@ Proof.
 Qed.
 
 (* Liste verknüpft mit der leeren Liste ergibt die ursprüngliche Liste *)
-Lemma app_l_nil: forall {X:Type} (l: list X),
+Lemma app_l_nil : forall {X : Type} (l : list X),
   l ++ nil = l.
 Proof.
   induction l.
@@ -48,7 +47,7 @@ Qed.
 
 (* Wenn x in Liste 1 oder Liste 2 vorkommt, 
 dann kommt x auch in der Konkatenation der Listen vor. *)
-Lemma app_appears_in : forall {X:Type} (xs ys : list X) (x:X),
+Lemma app_appears_in : forall {X : Type} (xs ys : list X) (x : X),
      appears_in x xs \/ appears_in x ys -> appears_in x (xs ++ ys).
 Proof.
   intros X xs ys x H.
@@ -72,9 +71,9 @@ Proof.
 Qed.
 
 (*Vorkommen von x in einer Teilliste. *)
-Lemma appears_in_app_split : forall {X:Type} (x:X) (l:list X),
+Lemma appears_in_app_split : forall {X : Type} (x : X) (l : list X),
   appears_in x l ->
-  exists l1, exists l2, l = l1 ++ (x::l2).
+  exists l1, exists l2, l = l1 ++ (x :: l2).
 Proof.
   intros X x l A.
   induction A.
@@ -84,7 +83,7 @@ Proof.
     reflexivity.
   - destruct IHA as [x0].
     destruct H as [x1].
-    exists (b::x0).
+    exists (b :: x0).
     exists (x1).
     simpl.
     intros.
@@ -92,18 +91,18 @@ Proof.
     reflexivity.
 Qed.
 
-Inductive repeats {X:Type} : list X -> Prop :=
+Inductive repeats {X : Type} : list X -> Prop :=
   (* extend *)
-  rp_ext : forall x:X, forall l: list X, repeats l -> repeats (x::l)
-| rp_intr : forall x:X, forall l: list X, appears_in x l -> repeats (x :: l).
+  rp_ext : forall x : X, forall l : list X, repeats l -> repeats (x :: l)
+| rp_intr : forall x : X, forall l : list X, appears_in x l -> repeats (x :: l).
 
-Lemma repeats_decomp: forall X: Type, forall l: list X,
+Lemma repeats_decomp : forall X : Type, forall l : list X,
   repeats l ->
-  exists x:X,
-  exists xs: list X,
-  exists ys: list X,
-  exists zs: list X,
-  l = xs ++ (x::ys) ++ (x::zs).
+  exists x : X,
+  exists xs : list X,
+  exists ys : list X,
+  exists zs : list X,
+  l = xs ++ (x :: ys) ++ (x :: zs).
 Proof.
   intros X l H.
   induction H.
@@ -113,7 +112,7 @@ Proof.
     inversion H2.
     clear IHrepeats H0 H1 H2.
     exists x0.
-    exists (x::x1).
+    exists (x :: x1).
     exists x2.
     exists x3.
     simpl in *.
@@ -145,9 +144,9 @@ Proof.
     reflexivity.
 Qed.
 
-Lemma map_dec_2 : forall X Y:Type, forall f: X->Y, forall l: list X,
-  forall xs ys: list Y,
-  map f l = xs ++ ys -> exists xs': list X, exists ys': list X,
+Lemma map_dec_2 : forall X Y :Type, forall f : X -> Y, forall l : list X,
+  forall xs ys : list Y,
+  map f l = xs ++ ys -> exists xs' : list X, exists ys' : list X,
   l = xs' ++ ys' /\ map f xs' = xs /\ map f ys' = ys.
 Proof.
   intros X Y f.
@@ -226,10 +225,10 @@ Proof.
         } 
 Qed.
 
-Lemma map_dec_3 : forall X Y:Type, forall f: X->Y, forall l: list X,
-  forall xs ys zs: list Y,
+Lemma map_dec_3 : forall X Y : Type, forall f : X -> Y, forall l : list X,
+  forall xs ys zs : list Y,
   map f l = xs ++ ys ++ zs ->
-  exists xs': list X, exists ys': list X, exists zs': list X,
+  exists xs' : list X, exists ys' : list X, exists zs' : list X,
   l = xs' ++ ys' ++ zs' /\
   map f xs' = xs /\ map f ys' = ys /\ map f zs' = zs.
 Proof.

@@ -5,7 +5,6 @@
    Deterministic Finite-State Automata.
  *)
 
-Require Import List.
 Load Definitions.
 Section Transitions.
 
@@ -16,15 +15,15 @@ Hint Rewrite map_length : dfa_trans.
 
 Print Rewrite HintDb dfa_trans.
 
-Fixpoint word_replicate (n: nat) (l: list Sigma) : list Sigma :=
+Fixpoint word_replicate (n : nat) (l : list Sigma) : list Sigma :=
   match n with
-  | O => nil
+  | O    => nil
   | S n' => l ++ word_replicate n' l
   end.
 
 (* Wenn es eine Schleife im Automaten gibt, kann man diese nutzen,
-um das Wort aufzublähen an dieser Stelle. *)
-Theorem ext_loop: forall n:nat, forall q: Q, forall xs: list Sigma,
+um das Wort aufzublähen an dieser Stelle und bleibt im gleichen Zustand. *)
+Theorem ext_loop: forall n : nat, forall q : Q, forall xs : list Sigma,
   ext q xs = q -> ext q (word_replicate n xs) = q.
 Proof.
   induction n as [|n'].
@@ -40,16 +39,16 @@ Proof.
     assumption.
 Qed.
 
-Fixpoint inits {X: Type} (l: list X) :list (list X) :=
+Fixpoint inits {X : Type} (l : list X) : list (list X) :=
   match l with
-  | nil => nil :: nil
+  | nil       => nil :: nil
   | x :: xs => nil :: map (cons x) (inits xs)
   end.
 
-Eval compute in (inits (1::2::nil)).
+Eval compute in (inits (1 :: 2 :: nil)).
 Eval compute in (inits nil : list (list nat)).
 
-Theorem inits_len: forall X: Type, forall l: list X,
+Theorem inits_len : forall X : Type, forall l : list X,
   length (inits l) = S (length l).
 Proof.
   induction l.
@@ -62,13 +61,13 @@ Qed.
 
 Hint Rewrite inits_len : dfa_trans.
 
-Theorem inits_dec_1:
-  forall X: Type,
-  forall l:list X,
-  forall y: list X, 
-  forall xs ys: list (list X),
-   inits l = xs ++ (y::ys) ->
-    exists zs: list X, l = y ++ zs.
+Theorem inits_dec_1 :
+  forall X : Type,
+  forall l : list X,
+  forall y : list X, 
+  forall xs ys : list (list X),
+   inits l = xs ++ (y :: ys) ->
+    exists zs : list X, l = y ++ zs.
 Proof.
   intros X l.
   induction l as [|h l'].
@@ -120,13 +119,13 @@ Proof.
         }
 Qed.
 
-Theorem inits_dec_2:
-  forall X: Type,
-  forall l: list X,
-  forall y z: list X,
-  forall xs ys zs: list (list X),
-   inits l = xs ++ (y::ys) ++ (z::zs) ->
-    exists ds: list X, z = y ++ ds /\ length ds > 0.
+Theorem inits_dec_2 :
+  forall X : Type,
+  forall l : list X,
+  forall y z : list X,
+  forall xs ys zs : list (list X),
+   inits l = xs ++ (y :: ys) ++ (z :: zs) ->
+    exists ds : list X, z = y ++ ds /\ length ds > 0.
 Proof.
   intros X l.
   induction l as [|h l'].
@@ -231,7 +230,7 @@ Proof.
           inversion H.
           subst l0. 
           clear H.
-          assert (map (cons h) (inits l) = xs ++ (y::ys) ++ (z::zs)).
+          assert (map (cons h) (inits l) = xs ++ (y :: ys) ++ (z :: zs)).
           - simpl.
             assumption.
           - apply map_dec_3 in H.
@@ -255,7 +254,7 @@ Proof.
                   apply IHl' in H.
                   destruct H as [ds].
                   destruct H.
-                  exists ds. 
+                  exists ds.
                   split.
                   - subst.
                     reflexivity.

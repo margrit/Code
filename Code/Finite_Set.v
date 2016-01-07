@@ -22,14 +22,6 @@ Inductive Finite_Set : nat -> Set :=
   F1 : forall n, Finite_Set (S n)
 | FS : forall n, Finite_Set n -> Finite_Set (S n).
 
-Parameters a b : nat.
-Parameter A : Finite_Set a.
-Parameter B : Finite_Set b.
-Print A.
-(*
-Definition abb A B := A -> B.
-Print abb.
-*)
 (*
 Axiom states_size: forall l: list Q, length l > Q_size ->
   repeats l.

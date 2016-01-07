@@ -4,7 +4,6 @@
  *)
 
 (* Require Import String. *)
-
 Load Repeats.
 Load Finite_Set.
 Require Import Fin.
@@ -29,7 +28,7 @@ Parameter delta : Q -> Sigma -> Q.
 Print delta.
 
 (* Funktion die entscheidet, ob ein Zustand ein akzeptierender Zustand ist *)
-Parameter is_accepting: Q -> Prop.
+Parameter is_accepting : Q -> Prop.
 Print is_accepting.
 
 (* Startzustand *)
@@ -39,28 +38,7 @@ Print q0.
 (* Um zu definieren, wann ein Wort akzeptiert wird, muessen noch 
 einige Vorueberlegungen getroffen werden. Hierzu braucht man die 
 erweiterte Transitionsfunktion ext.
-accepted_word (w: list Sigma) := is_accepting (ext q0 w). *)
-
-(* Keine Verwendung von Axiomen. *)
-Theorem states_size: forall l: list Q, length l > Q_size ->
-  repeats l.
-Proof.
-induction l.
-- intros.
-  simpl in H.
-  inversion H.
-- simpl.
-  intros.
-  unfold gt in H.
-  unfold lt in H.
-  apply le_S_n in H.
-  induction H.
-(*  + apply rp_ext.
-     apply IHl.
-     .
-*)
-Show 2.
-  apply rp_ext.
+accepted_word (w : list Sigma) := is_accepting (ext q0 w). *)
 
 
 
@@ -71,7 +49,7 @@ Fixpoint ext (q : Q) (l : list Sigma) : Q :=
     | h :: t  => ext (delta q h) t
   end.
 
-Theorem ext_app: forall xs ys: list Sigma, forall q: Q,
+Theorem ext_app : forall xs ys : list Sigma, forall q : Q,
   ext q (xs ++ ys) = ext (ext q xs) ys.
 Proof.
   induction xs.
@@ -84,6 +62,6 @@ Proof.
 Qed.
 
 (* Definiert, wann ein Wort akzeptiert wird. *)
-Definition accepted_word (w: list Sigma) :=
+Definition accepted_word (w : list Sigma) :=
   is_accepting (ext q0 w).
 Print accepted_word.
