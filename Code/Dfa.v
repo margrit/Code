@@ -262,12 +262,12 @@ Proof.
                 } }
 Qed.
 
-Theorem inits_dec: forall X: Type, forall l: list X,
-  forall b c: list X, forall ass bs cs: list (list X),
-  inits l = ass ++ (b::bs) ++ (c::cs) ->
-  (exists ds: list X, c = b ++ ds /\
+Theorem inits_dec : forall X : Type, forall l : list X,
+  forall b c : list X, forall ass bs cs : list (list X),
+  inits l = ass ++ (b :: bs) ++ (c :: cs) ->
+  (exists ds : list X, c = b ++ ds /\
     length ds > 0) /\
-  exists es: list X, l = c ++ es.
+  exists es : list X, l = c ++ es.
 Proof.
   intros X l b c ass bs cs H.
   remember H as H2.
@@ -285,10 +285,10 @@ Proof.
   apply H2. (*Warum das geht ist mir ein wenig schleierhaft*)
 Qed. 
 
-Definition prefixes (q: Q) (l: list Sigma) : list Q :=
+Definition prefixes (q : Q) (l : list Sigma) : list Q :=
   map (ext q) (inits l).
 
-Lemma prefixes_len: forall l: list Sigma, forall q: Q,
+Lemma prefixes_len : forall l : list Sigma, forall q : Q,
   length (prefixes q l) = S (length l).
 Proof.
   intros.
@@ -297,7 +297,7 @@ Proof.
 Qed.
 
 (* Pumping Lemma: *)
-Theorem pumping_lemma: forall w: list Sigma,
+Theorem pumping_lemma : forall w : list Sigma,
   accepted_word w -> Q_size <= length w ->
   exists xs : list Sigma,
   exists ys : list Sigma,
@@ -305,18 +305,18 @@ Theorem pumping_lemma: forall w: list Sigma,
   length ys > 0 /\
  (* length ys < Q_size -> *)
   w = xs ++ ys ++ zs /\
-  forall n:nat,
+  forall n : nat,
   accepted_word (xs ++ (word_replicate n ys) ++ zs).
 Proof.
   intros w acc len_w.
   (* Let's look at which state the DFA is after reading
   epsilon, w0, w0w1, .. w. *)
   set (pref := prefixes q0 w).
-  assert (Hpref: Q_size < length pref).
+  assert (Hpref : Q_size < length pref).
   - unfold pref.
     rewrite prefixes_len.
     auto with arith. (* bearbeiten mit len_w *)
-  - assert (HRep: repeats pref).
+  - assert (HRep : repeats pref).
     + apply states_size.
       apply Hpref.
     + set (Hx := repeats_decomp Q pref HRep).
@@ -327,7 +327,7 @@ Proof.
       unfold pref in H.
       unfold prefixes in H.
       set (Hx := map_dec_3 (list Sigma) Q (ext q0)
-      (inits w) x0 (x::x1) (x::x2) H).
+      (inits w) x0 (x :: x1) (x :: x2) H).
       destruct Hx.
       destruct H0.
       destruct H0.

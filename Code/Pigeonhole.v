@@ -24,19 +24,19 @@ induction n.
       rewrite H.
       reflexivity.
     * right.
-
-      unfold.
+      simplify_eq.
       contradict H.
-      inversion H.
-      dependent rewrite -> H1.
-      injection H.
-
+      injection H0.
       
 
+      inversion H.
+      injection H.
+      intros.
+      injection H0.
+      discriminate.
 
-apply IHn a b.
 unfold decidable in IHn.
-apply IHn
+apply IHn.
 
 dependent destruction a; dependent destruction b.
 unfold decidable.
