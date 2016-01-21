@@ -5,6 +5,38 @@ Require Import Arith.
 Require Import Decidable.
 Require Import Program.
 
+Lemma eq_app : forall (A B : Type) (f : A -> B) (x y  : A), x = y -> (f x = f y).
+Proof.
+intros.
+rewrite H.
+reflexivity.
+Qed.
+
+Lemma subst : forall {A : Type} {x y : A} (B : A -> Type) (p : x = y), B x -> B y.
+Proof.
+intros.
+destruct p.
+assumption.
+Defined.
+
+
+Print subst.
+Print eq_rect.
+(*
+Lemma subst_computation :  forall {A : Type} {x : A} (B : A -> Type) (b : B x), subst B eq_refl b = b.
+*)
+Lemma eq_app_dep : forall {A : Type} {x y : A} {B : A -> Type} (f : forall (x : A ), (B x)) (p : x = y), 
+    (subst B p (f x) = f y).
+Proof.
+intros.
+destruct p.
+simpl.
+reflexivity.
+Defined.
+
+Print projT2.
+Print projT1.
+
 Theorem fin_eq_dec : forall n : nat, forall a b : Finite_Set n, decidable (a = b).
 Proof.
 intros.
@@ -26,6 +58,7 @@ induction n.
     * right.
       simplify_eq.
       contradict H.
+      apply eq_app_dep with (f := projT2).
       injection H0.
       
 
