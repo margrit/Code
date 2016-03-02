@@ -3,27 +3,26 @@
 Require Import List.
 
 (* Vorkommen von x in einer Liste. *)
-Inductive appears_in {X : Type} (a : X) : list X -> Prop :=
+Inductive appears_in {X : Type} (a : X) : list X -> Type :=
   | ai_here : forall l, appears_in a (a :: l)
   | ai_later : forall b l, appears_in a l -> appears_in a (b :: l).
 
-(* Wenn x in der Konkatenation von zwei Listen vorkommt, 
-dann kommt x auch entweder in Liste 1 oder Liste 2 vor. *)
 Lemma appears_in_app : forall {X : Type} (xs ys : list X) (x : X),
-     appears_in x (xs ++ ys) -> appears_in x xs \/ appears_in x ys.
+     appears_in x (xs ++ ys) -> appears_in x xs + appears_in x ys.
 Proof.
   intros X xs ys x.
   induction xs.
   - simpl.
-    intros.
+    intro H1.
     right.
     assumption.
-  - intros H.
+  - intro H.
     inversion H.
     + left.
       apply ai_here.
-    + apply IHxs in H1.
+    + apply IHxs in X0.
        inversion H1.
+       destruct X0.
       * { left.
            apply ai_later.
            assumption.
@@ -48,14 +47,13 @@ Qed.
 (* Wenn x in Liste 1 oder Liste 2 vorkommt, 
 dann kommt x auch in der Konkatenation der Listen vor. *)
 Lemma app_appears_in : forall {X : Type} (xs ys : list X) (x : X),
-     appears_in x xs \/ appears_in x ys -> appears_in x (xs ++ ys).
+     appears_in x xs + appears_in x ys -> appears_in x (xs ++ ys).
 Proof.
   intros X xs ys x H.
-  (*inversion H.*)
-  destruct H.
+  destruct H as [xInxs | xInys].
   - induction xs.
-    + inversion H.
-    + inversion H.
+    + inversion xInxs.
+    + inversion xInxs.
       * { apply ai_here. }
       * { simpl.
           apply ai_later.
@@ -91,7 +89,7 @@ Proof.
     reflexivity.
 Qed.
 
-Inductive repeats {X : Type} : list X -> Prop :=
+Inductive repeats {X : Type} : list X -> Type :=
   (* extend *)
   rp_ext : forall x : X, forall l : list X, repeats l -> repeats (x :: l)
 | rp_intr : forall x : X, forall l : list X, appears_in x l -> repeats (x :: l).
@@ -118,8 +116,8 @@ Proof.
     simpl in *.
     rewrite H3.
     reflexivity.
-  - apply appears_in_app_split in H.
-    destruct H as [l1].
+  - apply appears_in_app_split in a.
+    destruct a as [l1].
     destruct H as [l2].
     rewrite H.
     exists x.
@@ -137,7 +135,7 @@ Proof.
   induction xs.
   - simpl.
     reflexivity.
-  - intros.
+  - intro ys.
     simpl.
     rewrite IHxs.
     simpl.
@@ -152,7 +150,7 @@ Proof.
   intros X Y f.
   induction l.
   (* l = [] *)
-  - intros.
+  - intros xs ys H.
     exists nil.
     exists nil.
     simpl in H.
@@ -232,7 +230,7 @@ Lemma map_dec_3 : forall X Y : Type, forall f : X -> Y, forall l : list X,
   l = xs' ++ ys' ++ zs' /\
   map f xs' = xs /\ map f ys' = ys /\ map f zs' = zs.
 Proof.
-  intros.
+  intros X Y f l xs ys zs H.
   remember (ys ++ zs) as ls.
   remember H as H2.
   clear HeqH2.
