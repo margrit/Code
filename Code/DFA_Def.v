@@ -60,11 +60,13 @@ Definition accepted_word (w : list Sigma) :=
 
 (* Typ der Konfigurationen eines DFA, Konf_DFA = Q x Sigma* *)
 Definition Konf_DFA := Q * (list Sigma) : Type.
+Print Konf_DFA.
 
 (* Konfigurationsübergangsrelation *)
 (* brauchen boolsche Gleichheit über Q *)
 Parameter eq_Q : Q -> Q -> bool.
+
 Inductive Konf_rel_DFA_Schritt (x : Konf_DFA) (y : Konf_DFA) : Type :=
-  | irgendwie : forall (q : Q) (p : Q) (a : Sigma) (w : list Sigma), (delta q a) = p.
+  | irgendwie : forall (q : Q) (p : Q) (a : Sigma) (w : list Sigma), Konf_rel_DFA_Schritt (q, a w) -> (p w).
 
 End Definitions.
