@@ -66,7 +66,13 @@ Print Konf_DFA.
 (* brauchen boolsche Gleichheit über Q *)
 Parameter eq_Q : Q -> Q -> bool.
 
+Print cons.
+
 Inductive Konf_rel_DFA_Schritt (x : Konf_DFA) (y : Konf_DFA) : Type :=
-  | irgendwie : forall (q : Q) (p : Q) (a : Sigma) (w : list Sigma), Konf_rel_DFA_Schritt (q, a w) -> (p w).
+ (* | sowarsgedacht : forall (q : Q) (p : Q) (a : Sigma) (w : list Sigma) (eq : (delta q a) = p), Konf_rel_DFA_Schritt (q, (cons a w)) (p, w). *)
+  | step : forall (a : Sigma), 
+           (delta (fst x) a = fst y) -> (snd x = cons a (snd y)) -> 
+              Konf_rel_DFA_Schritt x y.
+
 
 End Definitions.
