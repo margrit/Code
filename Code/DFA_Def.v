@@ -61,12 +61,26 @@ Definition accepted_word (w : list Sigma) :=
 (* Typ der Konfigurationen eines DFA, Konf_DFA = Q x Sigma* *)
 Definition Konf_DFA := Q * (list Sigma) : Type.
 Print Konf_DFA.
+Print cons.
+Print fst.
 
 (* Konfigurationsübergangsrelation *)
-(* brauchen boolsche Gleichheit über Q *)
-Parameter eq_Q : Q -> Q -> bool.
 
-Inductive Konf_rel_DFA_Schritt (x : Konf_DFA) (y : Konf_DFA) : Type :=
-  | irgendwie : forall (q : Q) (p : Q) (a : Sigma) (w : list Sigma), Konf_rel_DFA_Schritt (q, a w) -> (p w).
+Inductive Konf_rel_DFA_Schritt : Konf_DFA -> Konf_DFA -> Type :=
+ | sowarsgedacht : forall (q : Q) (p : Q) (a : Sigma) (w : list Sigma) (eq : (delta q a) = p), 
+                                    Konf_rel_DFA_Schritt (q, (cons a w)) (p, w).
+
+(* Tip: Das wird die reflexiv-transitive
+Hülle von Konf_rel_DFA_Schritt, Du brauchst also 3 Konstruktoren (einen
+für "Konf_rel_DFA_Schritt ist drin", einen für "ist reflexiv" und
+einen für "ist transitiv"...
+*)
+
+Inductive Konf_rel_DFA : Konf_DFA -> Konf_DFA -> Type :=
+  | refl    : forall (K : Konf_DFA), Konf_rel_DFA K K
+  | step  : forall (K L M : Konf_DFA),
+                                    Konf_rel_DFA K L ->
+                                    Konf_rel_DFA_Schritt L M ->
+                                    Konf_rel_DFA K M.
 
 End Definitions.
