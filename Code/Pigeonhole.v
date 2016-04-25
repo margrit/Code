@@ -37,7 +37,7 @@ Defined.
 Print projT2.
 Print projT1.
 
-Theorem fin_eq_dec : forall n : nat, forall a b : Finite_Set n, decidable (a = b).
+Theorem fin_eq_dec : forall n : nat, forall a b : @Fin.t n, decidable (a = b).
 Proof.
 intros.
 induction n.
@@ -57,39 +57,12 @@ induction n.
       reflexivity.
     * right.
       simplify_eq.
-      contradict H.
-      apply eq_app_dep with (f := projT2).
-      injection H0.
-      
-
-      inversion H.
-      injection H.
-      intros.
-      injection H0.
-      discriminate.
-
-unfold decidable in IHn.
-apply IHn.
-
-dependent destruction a; dependent destruction b.
-unfold decidable.
- left.
- reflexivity.
- unfold decidable.
- right.
- discriminate.
- unfold decidable.
- right.
-discriminate.
-induction n.
-  + inversion a.
-  + unfold decidable.
-     
-
+      dependent destruction H0.
+      destruct H.
+      reflexivity.
+Defined.
 
 Theorem dec_appears_in : forall a : Q, forall l : list Q, decidable (appears_in a l).
-Proof.
-intros.
 
 Theorem appears_in_Q_size_eq_length 
 
