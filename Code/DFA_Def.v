@@ -88,17 +88,22 @@ Print option.
 (*nextConf*)
 Fixpoint nextConf  (conf : Konf_DFA) : option Konf_DFA :=
   match conf with
-    | (q, nil)            => None
+    | (q, nil)      => None
     | (q, cons a w) => Some (delta q a, w)
   end.
 
 (*Kunfigurationssequenz in einer Liste speichern.*)
-Fixpoint conf_Sequenz (conf : Konf_DFA) : list Konf_DFA :=
-  match conf with
-    | (q, nil)            => cons (q, nil) nil
-    | (q, cons a w) => cons (q, cons a w) (conf_Sequenz ((delta q a), w)
+Fixpoint conf_Sequenz' (w : list Sigma) : Q -> list Konf_DFA :=
+  match w with
+    | nil       => fun q : Q => cons (q, nil) nil
+    | cons a w  => fun q : Q => cons (q, nil) (conf_Sequenz' w (delta q a))
   end.
 
+Fixpoint conf_Sequenz (conf : Konf_DFA) : list Konf_DFA :=
+  match conf with
+    | (q, w) => conf_Sequenz' w q
+  end.
+ 
 (*Inductive conf_Sequenz Konf_DFA : list Konf_DFA -> Type :=
     | nil : (q, nil)               -> (q, nil) + nil
     | step : (q, cons a w) -> q cons a w cons conf_Sequenz (delta q a) w.
