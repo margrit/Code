@@ -93,7 +93,7 @@ Fixpoint nextConf  (conf : Konf_DFA) : option Konf_DFA :=
   end.
 
 (*Kunfigurationssequenz in einer Liste speichern.*)
-Inductive conf_Sequenz :  Konf_DFA -> Q -> list Sigma -> list Konf_DFA :=
+Inductive conf_Sequenz : Konf_DFA -> Konf_DFA -> list Konf_DFA -> Type:=
     | nil    : (q, nil) -> (q, nil) cons nil
     | step : (q cons a w) -> q cons a w cons conf_Sequenz (delta q a) w.
 
