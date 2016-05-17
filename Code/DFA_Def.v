@@ -19,7 +19,6 @@
 Require Import Fin.
 Require Import Arith.
 
-
 Section Definitions.
 
 (* Anzahl der moeglichen Zustaende *)
@@ -45,18 +44,18 @@ Parameter q0 : Q.
 
 (* Um zu definieren, wann ein Wort akzeptiert wird, muessen noch 
 einige Vorueberlegungen getroffen werden. Hierzu braucht man die 
-erweiterte Transitionsfunktion delta_dach. *)
+erweiterte Transitionsfunktion delta_hat. *)
 Print cons.
-(* Erweiterte Überführungsfunktion - delta_dach *)
-Fixpoint delta_dach (q : Q) (wort : list Sigma) : Q :=
-  match wort with
+(* Erweiterte Überführungsfunktion - delta_hat *)
+Fixpoint delta_hat (q : Q) (word : list Sigma) : Q :=
+  match word with
     | nil                  => q
-    | cons h wort1 => delta_dach (delta q h) wort1
+    | cons h word1 => delta_hat (delta q h) word1
   end.
 
 (* Definiert, wann ein Wort akzeptiert wird. *)
 Definition accepted_word (w : list Sigma) :=
-  is_accepting (delta_dach q0 w).
+  is_accepting (delta_hat q0 w).
 
 (* Typ der Konfigurationen eines DFA, Konf_DFA = Q x Sigma* *)
 Definition Konf_DFA := Q * (list Sigma) : Type.
@@ -66,21 +65,55 @@ Print fst.
 
 (* Konfigurationsübergangsrelation *)
 
-Inductive Konf_rel_DFA_Schritt : Konf_DFA -> Konf_DFA -> Type :=
- | sowarsgedacht : forall (q : Q) (p : Q) (a : Sigma) (w : list Sigma) (eq : (delta q a) = p), 
-                                    Konf_rel_DFA_Schritt (q, (cons a w)) (p, w).
+Inductive Konf_DFA_step : Konf_DFA -> Konf_DFA -> Type :=
+ | one_step : forall (q : Q) (p : Q) (a : Sigma) (w : list Sigma) (eq : (delta q a) = p), 
+                                    Konf_DFA_step (q, (cons a w)) (p, w).
 
 (* Tip: Das wird die reflexiv-transitive
-Hülle von Konf_rel_DFA_Schritt, Du brauchst also 3 Konstruktoren (einen
-für "Konf_rel_DFA_Schritt ist drin", einen für "ist reflexiv" und
+Hülle von Konf_rel_DFA_step, Du brauchst also 3 Konstruktoren (einen
+für "Konf_rel_DFA_step ist drin", einen für "ist reflexiv" und
 einen für "ist transitiv"...
 *)
 
+(*K ext_conf M <=> K = M oder ex L mit K ext_conf L und L conf_step M*)
 Inductive Konf_rel_DFA : Konf_DFA -> Konf_DFA -> Type :=
   | refl    : forall (K : Konf_DFA), Konf_rel_DFA K K
   | step  : forall (K L M : Konf_DFA),
                                     Konf_rel_DFA K L ->
-                                    Konf_rel_DFA_Schritt L M ->
+                                    Konf_DFA_step L M ->
                                     Konf_rel_DFA K M.
 
+Print option.
+
+(*nextConf*)
+Fixpoint nextConf  (conf : Konf_DFA) : option Konf_DFA :=
+  match conf with
+    | (q, nil)            => None
+    | (q, cons a w) => Some (delta q a, w)
+  end.
+
+(*
+> nextConf : {a, s : Type} -> DSM a s -> DSMConf a s -> Maybe (DSMConf a s)
+> nextConf ts (state, Nil)      = Nothing
+> nextConf ts (state, (a::as))  = Just (transFun ts state a, as)
+*)
+
+Inductive conf_Sequenz : Konf_DFA -> Q -> list Sigma -> list Konf_DFA :=
+    | nil    : forall (q, nil), (q, nil)
+    | step : forall (q, cons a w), q cons a w cons conf_Sequenz (delta q a) w.
+
+> confSequence : {a, s : Type} -> DSM a s -> s -> List a -> List (DSMConf a s)
+> confSequence ts state Nil     = (state, Nil) :: Nil
+> confSequence ts state (a::as) = (state, (a::as)) :: confSequence ts (transFun ts state a) as
+
+(*Definition der akzeptierten Sprache*)
+Definition L_DFA (w : list Sigma) : Konf_DFA:=
+exists p : Q, Konf_rel_DFA (q0 , w) (p, nil).
+
+(*Definition accepted_word (w : list Sigma) :=
+  is_accepting (delta_hat q0 w).
+Parameter is_accepting : Q -> bool.
+*)
+
 End Definitions.
+

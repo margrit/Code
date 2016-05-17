@@ -1,7 +1,7 @@
 
 (* Erweiterte Überführungsfunktion über *)
-Theorem delta_dach_append : forall (xs : list Sigma) (ys : list Sigma) (q : Q),
-  delta_dach q (xs ++ ys) = delta_dach (delta_dach q xs) ys.
+Theorem delta_hat_append : forall (xs : list Sigma) (ys : list Sigma) (q : Q),
+  delta_hat q (xs ++ ys) = delta_hat (delta_hat q xs) ys.
 Proof.
   induction xs.
   - simpl.
