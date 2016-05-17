@@ -92,24 +92,15 @@ Fixpoint nextConf  (conf : Konf_DFA) : option Konf_DFA :=
     | (q, cons a w) => Some (delta q a, w)
   end.
 
-(*
-> nextConf : {a, s : Type} -> DSM a s -> DSMConf a s -> Maybe (DSMConf a s)
-> nextConf ts (state, Nil)      = Nothing
-> nextConf ts (state, (a::as))  = Just (transFun ts state a, as)
-*)
+(*Kunfigurationssequenz in einer Liste speichern.*)
+Inductive conf_Sequenz :  Konf_DFA -> Q -> list Sigma -> list Konf_DFA :=
+    | nil    : (q, nil) -> (q, nil) cons nil
+    | step : (q cons a w) -> q cons a w cons conf_Sequenz (delta q a) w.
 
-Inductive conf_Sequenz : Konf_DFA -> Q -> list Sigma -> list Konf_DFA :=
-    | nil    : forall (q, nil), (q, nil)
-    | step : forall (q, cons a w), q cons a w cons conf_Sequenz (delta q a) w.
-
-> confSequence : {a, s : Type} -> DSM a s -> s -> List a -> List (DSMConf a s)
-> confSequence ts state Nil     = (state, Nil) :: Nil
-> confSequence ts state (a::as) = (state, (a::as)) :: confSequence ts (transFun ts state a) as
-
-(*Definition der akzeptierten Sprache*)
+(*Definition der akzeptierten Sprache
 Definition L_DFA (w : list Sigma) : Konf_DFA:=
 exists p : Q, Konf_rel_DFA (q0 , w) (p, nil).
-
+*)
 (*Definition accepted_word (w : list Sigma) :=
   is_accepting (delta_hat q0 w).
 Parameter is_accepting : Q -> bool.
