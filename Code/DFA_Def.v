@@ -92,22 +92,46 @@ Fixpoint nextConf  (conf : Konf_DFA) : option Konf_DFA :=
     | (q, cons a w) => Some (delta q a, w)
   end.
 
-(*Kunfigurationssequenz in einer Liste speichern.*)
+(*Konfigurationssequenz in einer Liste speichern.*)
 Fixpoint conf_Sequenz' (w : list Sigma) : Q -> list Konf_DFA :=
   match w with
     | nil       => fun q : Q => cons (q, nil) nil
-    | cons a w  => fun q : Q => cons (q, nil) (conf_Sequenz' w (delta q a))
+    | cons a w'  => fun q : Q => cons (q, nil) (conf_Sequenz' w' (delta q a))
   end.
+
+(* aber im 2. Fall muss (q, w) zur Liste hinzugefuegt werden, oder? *)
 
 Fixpoint conf_Sequenz (conf : Konf_DFA) : list Konf_DFA :=
   match conf with
     | (q, w) => conf_Sequenz' w q
   end.
- 
-(*Inductive conf_Sequenz Konf_DFA : list Konf_DFA -> Type :=
-    | nil : (q, nil)               -> (q, nil) + nil
-    | step : (q, cons a w) -> q cons a w cons conf_Sequenz (delta q a) w.
-*)
+
+(* Ich habe auch nichts wirklich Besseres zu bieten. Man koennte vermutlich einen
+   anonymen Fixpunkt benutzen, aber dadurch wird es nicht lesbarer und 
+   ich sehe auch sonst keinen Vorteil.
+   Die "Wrapper" Funktion muss dann natuerlich kein Fixpunkt sein. *)
+
+(* Und wie waere es, auch "word" zu definieren? *)
+
+(* Anonsten: Ich denke, um solch eine Konfigurationsliste aufzubauen, 
+   ist ein Fixpunkt wirklich sinnvoller als eine induktive Definition. 
+   (Falls das noch zur Debatte stand.) *)
+
+Definition word := list Sigma.
+
+Definition emtptyW := @nil Sigma. 
+Definition concatW := @cons Sigma.
+
+Fixpoint conf_list (w : word) (q : Q) : list Konf_DFA :=
+ let conf := (q, w) in
+  match w with
+    | nil        => cons conf nil
+    | cons a w'  => cons conf (conf_list w' (delta q a))
+  end.
+
+Definition conf_to_conf_list (conf : Konf_DFA) : list Konf_DFA :=
+  let (q, w) := conf in conf_list w q.
+
 
 (*Definition der akzeptierten Sprache
 Definition L_DFA (w : list Sigma) : Konf_DFA:=
