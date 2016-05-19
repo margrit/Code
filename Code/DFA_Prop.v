@@ -49,4 +49,4 @@ Inductive Konf_rel_DFA_bool : Konf_DFA -> (Konf_DFA -> Prop) :=
 Theorem Konf_eq : forall (conf: Konf_DFA), Konf_DFA_step_bool -> Konf_DFA_step.
 Proof.
 intros.
-destruct Konf_DFA_step.
+

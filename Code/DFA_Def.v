@@ -88,22 +88,23 @@ Print option.
 (*nextConf*)
 Fixpoint nextConf  (conf : Konf_DFA) : option Konf_DFA :=
   match conf with
-    | (q, nil)      => None
+    | (q, nil)            => None
     | (q, cons a w) => Some (delta q a, w)
   end.
 
 (*Konfigurationssequenz in einer Liste speichern.*)
-Fixpoint conf_Sequenz' (w : list Sigma) : Q -> list Konf_DFA :=
+Fixpoint conf_seq' (w : list Sigma) : Q -> list Konf_DFA :=
   match w with
-    | nil       => fun q : Q => cons (q, nil) nil
-    | cons a w'  => fun q : Q => cons (q, nil) (conf_Sequenz' w' (delta q a))
+    | nil             => fun q : Q => cons (q, nil) nil
+    | cons a w'  => fun q : Q => cons (q, w) (conf_seq' w' (delta q a))
   end.
 
+Print conf_seq'.
 (* aber im 2. Fall muss (q, w) zur Liste hinzugefuegt werden, oder? *)
 
-Fixpoint conf_Sequenz (conf : Konf_DFA) : list Konf_DFA :=
+Fixpoint conf_seq (conf : Konf_DFA) : list Konf_DFA :=
   match conf with
-    | (q, w) => conf_Sequenz' w q
+    | (q, w) => conf_seq' w q
   end.
 
 (* Ich habe auch nichts wirklich Besseres zu bieten. Man koennte vermutlich einen
@@ -111,21 +112,15 @@ Fixpoint conf_Sequenz (conf : Konf_DFA) : list Konf_DFA :=
    ich sehe auch sonst keinen Vorteil.
    Die "Wrapper" Funktion muss dann natuerlich kein Fixpunkt sein. *)
 
-(* Und wie waere es, auch "word" zu definieren? *)
-
-(* Anonsten: Ich denke, um solch eine Konfigurationsliste aufzubauen, 
-   ist ein Fixpunkt wirklich sinnvoller als eine induktive Definition. 
-   (Falls das noch zur Debatte stand.) *)
-
 Definition word := list Sigma.
 
-Definition emtptyW := @nil Sigma. 
+Definition emtptyW := @nil Sigma.
 Definition concatW := @cons Sigma.
 
 Fixpoint conf_list (w : word) (q : Q) : list Konf_DFA :=
  let conf := (q, w) in
   match w with
-    | nil        => cons conf nil
+    | nil             => cons conf nil
     | cons a w'  => cons conf (conf_list w' (delta q a))
   end.
 

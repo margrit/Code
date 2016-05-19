@@ -190,3 +190,6 @@ Proof.
   rewrite e.  
   assumption.
 Defined.
+
+Print eqb.
+Print Nat.eqb.
