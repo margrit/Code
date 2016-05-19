@@ -1,0 +1,11 @@
+Allgemein in englisch
+-----------
+Konf_DFA -> Conf_DFA
+Funktionen klein mit _
+Typen Groß
+-----------
+iso delta_hat snoc / cons (als mögliche Hausaufgabe)
+(i)   induktiven Type word definieren mit concat und so
+(ii)  list to word & word from list
+(iii) Beweis:  forall w:word fromlist (tolist w) = w
+                    forall l:list tolist (fromlist l) = l
