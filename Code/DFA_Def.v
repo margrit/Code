@@ -44,18 +44,26 @@ Parameter q0 : Q.
 
 (* Um zu definieren, wann ein Wort akzeptiert wird, muessen noch 
 einige Vorueberlegungen getroffen werden. Hierzu braucht man die 
-erweiterte Transitionsfunktion delta_hat. *)
-Print cons.
+erweiterte Transitionsfunktion delta_hat_cons. *)
+
 (* Erweiterte Überführungsfunktion - delta_hat *)
-Fixpoint delta_hat (q : Q) (word : list Sigma) : Q :=
+Fixpoint delta_hat_cons (q : Q) (word : list Sigma) : Q :=
   match word with
     | nil                  => q
-    | cons h word1 => delta_hat (delta q h) word1
+    | cons h word1 => delta_hat_cons (delta q h) word1
   end.
+
+(*delta_hat_snoc, wie in der Vorlesung definiert* -- noch fehlerhaft, weil snoc nicht definiert.*)
+(*Fixpoint delta_hat_snoc (q : Q) (word : list Sigma) : Q :=
+  match word with
+    | nil                   => q
+    | snoc word1 h => delta_hat_snoc (delta q h) word1
+  end.
+*)
 
 (* Definiert, wann ein Wort akzeptiert wird. *)
 Definition accepted_word (w : list Sigma) :=
-  is_accepting (delta_hat q0 w).
+  is_accepting (delta_hat_cons q0 w).
 
 (* Typ der Konfigurationen eines DFA, Conf_DFA = Q x Sigma* *)
 Definition Conf_DFA := Q * (list Sigma) : Type.
@@ -65,6 +73,7 @@ Print fst.
 
 (* Konfigurationsübergangsrelation *)
 
+(* Ein einzelner Konfigurationsschritt. *)
 Inductive Conf_DFA_step : Conf_DFA -> Conf_DFA -> Type :=
  | one_step : forall (q : Q) (p : Q) (a : Sigma) (w : list Sigma) (eq : (delta q a) = p), 
                                     Conf_DFA_step (q, (cons a w)) (p, w).

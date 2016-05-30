@@ -8,3 +8,7 @@ iso delta_hat snoc / cons (als mögliche Hausaufgabe)
 (ii)  list to word & word from list
 (iii) Beweis:  forall w:word fromlist (tolist w) = w
                     forall l:list tolist (fromlist l) = l
+
+Danach könntest Du (mit Hilfe von word_reverse und rev) andere
+list_to_word' und word_to_list' definieren und analoge Beweise
+word_to_word' und list_to_list' führen.

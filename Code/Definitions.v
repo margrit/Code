@@ -40,8 +40,6 @@ einige Vorueberlegungen getroffen werden. Hierzu braucht man die
 erweiterte Transitionsfunktion ext.
 accepted_word (w : list Sigma) := is_accepting (ext q0 w). *)
 
-
-
 (* Erweiterte Transitionsfunktion - ext *)
 Fixpoint ext (q : Q) (l : list Sigma) : Q :=
   match l with
