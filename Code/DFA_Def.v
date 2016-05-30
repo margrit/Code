@@ -57,43 +57,43 @@ Fixpoint delta_hat (q : Q) (word : list Sigma) : Q :=
 Definition accepted_word (w : list Sigma) :=
   is_accepting (delta_hat q0 w).
 
-(* Typ der Konfigurationen eines DFA, Konf_DFA = Q x Sigma* *)
-Definition Konf_DFA := Q * (list Sigma) : Type.
-Print Konf_DFA.
+(* Typ der Konfigurationen eines DFA, Conf_DFA = Q x Sigma* *)
+Definition Conf_DFA := Q * (list Sigma) : Type.
+Print Conf_DFA.
 Print cons.
 Print fst.
 
 (* Konfigurationsübergangsrelation *)
 
-Inductive Konf_DFA_step : Konf_DFA -> Konf_DFA -> Type :=
+Inductive Conf_DFA_step : Conf_DFA -> Conf_DFA -> Type :=
  | one_step : forall (q : Q) (p : Q) (a : Sigma) (w : list Sigma) (eq : (delta q a) = p), 
-                                    Konf_DFA_step (q, (cons a w)) (p, w).
+                                    Conf_DFA_step (q, (cons a w)) (p, w).
 
 (* Tip: Das wird die reflexiv-transitive
-Hülle von Konf_rel_DFA_step, Du brauchst also 3 Konstruktoren (einen
-für "Konf_rel_DFA_step ist drin", einen für "ist reflexiv" und
+Hülle von Conf_rel_DFA_step, Du brauchst also 3 Konstruktoren (einen
+für "Conf_rel_DFA_step ist drin", einen für "ist reflexiv" und
 einen für "ist transitiv"...
 *)
 
 (*K ext_conf M <=> K = M oder ex L mit K ext_conf L und L conf_step M*)
-Inductive Konf_rel_DFA : Konf_DFA -> Konf_DFA -> Type :=
-  | refl    : forall (K : Konf_DFA), Konf_rel_DFA K K
-  | step  : forall (K L M : Konf_DFA),
-                                    Konf_rel_DFA K L ->
-                                    Konf_DFA_step L M ->
-                                    Konf_rel_DFA K M.
+Inductive Conf_rel_DFA : Conf_DFA -> Conf_DFA -> Type :=
+  | refl    : forall (K : Conf_DFA), Conf_rel_DFA K K
+  | step  : forall (K L M : Conf_DFA),
+                                    Conf_rel_DFA K L ->
+                                    Conf_DFA_step L M ->
+                                    Conf_rel_DFA K M.
 
 Print option.
 
 (*nextConf*)
-Fixpoint nextConf  (conf : Konf_DFA) : option Konf_DFA :=
+Fixpoint nextConf  (conf : Conf_DFA) : option Conf_DFA :=
   match conf with
     | (q, nil)            => None
     | (q, cons a w) => Some (delta q a, w)
   end.
 
 (*Konfigurationssequenz in einer Liste speichern.*)
-Fixpoint conf_seq' (w : list Sigma) : Q -> list Konf_DFA :=
+Fixpoint conf_seq' (w : list Sigma) : Q -> list Conf_DFA :=
   match w with
     | nil             => fun q : Q => cons (q, nil) nil
     | cons a w'  => fun q : Q => cons (q, w) (conf_seq' w' (delta q a))
@@ -102,7 +102,7 @@ Fixpoint conf_seq' (w : list Sigma) : Q -> list Konf_DFA :=
 Print conf_seq'.
 (* aber im 2. Fall muss (q, w) zur Liste hinzugefuegt werden, oder? *)
 
-Fixpoint conf_seq (conf : Konf_DFA) : list Konf_DFA :=
+Fixpoint conf_seq (conf : Conf_DFA) : list Conf_DFA :=
   match conf with
     | (q, w) => conf_seq' w q
   end.
@@ -117,20 +117,26 @@ Definition word := list Sigma.
 Definition emtptyW := @nil Sigma.
 Definition concatW := @cons Sigma.
 
-Fixpoint conf_list (w : word) (q : Q) : list Konf_DFA :=
+Fixpoint conf_list (w : word) (q : Q) : list Conf_DFA :=
  let conf := (q, w) in
   match w with
     | nil             => cons conf nil
     | cons a w'  => cons conf (conf_list w' (delta q a))
   end.
 
-Definition conf_to_conf_list (conf : Konf_DFA) : list Konf_DFA :=
+Definition conf_to_conf_list (conf : Conf_DFA) : list Conf_DFA :=
   let (q, w) := conf in conf_list w q.
 
+Print list.
+
+(*Definition eines induktiven Datentyps, der Wörter beschreibt.*)
+Inductive Word (S : Sigma) : Type :=
+| empty_Word : Word S
+| cons_Word : Word S -> Word S -> Word S.
 
 (*Definition der akzeptierten Sprache
-Definition L_DFA (w : list Sigma) : Konf_DFA:=
-exists p : Q, Konf_rel_DFA (q0 , w) (p, nil).
+Definition L_DFA (w : list Sigma) : Conf_DFA:=
+exists p : Q, Conf_rel_DFA (q0 , w) (p, nil).
 *)
 (*Definition accepted_word (w : list Sigma) :=
   is_accepting (delta_hat q0 w).

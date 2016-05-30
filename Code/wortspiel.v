@@ -20,24 +20,27 @@ end.
 
 Eval compute in (concat (snoc (snoc (snoc eps h) a) l) (snoc (snoc eps l) o)).
 
-
-
 (* Zur Uebung: *)
 
 (* Berechnung der Wortlaenge *)
 
 Fixpoint word_length {A : Type} (w : @word A) : nat :=
 match w with
-| eps => (* TODO *)
-| snoc w' x => (* TODO *)
+| eps => 0
+| snoc w' x => S (word_length w')
 end.
 
- 
+Eval compute in (word_length (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
+
 (* Ein Wort umdrehen: *)
 
 Fixpoint word_reverse {A : Type} (w : @word A) : @word A  :=
-(* TODO *)
-.
+match w with
+| eps => eps
+| snoc w' x =>  cons x (word_reverse w')
+end.
+
+Eval compute in (word_reverse (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
 
 (* Ein Wort in eine Liste umwandeln: *)
 
