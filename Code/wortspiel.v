@@ -26,7 +26,7 @@ Eval compute in (concat (snoc (snoc (snoc eps h) a) l) (snoc (snoc eps l) o)).
 
 Fixpoint word_length {A : Type} (w : @word A) : nat :=
 match w with
-| eps => 0
+| eps          => 0
 | snoc w' x => S (word_length w')
 end.
 
@@ -34,27 +34,33 @@ Eval compute in (word_length (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
 
 (* Ein Wort umdrehen: *)
 
-Fixpoint word_reverse {A : Type} (w : @word A) : @word A  :=
+(*Fixpoint word_reverse {A : Type} (w : @word A) : @word A  :=
 match w with
-| eps => eps
-| snoc w' x =>  cons x (word_reverse w')
+| eps           => eps
+| snoc w' x  =>  cons x (word_reverse w')
 end.
 
 Eval compute in (word_reverse (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
-
+*)
 (* Ein Wort in eine Liste umwandeln: *)
 
 Fixpoint word_to_list {A : Type} (w : @word A) : list A :=
-(* TODO *)
-.
+match w with
+| eps           => nil
+| snoc w' x  => cons x (word_to_list w')
+end.
 
+Eval compute in (word_to_list (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
 
 (* Eine Liste in ein Wort umwandeln: *)
 
 Fixpoint list_to_word {A : Type} (l : list A) : @word A :=
-(* TODO *)
-.
+match l with
+| nil           => eps
+| cons x l'  => snoc (list_to_word l') x
+end.
 
+Eval compute in (list_to_word (cons h(cons a(cons l nil)))).
 
 (* Isomorphie zwischen Woertern und Listen: *)
 
