@@ -48,7 +48,13 @@ Require Import List.
 Fixpoint word_to_list {A : Type} (w : @word A) : list A :=
 match w with
 | eps           => nil
-| snoc w' x  => rev (cons x (word_to_list w'))
+| snoc w' x  => cons x (word_to_list w')
+end.
+
+Fixpoint rev_word_to_list {A : Type} (w : @word A) : list A :=
+match w with
+| eps           => nil
+| snoc w' x  => rev (cons x (rev_word_to_list w'))
 end.
 
 Eval compute in (word_to_list (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
@@ -67,11 +73,20 @@ Eval compute in (list_to_word (cons h(cons a(cons l nil)))).
 
 Lemma list_word_list {A : Type} (l : list A) : word_to_list (list_to_word l) = l.
 Proof.
-admit.
-Admitted.
-
+induction l.
+  - simpl.
+    reflexivity.
+  - simpl.
+    rewrite IHl.
+    reflexivity.
+Qed.
 
 Lemma word_list_word {A : Type} (w : @word A) : list_to_word (word_to_list w) = w.
 Proof.
-admit.
-Admitted. 
+induction w.
+  - simpl.
+    reflexivity.
+  - simpl.
+    rewrite IHw.
+    reflexivity.
+Qed.
