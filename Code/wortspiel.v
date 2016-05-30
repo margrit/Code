@@ -42,12 +42,13 @@ end.
 
 Eval compute in (word_reverse (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
 
+Require Import List.
 (* Ein Wort in eine Liste umwandeln: *)
 
 Fixpoint word_to_list {A : Type} (w : @word A) : list A :=
 match w with
 | eps           => nil
-| snoc w' x  => cons x (word_to_list w')
+| snoc w' x  => rev (cons x (word_to_list w'))
 end.
 
 Eval compute in (word_to_list (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
