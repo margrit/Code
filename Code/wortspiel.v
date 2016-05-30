@@ -34,14 +34,14 @@ Eval compute in (word_length (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
 
 (* Ein Wort umdrehen: *)
 
-(*Fixpoint word_reverse {A : Type} (w : @word A) : @word A  :=
+Fixpoint word_reverse {A : Type} (w : @word A) : @word A  :=
 match w with
 | eps           => eps
-| snoc w' x  =>  cons x (word_reverse w')
+| snoc w' x  => concat (snoc eps x) (word_reverse w')
 end.
 
 Eval compute in (word_reverse (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
-*)
+
 (* Ein Wort in eine Liste umwandeln: *)
 
 Fixpoint word_to_list {A : Type} (w : @word A) : list A :=
