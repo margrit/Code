@@ -23,7 +23,6 @@ Eval compute in (concat (snoc (snoc (snoc eps h) a) l) (snoc (snoc eps l) o)).
 (* Zur Uebung: *)
 
 (* Berechnung der Wortlaenge *)
-
 Fixpoint word_length {A : Type} (w : @word A) : nat :=
 match w with
 | eps          => 0
@@ -33,7 +32,6 @@ end.
 Eval compute in (word_length (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
 
 (* Ein Wort umdrehen: *)
-
 Fixpoint word_reverse {A : Type} (w : @word A) : @word A  :=
 match w with
 | eps           => eps
@@ -42,25 +40,16 @@ end.
 
 Eval compute in (word_reverse (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
 
-Require Import List.
 (* Ein Wort in eine Liste umwandeln: *)
-
 Fixpoint word_to_list {A : Type} (w : @word A) : list A :=
 match w with
 | eps           => nil
 | snoc w' x  => cons x (word_to_list w')
 end.
 
-Fixpoint rev_word_to_list {A : Type} (w : @word A) : list A :=
-match w with
-| eps           => nil
-| snoc w' x  => rev (cons x (rev_word_to_list w'))
-end.
-
 Eval compute in (word_to_list (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
 
 (* Eine Liste in ein Wort umwandeln: *)
-
 Fixpoint list_to_word {A : Type} (l : list A) : @word A :=
 match l with
 | nil           => eps
@@ -90,3 +79,25 @@ induction w.
     rewrite IHw.
     reflexivity.
 Qed.
+
+Require Import List.
+
+Print rev.
+
+(*Ein Wort in eine Liste umwandeln unter Beachtung der Reihenfolge.*)
+Fixpoint word_to_list' {A : Type} (w : @word A) : list A :=
+match w with
+| eps           => nil
+| snoc w' x  => rev (cons x (word_to_list' w'))
+end.
+
+Eval compute in (word_to_list (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
+
+(*Eine Liste in ein Wort umwandeln unter Beachtung der Reihenfolge.*)
+Fixpoint list_to_word' {A : Type} (l : list A) : @word A :=
+match l with
+| nil           => eps
+| cons x l'  => word_reverse (snoc (list_to_word' l') x)
+end.
+
+Eval compute in (list_to_word (cons h(cons a(cons l nil)))).
