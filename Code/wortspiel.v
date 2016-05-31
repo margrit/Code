@@ -87,6 +87,8 @@ Print rev.
 (*Ein Wort in eine Liste umwandeln unter Beachtung der Reihenfolge.*)
 Definition word_to_list'' {A : Type} (w : @word A) : list A := rev (word_to_list w).
 Eval compute in (word_to_list'' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
+Definition word_to_list''' {A : Type} (w : @word A) : list A := word_to_list (word_reverse w).
+Eval compute in (word_to_list''' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
 
 Fixpoint word_to_list' {A : Type} (w : @word A) : list A :=
 match w with
@@ -99,6 +101,8 @@ Eval compute in (word_to_list' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o))
 (*Eine Liste in ein Wort umwandeln unter Beachtung der Reihenfolge.*)
 Definition list_to_word'' {A : Type} (l : list A) : @word A := word_reverse (list_to_word l).
 Eval compute in (list_to_word'' (cons h(cons a(cons l nil)))).
+Definition list_to_word''' {A : Type} (l : list A) : @word A := list_to_word (rev l).
+Eval compute in (list_to_word''' (cons h(cons a(cons l nil)))).
 
 Fixpoint list_to_word' {A : Type} (l : list A) : @word A :=
 match l with
@@ -108,12 +112,14 @@ end.
 
 Eval compute in (list_to_word' (cons h(cons a(cons l nil)))).
 
+Print rev.
+
 Lemma rev_rev {A : Type} (l : list A) : rev ( rev l) = l.
 Proof.
 induction l.
   - simpl.
     reflexivity.
-  -
+  - 
     
 
 Lemma w_rev_w_rev  {A : Type} (w : @word A) : word_reverse (word_reverse w) = w.
