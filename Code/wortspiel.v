@@ -107,3 +107,13 @@ match l with
 end.
 
 Eval compute in (list_to_word' (cons h(cons a(cons l nil)))).
+
+Lemma list_word_list'' {A : Type} (l : list A) : word_to_list'' (list_to_word'' l) = l.
+Proof.
+unfold word_to_list''.
+induction l.
+  - simpl.
+    reflexivity.
+  -
+
+Lemma word_list_word'' {A : Type} (w : @word A) : list_to_word'' (word_to_list'' w) = w.
