@@ -108,14 +108,22 @@ end.
 
 Eval compute in (list_to_word' (cons h(cons a(cons l nil)))).
 
+Lemma rev_rev {A : Type} (l : list A) : rev ( rev l) = l.
+Proof.
+induction l.
+  - simpl.
+    reflexivity.
+  -
+    
+
+Lemma w_rev_w_rev  {A : Type} (w : @word A) : word_reverse (word_reverse w) = w.
+
+
 (*Nach Definition von word_to_list'' - ergo albern*)
 Lemma rev_word_to_list {A : Type} (w : @word A) : rev (word_to_list w) = word_to_list'' w.
 Proof.
 unfold word_to_list''.
-induction w.
-  - simpl.
-    reflexivity.
-  - reflexivity.
+reflexivity.
 Qed.
 
 Lemma list_word_list'' {A : Type} (l : list A) : word_to_list'' (list_to_word'' l) = l.
@@ -124,6 +132,8 @@ unfold word_to_list''.
 induction l.
   - simpl.
     reflexivity.
-  - apply word_to_list''.
+  - unfold list_to_word''.
+    unfold list_to_word'' in IHl.
+
 
 Lemma word_list_word'' {A : Type} (w : @word A) : list_to_word'' (word_to_list'' w) = w.
