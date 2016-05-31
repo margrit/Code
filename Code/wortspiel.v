@@ -91,7 +91,7 @@ match w with
 | snoc w' x  => rev (cons x (word_to_list' w'))
 end.
 
-Eval compute in (word_to_list (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
+Eval compute in (word_to_list' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
 
 (*Eine Liste in ein Wort umwandeln unter Beachtung der Reihenfolge.*)
 Fixpoint list_to_word' {A : Type} (l : list A) : @word A :=
@@ -100,4 +100,4 @@ match l with
 | cons x l'  => word_reverse (snoc (list_to_word' l') x)
 end.
 
-Eval compute in (list_to_word (cons h(cons a(cons l nil)))).
+Eval compute in (list_to_word' (cons h(cons a(cons l nil)))).
