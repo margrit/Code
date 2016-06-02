@@ -12,14 +12,30 @@ Print list.
 Print word.
 
 
-Fixpoint concat {A : Type} (w1 w2 : @word A) : @word A :=
+Fixpoint concat_word {A : Type} (w1 w2 : @word A) : @word A :=
 match w2 with 
 | eps => w1
-| snoc w x => snoc (concat w1 w) x
+| snoc w x => snoc (concat_word w1 w) x
 end.
 
-Eval compute in (concat (snoc (snoc (snoc eps h) a) l) (snoc (snoc eps l) o)).
+Eval compute in (concat_word (snoc (snoc (snoc eps h) a) l) (snoc (snoc eps l) o)).
+Print "++".
+(*Eigenschaften von concat_word*)
+Lemma concat_word_nil {A : Type} (w : @word A) : concat_word w eps = w.
+Proof.
+  induction w.
+  - simpl.
+    reflexivity.
+  - simpl.
+    reflexivity.
+Defined.
 
+(*Lemma concat_word_associative {A : Type} (w1 w2 w3 : @word A) :
+  concat_word (concat_word w1 w2) w3 = concat_word w1 (concat_word w2 w3).
+Proof.
+  induction w1.
+  -
+*)
 (* Zur Uebung: *)
 
 (* Berechnung der Wortlaenge *)
@@ -35,8 +51,42 @@ Eval compute in (word_length (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
 Fixpoint word_reverse {A : Type} (w : @word A) : @word A  :=
 match w with
 | eps           => eps
-| snoc w' x  => concat (snoc eps x) (word_reverse w')
+| snoc w' x  => concat_word (snoc eps x) (word_reverse w')
 end.
+
+(*Eigenschaften von word_reverse*)
+
+(*Lemma word_reverse_nil  {A : Type} (w : @word A) : snoc*)
+
+(*Lemma word_reverse_concat_word {A : Type} (w1 w2 : @word A) :
+      word_reverse (concat_word w1 w2) = concat_word (word_reverse w1) (word_reverse w2).
+Proof.
+  induction w1.
+  - assert (word_reverse eps = @eps A).
+    + simpl; reflexivity.
+    + rewrite H.
+    pose (concat_word_nil (word_reverse w2)).
+...
+    rewrite e.
+    simpl; reflexivity.
+  - simpl.
+    rewrite IHw2.
+    apply concat_word_associative.
+Defined.
+
+Lemma word_reverse_idempotent {A : Type} (w : @word A) : word_reverse (word_reverse w) = w.
+Proof.
+  induction w.
+  - simpl.
+    reflexivity.
+  - simpl.
+    pose (word_reverse_concat_word (word_reverse w) snoc nil a).
+    rewrite e.
+    rewrite IHw.
+    simpl.
+    reflexivity.
+Defined.
+*)
 
 Eval compute in (word_reverse (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
 
@@ -112,19 +162,6 @@ end.
 
 Eval compute in (list_to_word' (cons h(cons a(cons l nil)))).
 
-Print rev.
-
-Lemma rev_rev {A : Type} (l : list A) : rev ( rev l) = l.
-Proof.
-induction l.
-  - simpl.
-    reflexivity.
-  - 
-    
-
-Lemma w_rev_w_rev  {A : Type} (w : @word A) : word_reverse (word_reverse w) = w.
-
-
 (*Nach Definition von word_to_list'' - ergo albern*)
 Lemma rev_word_to_list {A : Type} (w : @word A) : rev (word_to_list w) = word_to_list'' w.
 Proof.
@@ -138,8 +175,6 @@ unfold word_to_list''.
 induction l.
   - simpl.
     reflexivity.
-  - unfold list_to_word''.
-    unfold list_to_word'' in IHl.
-
+  - 
 
 Lemma word_list_word'' {A : Type} (w : @word A) : list_to_word'' (word_to_list'' w) = w.
