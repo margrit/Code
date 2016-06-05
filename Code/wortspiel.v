@@ -111,6 +111,57 @@ Fixpoint list_to_word {A : Type} (l : list A) : @word A :=
 
 Eval compute in (list_to_word (cons h(cons a(cons l nil)))).
 
+(*Ein Wort in eine Liste umwandeln unter Beachtung der Reihenfolge.*)
+Definition word_to_list'' {A : Type} (w : @word A) : list A := rev (word_to_list w).
+Eval compute in (word_to_list'' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
+
+Print concat.
+Print app.
+
+(*Idee: Wort erst in eine Liste umwandeln und dann die Reihenfolge wieder zurück ändern.*)
+Fixpoint word_to_list_rec {A: Type} (w : @word A) : list A :=
+  match w with
+  | eps           => nil
+  | snoc w' x  => app (word_to_list_rec w') (cons x nil)
+end.
+
+Eval compute in (word_to_list_rec (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
+
+Definition word_to_list''' {A : Type} (w : @word A) : list A := word_to_list (word_reverse w).
+Eval compute in (word_to_list''' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
+
+Fixpoint word_to_list' {A : Type} (w : @word A) : list A :=
+match w with
+| eps           => nil
+| snoc w' x  => rev (cons x (word_to_list' w'))
+end.
+
+Eval compute in (word_to_list' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
+
+(*Eine Liste in ein Wort umwandeln unter Beachtung der Reihenfolge.*)
+Definition list_to_word'' {A : Type} (l : list A) : @word A := word_reverse (list_to_word l).
+Eval compute in (list_to_word'' (cons h(cons a(cons l nil)))).
+
+Fixpoint list_to_word_rec {A : Type} (l : list A) : @word A :=
+match l with
+  | nil           => eps
+  | cons x l'  => concat_word (snoc eps x) (list_to_word_rec l')
+end.
+
+Eval compute in (list_to_word_rec (cons h(cons a(cons l (cons l nil))))).
+
+Definition list_to_word''' {A : Type} (l : list A) : @word A := list_to_word (rev l).
+Eval compute in (list_to_word''' (cons h(cons a(cons l nil)))).
+
+Fixpoint list_to_word' {A : Type} (l : list A) : @word A :=
+match l with
+| nil           => eps
+| cons x l'  => word_reverse (snoc (list_to_word' l') x)
+end.
+
+Eval compute in (list_to_word' (cons h(cons a(cons l nil)))).
+
+
 (* Isomorphie zwischen Woertern und Listen: *)
 
 Lemma list_word_list {A : Type} (l : list A) : word_to_list (list_to_word l) = l.
@@ -132,58 +183,6 @@ induction w.
     rewrite IHw.
     reflexivity.
 Qed.
-
-(*Ein Wort in eine Liste umwandeln unter Beachtung der Reihenfolge.*)
-Definition word_to_list'' {A : Type} (w : @word A) : list A := rev (word_to_list w).
-Eval compute in (word_to_list'' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
-
-(*Idee: Wort erst in eine Liste umwandeln und dann die Reihenfolge wieder zurück ändern.*)
-(*Fixpoint word_to_list_rec {A: Type} (w : @word A) : list A :=
-  match w with
-  | eps           => nil
-  | snoc w' x  => match w' with
-      | eps => nil
-      | snoc w'' x => concat (cons x nil) (word_to_list_rec w')
-    end
-end.
-*)
-
-Definition word_to_list''' {A : Type} (w : @word A) : list A := word_to_list (word_reverse w).
-Eval compute in (word_to_list''' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
-
-Fixpoint word_to_list' {A : Type} (w : @word A) : list A :=
-match w with
-| eps           => nil
-| snoc w' x  => rev (cons x (word_to_list' w'))
-end.
-
-Eval compute in (word_to_list' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
-
-(*Eine Liste in ein Wort umwandeln unter Beachtung der Reihenfolge.*)
-Definition list_to_word'' {A : Type} (l : list A) : @word A := word_reverse (list_to_word l).
-Eval compute in (list_to_word'' (cons h(cons a(cons l nil)))).
-
-Fixpoint list_to_word_rec {A : Type} (l : list A) : @word A :=
-match l with
-  | nil           => eps
-  | cons x l'  => match l' with
-      | nil => eps
-      | cons x l'' => concat_word (snoc eps x) (word_reverse (list_to_word_rec l'))
-    end
-end.
-
-Eval compute in (list_to_word_rec (cons h(cons a(cons l (cons l nil))))).
-
-Definition list_to_word''' {A : Type} (l : list A) : @word A := list_to_word (rev l).
-Eval compute in (list_to_word''' (cons h(cons a(cons l nil)))).
-
-Fixpoint list_to_word' {A : Type} (l : list A) : @word A :=
-match l with
-| nil           => eps
-| cons x l'  => word_reverse (snoc (list_to_word' l') x)
-end.
-
-Eval compute in (list_to_word' (cons h(cons a(cons l nil)))).
 
 (*Nach Definition von word_to_list'' - ergo albern*)
 Lemma rev_word_to_list {A : Type} (w : @word A) : rev (word_to_list w) = word_to_list'' w.
