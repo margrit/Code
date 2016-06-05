@@ -115,9 +115,6 @@ Eval compute in (list_to_word (cons h(cons a(cons l nil)))).
 Definition word_to_list'' {A : Type} (w : @word A) : list A := rev (word_to_list w).
 Eval compute in (word_to_list'' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
 
-Print concat.
-Print app.
-
 (*Idee: Wort erst in eine Liste umwandeln und dann die Reihenfolge wieder zurück ändern.*)
 Fixpoint word_to_list_rec {A: Type} (w : @word A) : list A :=
   match w with
@@ -184,6 +181,24 @@ induction w.
     reflexivity.
 Qed.
 
+Lemma list_word_list_rec {A : Type} (l : list A) : word_to_list_rec (list_to_word_rec l) = l.
+Proof.
+induction l.
+  - simpl.
+    reflexivity.
+  - simpl.
+(*Um IHl anwenden zu können, muss ich das irgendwie hin bekommen, dass list_to_word_rec
+abgeschlossen unter Concatenation ist. Irgendwie sowas in die Richtung.
+Lemma concat_word (snoc eps w)(list_to_word_rec l) = wl *)
+
+Lemma word_list_word_rec {A : Type} (w : @word A) : list_to_word_rec (word_to_list_rec w) = w.
+Proof.
+induction w.
+  - simpl.
+    reflexivity.
+  - simpl.
+(*Lemma word_to_list w ++ x::nil = cons x w*)
+
 (*Nach Definition von word_to_list'' - ergo albern*)
 Lemma rev_word_to_list {A : Type} (w : @word A) : rev (word_to_list w) = word_to_list'' w.
 Proof.
@@ -199,6 +214,5 @@ induction l.
   - simpl.
     reflexivity.
   - simpl.
-    rewrite <- IHl.
 
 Lemma word_list_word'' {A : Type} (w : @word A) : list_to_word'' (word_to_list'' w) = w.
