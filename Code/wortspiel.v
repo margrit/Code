@@ -181,12 +181,39 @@ induction w.
     reflexivity.
 Qed.
 
+(*Kopie aus wortspiel2 *)
+Lemma list_to_word_singleappend {A : Type} (a : A) (l : list A) :
+  list_to_word (l ++ (a :: nil)) = concat_word (snoc eps a) (list_to_word l).
+Proof.
+  induction l.
+  - simpl.
+    reflexivity.
+  - simpl.
+    rewrite IHl.
+    reflexivity.
+Defined.
+(*Ende der Kopie aus wortspiel2 *)
+
+(*word_to_list_rec (concat_word (snoc eps a0) (list_to_word_rec l0)) = a0 :: l0*)
+
+Lemma word_to_list_rec_singleappend {A : Type} (x : A) (w : @word A):
+word_to_list_rec (concat_word w (snoc eps x))  = app (word_to_list_rec w) (cons x nil).
+Proof.
+induction w.
+  - simpl.
+    reflexivity.
+  - simpl.
+    reflexivity.
+Defined.
+
 Lemma list_word_list_rec {A : Type} (l : list A) : word_to_list_rec (list_to_word_rec l) = l.
 Proof.
 induction l.
   - simpl.
     reflexivity.
   - simpl.
+    pose (word_to_list_rec_singleappend (list_to_word_rec l0)).
+    rewrite e.
 (*Um IHl anwenden zu können, muss ich das irgendwie hin bekommen, dass list_to_word_rec
 abgeschlossen unter Concatenation ist. Irgendwie sowas in die Richtung.
 Lemma concat_word (snoc eps w)(list_to_word_rec l) = wl *)
