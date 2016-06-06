@@ -113,4 +113,5 @@ Proof.
     pose (ltwsa := list_to_word_singleappend a (rev l)).
     rewrite ltwsa.
     reflexivity.
+Defined.
 
