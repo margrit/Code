@@ -127,14 +127,6 @@ Eval compute in (word_to_list_rec (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) 
 Definition word_to_list''' {A : Type} (w : @word A) : list A := word_to_list (word_reverse w).
 Eval compute in (word_to_list''' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
 
-Fixpoint word_to_list' {A : Type} (w : @word A) : list A :=
-match w with
-| eps           => nil
-| snoc w' x  => rev (cons x (word_to_list' w'))
-end.
-
-Eval compute in (word_to_list' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
-
 (*Eine Liste in ein Wort umwandeln unter Beachtung der Reihenfolge.*)
 Definition list_to_word'' {A : Type} (l : list A) : @word A := word_reverse (list_to_word l).
 Eval compute in (list_to_word'' (cons h(cons a(cons l nil)))).
@@ -149,15 +141,6 @@ Eval compute in (list_to_word_rec (cons h(cons a(cons l (cons l nil))))).
 
 Definition list_to_word''' {A : Type} (l : list A) : @word A := list_to_word (rev l).
 Eval compute in (list_to_word''' (cons h(cons a(cons l nil)))).
-
-Fixpoint list_to_word' {A : Type} (l : list A) : @word A :=
-match l with
-| nil           => eps
-| cons x l'  => word_reverse (snoc (list_to_word' l') x)
-end.
-
-Eval compute in (list_to_word' (cons h(cons a(cons l nil)))).
-
 
 (* Isomorphie zwischen Woertern und Listen: *)
 
@@ -258,6 +241,37 @@ Proof.
 unfold word_to_list''.
 reflexivity.
 Qed.
+
+Lemma word_to_list''_singleappend {A : Type} (x : A) (w : @word A):
+word_to_list'' (concat_word (snoc eps x) w)  = app (cons x nil) (word_to_list'' w).
+Proof.
+unfold word_to_list''.
+induction w.
+  - simpl.
+    reflexivity.
+  - simpl.
+    rewrite IHw.
+    reflexivity.
+Defined.
+
+Lemma word_list_word'' {A : Type} (w : @word A) : list_to_word'' (word_to_list'' w) = w.
+Proof.
+induction w.
+  - simpl.
+    reflexivity.
+  - simpl.
+
+Lemma list_to_word''_singleappend {A : Type} (a : A) (l : list A) :
+  list_to_word'' (l ++ (a :: nil)) = concat_word (list_to_word'' l) (snoc eps a).
+Proof.
+unfold list_to_word''.
+induction l.
+  - simpl.
+    reflexivity.
+   - simpl.
+     rewrite IHl.
+    reflexivity.
+Defined.
 
 Lemma list_word_list'' {A : Type} (l : list A) : word_to_list'' (list_to_word'' l) = l.
 Proof.
