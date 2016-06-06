@@ -193,9 +193,27 @@ Proof.
     reflexivity.
 Defined.
 (*Ende der Kopie aus wortspiel2 *)
+Print app.
+Eval compute in (list_to_word_rec((cons l nil) ++ (a :: nil))).
+Eval compute in (list_to_word((cons l nil) ++ (a :: nil))).
+Eval compute in (list_to_word_singleappend( (cons l nil) ++ (a :: nil))).
+Eval compute in (concat_word (snoc eps a) (snoc eps l)).
+
+(*  | cons x l'  => concat_word (snoc eps x) (list_to_word_rec l')*)
+Lemma list_to_word_rec_singleappend {A : Type} (a : A) (l : list A) :
+  list_to_word_rec (l ++ (a :: nil)) = concat_word (list_to_word_rec l) (snoc eps a).
+Proof.
+induction l.
+  - simpl.
+    reflexivity.
+  - simpl.
+    rewrite IHl.
+    simpl.
+    reflexivity.
+Defined.
 
 (*word_to_list_rec (concat_word (snoc eps a0) (list_to_word_rec l0)) = a0 :: l0*)
-
+(*  | snoc w' x  => app (word_to_list_rec w') (cons x nil)*)
 Lemma word_to_list_rec_singleappend {A : Type} (x : A) (w : @word A):
 word_to_list_rec (concat_word (snoc eps x) w)  = app (cons x nil) (word_to_list_rec w).
 Proof.
@@ -213,11 +231,12 @@ induction l.
   - simpl.
     reflexivity.
   - simpl.
-    pose (word_to_list_rec_singleappend (list_to_word_rec l0)).
+    pose (word_to_list_rec_singleappend a0 (list_to_word_rec l0)).
     rewrite e.
-(*Um IHl anwenden zu können, muss ich das irgendwie hin bekommen, dass list_to_word_rec
-abgeschlossen unter Concatenation ist. Irgendwie sowas in die Richtung.
-Lemma concat_word (snoc eps w)(list_to_word_rec l) = wl *)
+    rewrite IHl.
+    simpl.
+    reflexivity.
+Defined.
 
 Lemma word_list_word_rec {A : Type} (w : @word A) : list_to_word_rec (word_to_list_rec w) = w.
 Proof.
@@ -225,6 +244,12 @@ induction w.
   - simpl.
     reflexivity.
   - simpl.
+    pose (list_to_word_rec_singleappend a0 (word_to_list_rec w)).
+    rewrite e.
+    rewrite IHw.
+    simpl.
+    reflexivity.
+Defined.
 (*Lemma word_to_list w ++ x::nil = cons x w*)
 
 (*Nach Definition von word_to_list'' - ergo albern*)
@@ -242,5 +267,6 @@ induction l.
   - simpl.
     reflexivity.
   - simpl.
+
 
 Lemma word_list_word'' {A : Type} (w : @word A) : list_to_word'' (word_to_list'' w) = w.
