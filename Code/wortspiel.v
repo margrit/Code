@@ -197,12 +197,13 @@ Defined.
 (*word_to_list_rec (concat_word (snoc eps a0) (list_to_word_rec l0)) = a0 :: l0*)
 
 Lemma word_to_list_rec_singleappend {A : Type} (x : A) (w : @word A):
-word_to_list_rec (concat_word w (snoc eps x))  = app (word_to_list_rec w) (cons x nil).
+word_to_list_rec (concat_word (snoc eps x) w)  = app (cons x nil) (word_to_list_rec w).
 Proof.
 induction w.
   - simpl.
     reflexivity.
   - simpl.
+    rewrite IHw.
     reflexivity.
 Defined.
 
