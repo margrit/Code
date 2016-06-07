@@ -25,6 +25,55 @@ Fixpoint concat_word {A : Type} (w1 w2 : @word A) : @word A :=
   end.
 
 Eval compute in (concat_word (snoc (snoc (snoc eps h) a) l) (snoc (snoc eps l) o)).
+(*Eigenschaften von concat und rev über Listen*)
+
+Lemma concat_nil {A : Type} (ls : list A) : (ls ++ nil) = ls.
+Proof.
+  induction ls.
+  - simpl.
+    reflexivity.
+  - simpl.
+    rewrite IHls.
+    reflexivity.
+Defined.
+
+Lemma concat_associative {A : Type} (l1 l2 l3 : list A) : 
+   (l1 ++ l2) ++ l3 = l1 ++ (l2 ++ l3). 
+Proof.
+  induction l1.
+  - simpl; reflexivity.
+  - simpl.
+    rewrite IHl1.
+    reflexivity.
+Defined.
+
+Lemma rev_concat {A : Type} (l1 l2 : list A) : 
+      rev (l1 ++ l2) = (rev l2) ++ (rev l1).
+Proof.
+  induction l1.
+  - assert (rev nil = @nil A).
+    + simpl; reflexivity.
+    + rewrite H.
+    pose (concat_nil (rev l2)).
+    rewrite e.
+    simpl; reflexivity.
+  - simpl.
+    rewrite IHl1.
+    apply concat_associative.
+Defined.
+
+Lemma rev_idempotent {A : Type} (ls : list A) : rev (rev ls) = ls.
+Proof.
+  induction ls.
+  - simpl.
+    reflexivity.
+  - simpl.
+    pose (rev_concat (rev ls) (a0 :: nil)).
+    rewrite e.
+    rewrite IHls.
+    simpl.
+    reflexivity.
+Defined.
 
 (*Eigenschaften von concat_word*)
 Lemma concat_word_nil {A : Type} (w : @word A) : concat_word eps w = w.
@@ -87,11 +136,6 @@ Proof.
 Defined.
 
 Eval compute in (word_reverse (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
-
-(*Eigenschaften von concat - aus wortspiel2.v*)
-
-(*Eigenschaften von rev - aus wortspiel2.v*)
-
 
 (* Ein Wort in eine Liste umwandeln: *)
 Fixpoint word_to_list {A : Type} (w : @word A) : list A :=
@@ -164,7 +208,6 @@ induction w.
     reflexivity.
 Qed.
 
-(*Kopie aus wortspiel2 *)
 Lemma list_to_word_singleappend {A : Type} (a : A) (l : list A) :
   list_to_word (l ++ (a :: nil)) = concat_word (snoc eps a) (list_to_word l).
 Proof.
@@ -175,7 +218,18 @@ Proof.
     rewrite IHl.
     reflexivity.
 Defined.
-(*Ende der Kopie aus wortspiel2 *)
+
+Lemma word_to_list_singleappend {A : Type} (x : A) (w : @word A) :
+  word_to_list (concat_word (snoc eps x) w) = app (word_to_list w) (x :: nil).
+Proof.
+  induction w.
+  - simpl.
+    reflexivity.
+  - simpl.
+    rewrite IHw.
+    reflexivity.
+Defined.
+
 Print app.
 Eval compute in (list_to_word_rec((cons l nil) ++ (a :: nil))).
 Eval compute in (list_to_word((cons l nil) ++ (a :: nil))).
@@ -254,12 +308,37 @@ induction w.
     reflexivity.
 Defined.
 
-Lemma word_list_word'' {A : Type} (w : @word A) : list_to_word'' (word_to_list'' w) = w.
+(*weitere Lemmata über die Isomorphie zwischen list_to_word / '' / ''' / rec*)
+Lemma list_to_word_Lemma {A : Type} (l : list A) :
+  list_to_word''' l = list_to_word'' l.
 Proof.
-induction w.
+  unfold list_to_word'''.
+  unfold list_to_word''.
+  induction l.
   - simpl.
     reflexivity.
   - simpl.
+    rewrite <- IHl.
+    pose (ltwsa := list_to_word_singleappend a0 (rev l0)).
+    rewrite ltwsa.
+    reflexivity.
+Defined.
+
+(*weitere Lemmata über die Isomorphie zwischen word_to_list / '' / ''' / rec*)
+Lemma word_to_list_Lemma {A : Type} (w : @word A) :
+  word_to_list''' w = word_to_list'' w.
+Proof.
+unfold word_to_list'''.
+unfold word_to_list''.
+induction w.
+ - simpl.
+   reflexivity.
+  - simpl.
+    rewrite <- IHw.
+    pose (wtl := word_to_list_singleappend a0 (word_reverse w)).
+    rewrite wtl.
+    reflexivity.
+Defined.
 
 Lemma list_to_word''_singleappend {A : Type} (a : A) (l : list A) :
   list_to_word'' (l ++ (a :: nil)) = concat_word (list_to_word'' l) (snoc eps a).
@@ -273,14 +352,13 @@ induction l.
     reflexivity.
 Defined.
 
+Lemma word_list_word'' {A : Type} (w : @word A) : list_to_word'' (word_to_list'' w) = w.
+Proof.
+unfold list_to_word''.
+unfold word_to_list''.
+
 Lemma list_word_list'' {A : Type} (l : list A) : word_to_list'' (list_to_word'' l) = l.
 Proof.
 unfold word_to_list''.
 unfold list_to_word''.
-induction l.
-  - simpl.
-    reflexivity.
-  - simpl.
 
-
-Lemma word_list_word'' {A : Type} (w : @word A) : list_to_word'' (word_to_list'' w) = w.
