@@ -4,9 +4,6 @@ Funktionen klein mit _
 Typen Groß
 -----------
 iso delta_hat snoc / cons (als mögliche Hausaufgabe)
-(ii)  list to word & word from list
-(iii) Beweis:  forall w:word fromlist (tolist w) = w
-                    forall l:list tolist (fromlist l) = l
 
-Lemma list_word_list'' {A : Type} (l : list A) : word_to_list'' (list_to_word'' l) = l.
-Lemma word_list_word'' {A : Type} (w : @word A) : list_to_word'' (word_to_list'' w) = w.
+Die verschiedenen Beweise für die (6, davon jeweils 2
+zusammengehörige) "Hin und Zurück ist Identität"-Aussagen vergleichen.
