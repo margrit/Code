@@ -4,7 +4,7 @@ Inductive Sigma := h : Sigma | a : Sigma | l : Sigma | o : Sigma.
 
 (*Definition von Wörtern*)
 
-Inductive word {A : Type} : Type:= 
+Inductive word {A : Type} : Type:=
   | eps   : @word A
   | snoc : @word A -> A -> @word A.
 
@@ -198,6 +198,8 @@ induction l.
     reflexivity.
 Qed.
 
+Eval compute in (list_word_list (cons h(cons a(cons l (cons l nil))))).
+
 Lemma word_list_word {A : Type} (w : @word A) : list_to_word (word_to_list w) = w.
 Proof.
 induction w.
@@ -207,6 +209,8 @@ induction w.
     rewrite IHw.
     reflexivity.
 Qed.
+
+Eval compute in (word_list_word (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
 
 Lemma list_to_word_singleappend {A : Type} (a : A) (l : list A) :
   list_to_word (l ++ (a :: nil)) = concat_word (snoc eps a) (list_to_word l).
@@ -352,13 +356,55 @@ induction l.
     reflexivity.
 Defined.
 
+Lemma list_to_word'_Lemma {A : Type} (l : list A) :
+  list_to_word'' l = list_to_word''' l.
+Proof.
+  unfold list_to_word'''.
+  unfold list_to_word''.
+  induction l.
+  - simpl.
+    reflexivity.
+  - simpl.
+    rewrite IHl.
+    pose (ltw'sa := list_to_word_singleappend a0 (rev l0)).
+    rewrite ltw'sa.
+    reflexivity.
+Defined.
+
+Lemma word_to_list'_Lemma {A : Type} (w : @word A) :
+  word_to_list'' w = word_to_list''' w.
+Proof.
+unfold word_to_list'''.
+unfold word_to_list''.
+induction w.
+ - simpl.
+   reflexivity.
+  - simpl.
+    rewrite IHw.
+    pose (wtl' := word_to_list_singleappend a0 (word_reverse w)).
+    rewrite wtl'.
+    reflexivity.
+Defined.
+
 Lemma word_list_word'' {A : Type} (w : @word A) : list_to_word'' (word_to_list'' w) = w.
 Proof.
-unfold list_to_word''.
 unfold word_to_list''.
+pose (ltw'L := list_to_word'_Lemma (rev (word_to_list w))).
+rewrite ltw'L.
+unfold list_to_word'''.
+pose (revip := rev_idempotent (word_to_list w)).
+rewrite revip.
+apply word_list_word.
+Defined.
 
 Lemma list_word_list'' {A : Type} (l : list A) : word_to_list'' (list_to_word'' l) = l.
 Proof.
-unfold word_to_list''.
 unfold list_to_word''.
+pose (wtl'L := word_to_list'_Lemma (word_reverse (list_to_word l))).
+rewrite wtl'L.
+unfold word_to_list'''.
+pose (wrip := word_reverse_idempotent (list_to_word l)).
+rewrite wrip.
+apply list_word_list.
+Defined.
 
