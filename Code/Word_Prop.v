@@ -1,6 +1,6 @@
 Require Import List.
 (* Nur Spielerei: *)
-Inductive Sigma := h : Sigma | a : Sigma | l : Sigma | o : Sigma.
+(*Inductive Sigma := h : Sigma | a : Sigma | l : Sigma | o : Sigma.*)
 
 (*Definition von Wörtern*)
 
@@ -15,7 +15,7 @@ Fixpoint word_length {A : Type} (w : @Word A) : nat :=
     | snoc w' x => S (word_length w')
   end.
 
-Eval compute in (word_length (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
+(*Eval compute in (word_length (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).*)
 
 (*Verknüpfung zweier Wörter*)
 Fixpoint concat_word {A : Type} (w1 w2 : @Word A) : @Word A :=
@@ -24,7 +24,7 @@ Fixpoint concat_word {A : Type} (w1 w2 : @Word A) : @Word A :=
     | snoc w x => snoc (concat_word w1 w) x
   end.
 
-Eval compute in (concat_word (snoc (snoc (snoc eps h) a) l) (snoc (snoc eps l) o)).
+(*Eval compute in (concat_word (snoc (snoc (snoc eps h) a) l) (snoc (snoc eps l) o)).*)
 (*Eigenschaften von concat und rev über Listen*)
 
 Lemma concat_nil {A : Type} (ls : list A) : (ls ++ nil) = ls.
@@ -68,7 +68,7 @@ Proof.
   - simpl.
     reflexivity.
   - simpl.
-    pose (rev_concat (rev ls) (a0 :: nil)).
+    pose (rev_concat (rev ls) (a :: nil)).
     rewrite e.
     rewrite IHls.
     simpl.
@@ -128,14 +128,14 @@ Proof.
   - simpl.
     reflexivity.
   - simpl.
-    pose (word_reverse_concat_word (snoc eps a0) (word_reverse w) ).
+    pose (word_reverse_concat_word (snoc eps a) (word_reverse w) ).
     rewrite e.
     rewrite IHw.
     simpl.
     reflexivity.
 Defined.
 
-Eval compute in (word_reverse (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
+(*Eval compute in (word_reverse (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).*)
 
 (* Ein Wort in eine Liste umwandeln: *)
 Fixpoint word_to_list {A : Type} (w : @Word A) : list A :=
@@ -144,7 +144,7 @@ Fixpoint word_to_list {A : Type} (w : @Word A) : list A :=
     | snoc w' x  => cons x (word_to_list w')
   end.
 
-Eval compute in (word_to_list (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
+(*Eval compute in (word_to_list (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).*)
 
 (* Eine Liste in ein Wort umwandeln: *)
 Fixpoint list_to_word {A : Type} (l : list A) : @Word A :=
@@ -153,11 +153,11 @@ Fixpoint list_to_word {A : Type} (l : list A) : @Word A :=
     | cons x l'  => snoc (list_to_word l') x
   end.
 
-Eval compute in (list_to_word (cons h(cons a(cons l nil)))).
+(*Eval compute in (list_to_word (cons h(cons a(cons l nil)))).*)
 
 (*Ein Wort in eine Liste umwandeln unter Beachtung der Reihenfolge.*)
 Definition word_to_list'' {A : Type} (w : @Word A) : list A := rev (word_to_list w).
-Eval compute in (word_to_list'' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
+(*Eval compute in (word_to_list'' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).*)
 
 (*Idee: Wort erst in eine Liste umwandeln und dann die Reihenfolge wieder zurück ändern.*)
 Fixpoint word_to_list_rec {A: Type} (w : @Word A) : list A :=
@@ -166,14 +166,14 @@ Fixpoint word_to_list_rec {A: Type} (w : @Word A) : list A :=
   | snoc w' x  => app (word_to_list_rec w') (cons x nil)
 end.
 
-Eval compute in (word_to_list_rec (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
+(*Eval compute in (word_to_list_rec (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).*)
 
 Definition word_to_list''' {A : Type} (w : @Word A) : list A := word_to_list (word_reverse w).
-Eval compute in (word_to_list''' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
+(*Eval compute in (word_to_list''' (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).*)
 
 (*Eine Liste in ein Wort umwandeln unter Beachtung der Reihenfolge.*)
 Definition list_to_word'' {A : Type} (l : list A) : @Word A := word_reverse (list_to_word l).
-Eval compute in (list_to_word'' (cons h(cons a(cons l nil)))).
+(*Eval compute in (list_to_word'' (cons h(cons a(cons l nil)))).*)
 
 Fixpoint list_to_word_rec {A : Type} (l : list A) : @Word A :=
 match l with
@@ -181,10 +181,10 @@ match l with
   | cons x l'  => concat_word (snoc eps x) (list_to_word_rec l')
 end.
 
-Eval compute in (list_to_word_rec (cons h(cons a(cons l (cons l nil))))).
+(*Eval compute in (list_to_word_rec (cons h(cons a(cons l (cons l nil))))).*)
 
 Definition list_to_word''' {A : Type} (l : list A) : @Word A := list_to_word (rev l).
-Eval compute in (list_to_word''' (cons h(cons a(cons l nil)))).
+(*Eval compute in (list_to_word''' (cons h(cons a(cons l nil)))).*)
 
 (* Isomorphie zwischen Woertern und Listen: *)
 
@@ -198,7 +198,7 @@ induction l.
     reflexivity.
 Qed.
 
-Eval compute in (list_word_list (cons h(cons a(cons l (cons l nil))))).
+(*Eval compute in (list_word_list (cons h(cons a(cons l (cons l nil))))).*)
 
 Lemma word_list_word {A : Type} (w : @Word A) : list_to_word (word_to_list w) = w.
 Proof.
@@ -210,7 +210,7 @@ induction w.
     reflexivity.
 Qed.
 
-Eval compute in (word_list_word (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).
+(*Eval compute in (word_list_word (snoc (snoc (snoc (snoc (snoc eps h) a) l) l) o)).*)
 
 Lemma list_to_word_singleappend {A : Type} (a : A) (l : list A) :
   list_to_word (l ++ (a :: nil)) = concat_word (snoc eps a) (list_to_word l).
@@ -233,12 +233,6 @@ Proof.
     rewrite IHw.
     reflexivity.
 Defined.
-
-Print app.
-Eval compute in (list_to_word_rec((cons l nil) ++ (a :: nil))).
-Eval compute in (list_to_word((cons l nil) ++ (a :: nil))).
-Eval compute in (list_to_word_singleappend( (cons l nil) ++ (a :: nil))).
-Eval compute in (concat_word (snoc eps a) (snoc eps l)).
 
 (*  | cons x l'  => concat_word (snoc eps x) (list_to_word_rec l')*)
 Lemma list_to_word_rec_singleappend {A : Type} (a : A) (l : list A) :
@@ -272,7 +266,7 @@ induction l.
   - simpl.
     reflexivity.
   - simpl.
-    pose (word_to_list_rec_singleappend a0 (list_to_word_rec l0)).
+    pose (word_to_list_rec_singleappend a (list_to_word_rec l)).
     rewrite e.
     rewrite IHl.
     simpl.
@@ -285,7 +279,7 @@ induction w.
   - simpl.
     reflexivity.
   - simpl.
-    pose (list_to_word_rec_singleappend a0 (word_to_list_rec w)).
+    pose (list_to_word_rec_singleappend a (word_to_list_rec w)).
     rewrite e.
     rewrite IHw.
     simpl.
@@ -323,7 +317,7 @@ Proof.
     reflexivity.
   - simpl.
     rewrite <- IHl.
-    pose (ltwsa := list_to_word_singleappend a0 (rev l0)).
+    pose (ltwsa := list_to_word_singleappend a (rev l)).
     rewrite ltwsa.
     reflexivity.
 Defined.
@@ -339,7 +333,7 @@ induction w.
    reflexivity.
   - simpl.
     rewrite <- IHw.
-    pose (wtl := word_to_list_singleappend a0 (word_reverse w)).
+    pose (wtl := word_to_list_singleappend a (word_reverse w)).
     rewrite wtl.
     reflexivity.
 Defined.
@@ -366,7 +360,7 @@ Proof.
     reflexivity.
   - simpl.
     rewrite IHl.
-    pose (ltw'sa := list_to_word_singleappend a0 (rev l0)).
+    pose (ltw'sa := list_to_word_singleappend a (rev l)).
     rewrite ltw'sa.
     reflexivity.
 Defined.
@@ -381,7 +375,7 @@ induction w.
    reflexivity.
   - simpl.
     rewrite IHw.
-    pose (wtl' := word_to_list_singleappend a0 (word_reverse w)).
+    pose (wtl' := word_to_list_singleappend a (word_reverse w)).
     rewrite wtl'.
     reflexivity.
 Defined.

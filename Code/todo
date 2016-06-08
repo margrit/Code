@@ -11,3 +11,6 @@ Kommentare ergänzen
 
 Die verschiedenen Beweise für die (6, davon jeweils 2
 zusammengehörige) "Hin und Zurück ist Identität"-Aussagen vergleichen.
+
+Word_Prop.v in notwendige Dateien einbinden
+* beteits ins DFA_Def eingebunden, aber noch nicht überarbeitet.

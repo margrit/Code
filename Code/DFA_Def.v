@@ -18,6 +18,7 @@
 
 Require Import Fin.
 Require Import Arith.
+Load Word_Prop.
 
 Section Definitions.
 
@@ -47,10 +48,10 @@ einige Vorueberlegungen getroffen werden. Hierzu braucht man die
 erweiterte Transitionsfunktion delta_hat_cons. *)
 
 (* Erweiterte Überführungsfunktion - delta_hat *)
-Fixpoint delta_hat_cons (q : Q) (word : list Sigma) : Q :=
-  match word with
+Fixpoint delta_hat_cons (q : Q) (w : list Sigma) : Q :=
+  match w with
     | nil                  => q
-    | cons h word1 => delta_hat_cons (delta q h) word1
+    | cons h w' => delta_hat_cons (delta q h) w'
   end.
 
 (*delta_hat_snoc, wie in der Vorlesung definiert* -- noch fehlerhaft, weil snoc nicht definiert.*)
