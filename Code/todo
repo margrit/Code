@@ -17,3 +17,33 @@ zusammengehörige) "Hin und Zurück ist Identität"-Aussagen vergleichen.
 
 Word_Prop.v in notwendige Dateien einbinden
 * beteits ins DFA_Def eingebunden, aber noch nicht überarbeitet.
+
+**** aus der Mail ****
+1. Erstmal einen Typ "deterministischer Automat" ( "DAuto A S" mit einem Typ A
+  für das Alphabet und einem Typ S für die States als Parameter ... deren
+  Endlichkeit ist erstmal nebensächlich).
+
+2. Definiere die erweiterte Überführungsfunktion und die akzeptierte Sprache
+  eines deterministischen Automaten.
+
+3. Definiere einen Typ, dessen Elemente die "Konfigurationen" (DConf A S) von det.
+  Automaten über Alphabet A und Zustandstyp S beschreiben.
+
+4. Implementiere die Konfigurationsübergangsrelation eines det. Automaten.
+
+5. Definiere die akzeptierte Sprache eines det. Automaten einmal über die erweiterte
+  Überführungsfunktion und nochmal über die Konfigurationsübergangsrelation.
+  Zeige, dass beide Definitionen dieselbe Sprache definieren.
+
+6. Definiere einen (induktiven) Typen für reguläre Ausdrücke über einem Alphabet A (Man
+  braucht einzelne Zeichen aus A, Verkettung von 2 reg. Ausdrücken, Oder-Verknüpfung
+  von 2 reg. Ausdrücken, Kleensche Hülle eines reg. Ausdrucks).
+
+7. Definiere eine Funktion, die einem regulären Ausdruck über A die durch diesen
+  Ausdruck definierte Sprache zuordnet.
+
+8. Definiere die Beispielautomaten aus Einheit 2.1 der TI1-Vorlesung (den Wechselschalter
+  und den "TI1" Automaten)
+
+9. Versuche, die Beweise über die Sprachen dieser Automaten aus Abschnitt 2.1 möglichst
+  genau und transparent zu formalisieren.
