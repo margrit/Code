@@ -5,6 +5,9 @@ Typen Groß
 -----------
 iso delta_hat snoc / cons (als mögliche Hausaufgabe)
 
+list_to_word_rec = list_to_word''
+word_to_list_rec = word_to_list ''
+
 Struktur einbringen und Abhängigkeiten besser darstellen.
 
 Kommentare ergänzen
