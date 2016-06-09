@@ -76,7 +76,7 @@ Proof.
 Defined.
 
 (*Eigenschaften von concat_word*)
-Lemma concat_word_nil {A : Type} (w : @Word A) : concat_word eps w = w.
+Lemma concat_word_eps {A : Type} (w : @Word A) : concat_word eps w = w.
 Proof.
   induction w.
   - simpl.
@@ -113,7 +113,7 @@ induction w2.
     + simpl; reflexivity.
     + rewrite H.
        simpl.
-       pose (concat_word_nil (word_reverse w1)) as con_nil.
+       pose (concat_word_eps (word_reverse w1)) as con_nil.
        rewrite con_nil.
        reflexivity.
   - simpl.
@@ -286,13 +286,6 @@ induction w.
     reflexivity.
 Defined.
 (*Lemma word_to_list w ++ x::nil = cons x w*)
-
-(*Nach Definition von word_to_list'' - ergo albern*)
-Lemma rev_word_to_list {A : Type} (w : @Word A) : rev (word_to_list w) = word_to_list'' w.
-Proof.
-unfold word_to_list''.
-reflexivity.
-Qed.
 
 Lemma word_to_list''_singleappend {A : Type} (x : A) (w : @Word A):
 word_to_list'' (concat_word (snoc eps x) w)  = app (cons x nil) (word_to_list'' w).
