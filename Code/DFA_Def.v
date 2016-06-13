@@ -47,66 +47,64 @@ Parameter q0 : Q.
 einige Vorueberlegungen getroffen werden. Hierzu braucht man die 
 erweiterte Transitionsfunktion delta_hat_cons. *)
 
-(* Erweiterte Überführungsfunktion - delta_hat *)
+(* Erweiterte Überführungsfunktion - delta_hat, wird wahrscheinlich wieder rausgenommen, 
+ da in der Vorlesung über snoc-Listen definiert wurde.*)
 Fixpoint delta_hat_cons (q : Q) (w : list Sigma) : Q :=
   match w with
-    | nil                  => q
+    | nil             => q
     | cons h w' => delta_hat_cons (delta q h) w'
   end.
 
-(*delta_hat_snoc, wie in der Vorlesung definiert* -- noch fehlerhaft, weil snoc nicht definiert.*)
-(*Fixpoint delta_hat_snoc (q : Q) (word : list Sigma) : Q :=
-  match word with
-    | nil                   => q
-    | snoc word1 h => delta_hat_snoc (delta q h) word1
+(* Erweiterte Überführungsfunktion delta_hat_snoc, wie in der Vorlesung definiert.*)
+Fixpoint delta_hat_snoc (q : Q) (w : @Word Sigma) : Q :=
+   match w with
+    | eps          => q
+    | snoc w' h => delta_hat_snoc (delta q h) w'
   end.
-*)
 
 (* Definiert, wann ein Wort akzeptiert wird. *)
 Definition accepted_word (w : list Sigma) :=
   is_accepting (delta_hat_cons q0 w).
 
+Definition accepted_word_snoc (w : @Word Sigma) :=
+  is_accepting (delta_hat_snoc q0 w).
+
 (* Typ der Konfigurationen eines DFA, Conf_DFA = Q x Sigma* *)
-Definition Conf_DFA := Q * (list Sigma) : Type.
+(*Definition Conf_DFA := Q * (list Sigma) : Type.*)
+Definition Conf_DFA := Q * (@Word Sigma) : Type.
 Print Conf_DFA.
-Print cons.
-Print fst.
 
 (* Konfigurationsübergangsrelation *)
 
 (* Ein einzelner Konfigurationsschritt. *)
 Inductive Conf_DFA_step : Conf_DFA -> Conf_DFA -> Type :=
- | one_step : forall (q : Q) (p : Q) (a : Sigma) (w : list Sigma) (eq : (delta q a) = p), 
-                                    Conf_DFA_step (q, (cons a w)) (p, w).
+ | one_step : forall (q : Q) (p : Q) (a : Sigma) (w : @Word Sigma) (eq : (delta q a) = p), 
+                                    Conf_DFA_step (q, (snoc w a)) (p, w).
 
-(* Tip: Das wird die reflexiv-transitive
-Hülle von Conf_rel_DFA_step, Du brauchst also 3 Konstruktoren (einen
-für "Conf_rel_DFA_step ist drin", einen für "ist reflexiv" und
-einen für "ist transitiv"...
-*)
-
-(*K ext_conf M <=> K = M oder ex L mit K ext_conf L und L conf_step M*)
+(* Die reflexiv-transitive Hülle von Conf_rel_DFA_step.
+K ext_conf M <=> K = M (revlexiv) oder 
+ex L mit K ext_conf L und L conf_step M (reflexiv-transitive Hülle)*)
 Inductive Conf_rel_DFA : Conf_DFA -> Conf_DFA -> Type :=
   | refl    : forall (K : Conf_DFA), Conf_rel_DFA K K
   | step  : forall (K L M : Conf_DFA),
-                                    Conf_rel_DFA K L ->
-                                    Conf_DFA_step L M ->
-                                    Conf_rel_DFA K M.
+                                     Conf_rel_DFA K L ->
+                                     Conf_DFA_step L M ->
+                                     Conf_rel_DFA K M.
 
 Print option.
 
-(*nextConf*)
-Fixpoint nextConf  (conf : Conf_DFA) : option Conf_DFA :=
+(* Ableiten der nächsten Konfiguration - next_Conf.*)
+Fixpoint next_Conf  (conf : Conf_DFA) : option Conf_DFA :=
   match conf with
-    | (q, nil)            => None
-    | (q, cons a w) => Some (delta q a, w)
+    | (q, eps)         => None
+    | (q, snoc w a) => Some (delta q a, w)
   end.
 
 (*Konfigurationssequenz in einer Liste speichern.*)
-Fixpoint conf_seq' (w : list Sigma) : Q -> list Conf_DFA :=
+Fixpoint conf_seq' (w : @Word Sigma) : Q -> list Conf_DFA :=
   match w with
-    | nil             => fun q : Q => cons (q, nil) nil
-    | cons a w'  => fun q : Q => cons (q, w) (conf_seq' w' (delta q a))
+    | eps           => fun q : Q => cons (q, eps) nil
+    | snoc w' a  => fun q : Q => cons (q, w) (conf_seq' w' (delta q a))
   end.
 
 Print conf_seq'.
@@ -117,21 +115,24 @@ Fixpoint conf_seq (conf : Conf_DFA) : list Conf_DFA :=
     | (q, w) => conf_seq' w q
   end.
 
+(*################# Alternativ ###################*)
+
 (* Ich habe auch nichts wirklich Besseres zu bieten. Man koennte vermutlich einen
    anonymen Fixpunkt benutzen, aber dadurch wird es nicht lesbarer und 
    ich sehe auch sonst keinen Vorteil.
    Die "Wrapper" Funktion muss dann natuerlich kein Fixpunkt sein. *)
 
-Definition word := list Sigma.
+(*Definition word := list Sigma.
 
 Definition emtptyW := @nil Sigma.
 Definition concatW := @cons Sigma.
+*)
 
-Fixpoint conf_list (w : word) (q : Q) : list Conf_DFA :=
+Fixpoint conf_list (w : @Word Sigma) (q : Q) : list Conf_DFA :=
  let conf := (q, w) in
   match w with
-    | nil             => cons conf nil
-    | cons a w'  => cons conf (conf_list w' (delta q a))
+    | eps             => cons conf nil
+    | snoc w' a => cons conf (conf_list w' (delta q a))
   end.
 
 Definition conf_to_conf_list (conf : Conf_DFA) : list Conf_DFA :=
@@ -140,10 +141,10 @@ Definition conf_to_conf_list (conf : Conf_DFA) : list Conf_DFA :=
 Print list.
 
 (*Definition eines induktiven Datentyps, der Wörter beschreibt.*)
-Inductive Word (S : Sigma) : Type :=
+(*Inductive Word (S : Sigma) : Type :=
 | empty_Word : Word S
 | cons_Word : Word S -> Word S -> Word S.
-
+*)
 (*Definition der akzeptierten Sprache
 Definition L_DFA (w : list Sigma) : Conf_DFA:=
 exists p : Q, Conf_rel_DFA (q0 , w) (p, nil).
