@@ -8,7 +8,7 @@ Require Import List.
  möglichst eins zu eins abgebildet werden sollen, ist es notwendig einen induktiven Typen
  [Word] zu definieren, der, anders als bei Listen, die Zeichen am Ende der Zeichenkette anfügt.
  Da sowohl Listen als auch Wörter für die Darstellung benötigt werden, müssen die Typen
-  ineinander überführbar sein. *)
+ ineinander überführbar sein. *)
 
 (** * Definition von Wörtern: *)
 Inductive Word {A : Type} : Type:=
@@ -41,7 +41,7 @@ Fixpoint word_reverse {A : Type} (w : @Word A) : @Word A  :=
 (** * Definition von Listen *)
 
 (** In der Standardbibliothek befinden sich bereits Listenoperationen wie [concat] und [rev],
- die analos zu [concat_word] und [word_reverse] arbeiten. Zusätzlich werden noch weitere 
+ die analog zu [concat_word] und [word_reverse] arbeiten. Zusätzlich werden noch weitere 
  Eigenschaften benötigt, die nachfolgend gezeigt werden. *)
 
 (** ** Eigenschaften von [concat] und [rev] über Listen: *)
@@ -99,7 +99,7 @@ Proof.
 Defined.
 
 (** Analog zum Typen [list] werden diese Eigenschaften ebenfalls für die Operationen auf [Word]
- definiert.*)
+ bewiesen.*)
 
 (** ** Eigenschaften von [concat_word] und [word_reverse].*)
 
@@ -158,8 +158,8 @@ Proof.
     reflexivity.
 Defined.
 
-(** Somit ist [Word] als Monoid mit [concat_word] als assoziatove Konkatenation 
- und [eps] als neutrales Element, definiert. Bei [list] erhalten wir die gleichen Eigenschaften 
+(** Somit ist [Word] als Monoid mit [concat_word] als assoziativer Konkatenation 
+ und [eps] als neutralem Element definiert. Bei [list] erhalten wir die gleichen Eigenschaften 
  durch [concat] als assoziative Konkatenation und [nil] als neutrales Element bezüglich der 
  Konkatenation. 
 
@@ -168,7 +168,7 @@ Defined.
 
 (**  * Eine Liste in ein Wort umwandeln.*)
 
-(** Ein Problem, dass sich hierbei ergibt ist, dass die Typen von Listen und Wörter auf unterschiedlich
+(** Ein Problem, dass sich hierbei ergibt ist, dass die Typen von Listen und Wörtern auf unterschiedlich
  arbeitende Konstruktoren aufbauen. Die Liste wird von hinten nach vorn aufgebaut, indem das 
  nächste Zeichen vorn angehängt wird und der Aufbau eines Wortes ist entgegengesetzt. Wenn man 
  die Umwandlung von einer Liste in ein Wort intuitiv implementiert, erhält man die Funktion, die in 
@@ -181,9 +181,9 @@ Fixpoint list_to_word {A : Type} (l : list A) : @Word A :=
   end.
 
 (** Um eine Liste mithilfe von [list_to_word] in ein Wort unter Beachtung der Reihenfolge unzuwandeln,
- können zwei verschiedene Ansätze verwerdent werden. Die Liste wird zuerst in ein Wort umgewandelt 
-und anschließent wird die Reihenfolge mit [word_reverse] geändert oder die Liste wird zuerst mit [rev] 
-gedreht und anschließend in ein Wort umgewandelt. *)
+ können zwei verschiedene Ansätze verwendet werden. Die Liste wird zuerst in ein Wort umgewandelt 
+und anschließend wird die Reihenfolge mit [word_reverse] geändert oder die Liste wird zuerst mit [rev] 
+umgedreht und anschließend in ein Wort umgewandelt. *)
 Definition list_to_word'' {A : Type} (l : list A) : @Word A := word_reverse (list_to_word l).
 
 Definition list_to_word''' {A : Type} (l : list A) : @Word A := list_to_word (rev l).
@@ -404,7 +404,8 @@ induction w.
     reflexivity.
 Defined.
 
-(* Die Umwandlung einer Liste in einem Wort und zurück ergibt die Identität.*)
+(* Wandelt man eine Liste in ein Wort um und dieses zurück in eine Liste, erhält
+   man die Ausgangsliste. *)
 Lemma list_word_list {A : Type} (l : list A) : word_to_list (list_to_word l) = l.
 Proof.
 induction l.
@@ -439,7 +440,8 @@ induction l.
     reflexivity.
 Defined.
 
-(* Die Umwandlung eines Wortes in einer Liste und zurück ergibt die Identität.*)
+(* Wandelt man ein Wort in eine Liste um und diese zurück in eine Wort, erhält
+   man das Ausgangswort. *)
 Lemma word_list_word {A : Type} (w : @Word A) : list_to_word (word_to_list w) = w.
 Proof.
 induction w.
