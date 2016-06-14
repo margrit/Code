@@ -4,35 +4,49 @@ Require Import List.
 
 (*Inductive Sigma := h : Sigma | a : Sigma | l : Sigma | o : Sigma.*)
 
-(* Definition von Wörtern*)
+(** Die Ursprungsidee war auf Listen zu arbeiten. Da die Verfahren aus der Vorlesung
+ möglichst eins zu eins abgebildet werden sollen, ist es notwendig einen induktiven Typen
+ [Word] zu definieren, der, anders als bei Listen, die Zeichen am Ende der Zeichenkette anfügt.
+ Da sowohl Listen als auch Wörter für die Darstellung benötigt werden, müssen die Typen
+  ineinander überführbar sein. *)
+
+(** * Definition von Wörtern: *)
 Inductive Word {A : Type} : Type:=
   | eps   : @Word A
   | snoc : @Word A -> A -> @Word A.
 
-(* Berechnung der Wortlänge *)
+(** ** Grundoperationen auf dem Typ [Word]: *)
+
+(** Berechnung der Wortlänge: *)
 Fixpoint word_length {A : Type} (w : @Word A) : nat :=
   match w with
     | eps          => 0
     | snoc w' x => S (word_length w')
   end.
 
-(* Verknüpfung zweier Wörter*)
+(** Verknüpfung zweier Wörter: *)
 Fixpoint concat_word {A : Type} (w1 w2 : @Word A) : @Word A :=
   match w2 with
     | eps => w1
     | snoc w x => snoc (concat_word w1 w) x
   end.
 
-(* Ein Wort umdrehen: *)
+(** Ein Wort umdrehen: *)
 Fixpoint word_reverse {A : Type} (w : @Word A) : @Word A  :=
   match w with
     | eps           => eps
     | snoc w' x  => concat_word (snoc eps x) (word_reverse w')
   end.
 
-(* Eigenschaften von concat und rev über Listen*)
+(** * Definition von Listen *)
 
-(* Eine Liste verknüpft mit der leeren Liste ergibt die Ursprungsliste.*)
+(** In der Standardbibliothek befinden sich bereits Listenoperationen wie [concat] und [rev],
+ die analos zu [concat_word] und [word_reverse] arbeiten. Zusätzlich werden noch weitere 
+ Eigenschaften benötigt, die nachfolgend gezeigt werden. *)
+
+(** ** Eigenschaften von [concat] und [rev] über Listen: *)
+
+(** Die leere Liste [nil] ist rechtsneutral bezüglich der Konkatenation.*)
 Lemma concat_nil {A : Type} (ls : list A) : (ls ++ nil) = ls.
 Proof.
   induction ls.
@@ -43,7 +57,7 @@ Proof.
     reflexivity.
 Defined.
 
-(* Die Konkatenation von Listen ist assoziativ.*)
+(** Die Konkatenation von Listen ist assoziativ.*)
 Lemma concat_associative {A : Type} (l1 l2 l3 : list A) :
    (l1 ++ l2) ++ l3 = l1 ++ (l2 ++ l3). 
 Proof.
@@ -54,7 +68,7 @@ Proof.
     reflexivity.
 Defined.
 
-(* Gleichheit von der Konkatenation und das Umdrehen von Listen.*)
+(** Das Umdrehen von Listen ist ein Antihomomorphismus bezüglich der Konkatenation. *)
 Lemma rev_concat {A : Type} (l1 l2 : list A) :
       rev (l1 ++ l2) = (rev l2) ++ (rev l1).
 Proof.
@@ -70,7 +84,7 @@ Proof.
     apply concat_associative.
 Defined.
 
-(* Das Drehen von Listen ist idempotent.*)
+(** Das Umdrehen von Listen ist idempotent.*)
 Lemma rev_idempotent {A : Type} (ls : list A) : rev (rev ls) = ls.
 Proof.
   induction ls.
@@ -84,9 +98,12 @@ Proof.
     reflexivity.
 Defined.
 
-(* Eigenschaften von concat_word und word_reverse.*)
+(** Analog zum Typen [list] werden diese Eigenschaften ebenfalls für die Operationen auf [Word]
+ definiert.*)
 
-(* Ein Wort verknüpft mit dem leeren Wort ergibt das Ursprungswort.*)
+(** ** Eigenschaften von [concat_word] und [word_reverse].*)
+
+(** Das leere Wort [eps] ist linksneutral bezüglich der Konkatenation. *)
 Lemma concat_word_eps {A : Type} (w : @Word A) : concat_word eps w = w.
 Proof.
   induction w.
@@ -97,7 +114,7 @@ Proof.
     reflexivity.
 Defined.
 
-(* Die Konkatenation von Wörtern ist assoziativ.*)
+(** Die Konkatenation von Wörtern ist assoziativ.*)
 Lemma concat_word_associative {A : Type} (w1 w2 w3 : @Word A) :
   concat_word (concat_word w1 w2) w3 = concat_word w1 (concat_word w2 w3).
 Proof.
@@ -109,7 +126,7 @@ Proof.
     reflexivity.
 Defined.
 
-(* Gleichheit von der Konkatenation und das Umdrehen von Wörtern.*)
+(** Das Umdrehen von Wörtern ist ein Antihomomorphismus bezüglich der Konkatenation. *)
 Lemma word_reverse_concat_word {A : Type} (w1 w2 : @Word A) :
       word_reverse (concat_word w1 w2) = concat_word (word_reverse w2) (word_reverse w1).
 Proof.
@@ -127,7 +144,7 @@ induction w2.
     apply concat_word_associative.
 Defined.
 
-(* Das Drehen von Wörtern ist idempotent.*)
+(** Das Umdrehen von Wörtern ist idempotent.*)
 Lemma word_reverse_idempotent {A : Type} (w : @Word A) : word_reverse (word_reverse w) = w.
 Proof.
   induction w.
@@ -141,19 +158,32 @@ Proof.
     reflexivity.
 Defined.
 
-(* Eine Liste in ein Wort umwandeln.*)
+(** Somit ist [Word] als Monoid mit [concat_word] als assoziatove Konkatenation 
+ und [eps] als neutrales Element, definiert. Bei [list] erhalten wir die gleichen Eigenschaften 
+ durch [concat] als assoziative Konkatenation und [nil] als neutrales Element bezüglich der 
+ Konkatenation. 
 
-(* Hierbei wird die Liste in ein Wort umgewandelt, allerdings wird das Wort auch in der umgedrehten 
-Reihenfolge wieder zusammengesetzt.*)
+ Diese Eigenschaften von Listen und Wörtern ermöglichen weitere Schlussfolgerungen
+ bezüglich der Überführung von Listen in Wörtern und anders herum. *)
+
+(**  * Eine Liste in ein Wort umwandeln.*)
+
+(** Ein Problem, dass sich hierbei ergibt ist, dass die Typen von Listen und Wörter auf unterschiedlich
+ arbeitende Konstruktoren aufbauen. Die Liste wird von hinten nach vorn aufgebaut, indem das 
+ nächste Zeichen vorn angehängt wird und der Aufbau eines Wortes ist entgegengesetzt. Wenn man 
+ die Umwandlung von einer Liste in ein Wort intuitiv implementiert, erhält man die Funktion, die in 
+ [list_to_word] beschrieben ist. Das Ergebis ist jedoch ein Wort in umgedrehter Reihenfolge. *)
+
 Fixpoint list_to_word {A : Type} (l : list A) : @Word A :=
   match l with
     | nil           => eps
     | cons x l'  => snoc (list_to_word l') x
   end.
 
-(* Eine Liste in ein Wort umwandeln unter Beachtung der Reihenfolge und mithilfe von list_to_word.
-Hierbei gibt es zwei Varianten. Die Liste zuerst in ein Wort umwandeln und dann die Reihenfolge ändern
-oder zuerst die Liste umdrehen und dann in ein Wort umwandeln.*)
+(** Um eine Liste mithilfe von [list_to_word] in ein Wort unter Beachtung der Reihenfolge unzuwandeln,
+ können zwei verschiedene Ansätze verwerdent werden. Die Liste wird zuerst in ein Wort umgewandelt 
+und anschließent wird die Reihenfolge mit [word_reverse] geändert oder die Liste wird zuerst mit [rev] 
+gedreht und anschließend in ein Wort umgewandelt. *)
 Definition list_to_word'' {A : Type} (l : list A) : @Word A := word_reverse (list_to_word l).
 
 Definition list_to_word''' {A : Type} (l : list A) : @Word A := list_to_word (rev l).
@@ -165,6 +195,18 @@ match l with
   | nil           => eps
   | cons x l'  => concat_word (snoc eps x) (list_to_word_rec l')
 end.
+
+(** [list_to_word] ist ein Antihomomorphismus bezüglich der Konkatenation. *)
+Lemma  list_to_word_antihom {A: Type} (l1 l2 : list A) :
+  list_to_word (l1 ++ l2) = concat_word (list_to_word l2) (list_to_word l1).
+Proof.
+induction l1.
+- simpl.
+  reflexivity.
+- simpl.
+  rewrite IHl1.
+  reflexivity.
+Defined.
 
 (* Ein zusätzliches Zeichen in list_to_word verarbeiten oder erst die Liste in ein Wort umwandeln
  und dann das zusätzliche Zeichen anhängen.*)
