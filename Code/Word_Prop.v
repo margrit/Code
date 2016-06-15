@@ -114,6 +114,8 @@ Proof.
     reflexivity.
 Defined.
 
+(*Lemma concat_eps_word {A : Type} (w: @Word)*)
+
 (** Die Konkatenation von Wörtern ist assoziativ.*)
 Lemma concat_word_associative {A : Type} (w1 w2 w3 : @Word A) :
   concat_word (concat_word w1 w2) w3 = concat_word w1 (concat_word w2 w3).
@@ -196,6 +198,13 @@ match l with
   | cons x l'  => concat_word (snoc eps x) (list_to_word_rec l')
 end.
 
+Lemma list_to_word_rec_single {A : Type} (a : A) :
+  list_to_word_rec (cons a nil) = snoc eps a.
+Proof.
+simpl.
+reflexivity.
+Defined.
+
 (** [list_to_word] ist ein Antihomomorphismus bezüglich der Konkatenation. *)
 Lemma  list_to_word_antihom {A: Type} (l1 l2 : list A) :
   list_to_word (l1 ++ l2) = concat_word (list_to_word l2) (list_to_word l1).
@@ -233,6 +242,19 @@ induction l.
     rewrite IHl.
     simpl.
     reflexivity.
+Defined.
+
+Lemma list_to_word_rec_append {A : Type} (l1 l2 : list A) :
+  list_to_word_rec (l1 ++ l2) = concat_word (list_to_word_rec l1) (list_to_word_rec l2).
+Proof.
+induction l1.
+  - simpl.
+    rewrite (concat_word_eps (list_to_word_rec l2)).
+    reflexivity.
+  - simpl.
+    rewrite IHl1.
+    apply eq_sym.
+    apply concat_word_associative.
 Defined.
 
 (* Ein zusätzliches Zeichen in list_to_word'' verarbeiten oder erst die Liste in ein Wort umwandeln

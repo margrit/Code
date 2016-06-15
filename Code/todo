@@ -3,7 +3,7 @@ Allgemeine Namen im Code in englisch
 Funktionen klein mit _
 Typen Groß
 -----------
-iso delta_hat snoc / cons (als mögliche Hausaufgabe)
+iso delta_hat snoc / cons, accepted_word, ... (als mögliche Hausaufgabe)
 
 Kommentare überarbeiten
 
@@ -13,22 +13,29 @@ zusammengehörige) "Hin und Zurück ist Identität"-Aussagen vergleichen.
 Word_Prop.v in notwendige Dateien einbinden
 * beteits ins DFA_Def eingebunden.
 
+snoc als "normale" Namensfunktion und wenn die cons verwendet werden, dann mit _cons um 
+die Namen zu kürzen
+
+Lemma delta_hat_cons_snoc (q : Q) (l : list Sigma) : andersrum
+
+accepted_word = accepted_word_snoc
+
 **** aus der Mail ****
-1. Erstmal einen Typ "deterministischer Automat" ( "DAuto A S" mit einem Typ A
-  für das Alphabet und einem Typ S für die States als Parameter ... deren
-  Endlichkeit ist erstmal nebensächlich).
-
-2. Definiere die erweiterte Überführungsfunktion und die akzeptierte Sprache
-  eines deterministischen Automaten.
-
-3. Definiere einen Typ, dessen Elemente die "Konfigurationen" (DConf A S) von det.
-  Automaten über Alphabet A und Zustandstyp S beschreiben.
 
 4. Implementiere die Konfigurationsübergangsrelation eines det. Automaten.
 
-5. Definiere die akzeptierte Sprache eines det. Automaten einmal über die erweiterte
-  Überführungsfunktion und nochmal über die Konfigurationsübergangsrelation.
-  Zeige, dass beide Definitionen dieselbe Sprache definieren.
+5. Definiere die akzeptierte Sprache eines det. Automaten einmal über die 
+  Konfigurationsübergangsrelation.
+  Zeige, dass beide Definitionen 
+
+acceptet_word (delta_hat)
+acceptet_word (Conf_rel_DFA)
+
+Frage: Sollte Conf_rel_DFA nicht besser gleich nach bool statt Type gehen?
+
+dieselbe Sprache definieren.
+
+conf_list w q Zustand im letzten Element der Liste = delta_hat w q
 
 6. Definiere einen (induktiven) Typen für reguläre Ausdrücke über einem Alphabet A (Man
   braucht einzelne Zeichen aus A, Verkettung von 2 reg. Ausdrücken, Oder-Verknüpfung

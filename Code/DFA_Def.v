@@ -59,8 +59,33 @@ Fixpoint delta_hat_cons (q : Q) (w : list Sigma) : Q :=
 Fixpoint delta_hat_snoc (q : Q) (w : @Word Sigma) : Q :=
    match w with
     | eps          => q
-    | snoc w' h => delta_hat_snoc (delta q h) w'
+    | snoc w' h => delta (delta_hat_snoc q w' ) h
   end.
+
+Lemma delta_hat_snoc_Lemma (q : Q) (a : Sigma) (w : @Word Sigma) :
+  delta_hat_snoc q (concat_word (snoc eps a) w) = delta_hat_snoc (delta q a) w.
+Proof.
+induction w.
+  - simpl.
+    reflexivity.
+  - simpl.
+    rewrite IHw.
+    reflexivity.
+Defined.
+
+Lemma delta_hat_cons_snoc (q : Q) (l : list Sigma) :
+  delta_hat_cons q l = delta_hat_snoc q (list_to_word_rec l).
+Proof.
+generalize q.
+induction l.
+  - simpl.
+    reflexivity.
+  - simpl.
+    intro q1.
+    rewrite (IHl (delta q1 a)).
+    rewrite (delta_hat_snoc_Lemma q1 a (list_to_word_rec l)).
+    reflexivity.
+Defined.
 
 (* Definiert, wann ein Wort akzeptiert wird. *)
 Definition accepted_word (w : list Sigma) :=
