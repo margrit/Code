@@ -339,6 +339,13 @@ Fixpoint word_to_list_rec {A: Type} (w : @Word A) : list A :=
   | snoc w' x  => app (word_to_list_rec w') (cons x nil)
 end.
 
+Lemma word_to_list_rec_single {A : Type} (a : A) :
+  word_to_list_rec (snoc eps a) = cons a nil.
+Proof.
+simpl.
+reflexivity.
+Defined.
+
 (* Ein zusätzliches Zeichen in word_to_list verarbeiten oder erst das Wort in eine Liste umwandeln
  und dann das zusätzliche Zeichen anhängen.*)
 Lemma word_to_list_singleappend {A : Type} (x : A) (w : @Word A) :
@@ -351,6 +358,16 @@ Proof.
     rewrite IHw.
     reflexivity.
 Defined.
+
+Lemma word_to_list_rec_append {A : Type} (w1 w2 : @Word A) :
+  word_to_list_rec (concat_word w1 w2) = (word_to_list_rec w1) ++ (word_to_list_rec w2).
+Proof.
+induction w1.
+  - simpl.
+    rewrite (concat_word_eps  w2).
+    reflexivity.
+  - simpl.
+(* hier komm ich auch nicht wirklich weiter. fehlt mir irgendwie grad die zündene idee.*)
 
 (* Ein zusätzliches Zeichen in word_to_list_rec verarbeiten oder erst das Wort in eine Liste umwandeln
  und dann das zusätzliche Zeichen anhängen.*)

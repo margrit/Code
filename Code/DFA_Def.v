@@ -55,6 +55,19 @@ Fixpoint delta_hat_cons (q : Q) (w : list Sigma) : Q :=
     | cons h w' => delta_hat_cons (delta q h) w'
   end.
 
+Lemma delta_hat_cons_Lemma (q : Q) (a : Sigma) (l : list Sigma) :
+  delta_hat_cons q (l ++ (a :: nil)) = delta_hat_cons (delta q a) l.
+Proof.
+induction l.
+  - simpl.
+    reflexivity.
+  - simpl.
+(* glaube die Definition des Lemmas ist falsch.
+    rewrite IHl.
+    reflexivity.
+Defined.
+*)
+
 (* Erweiterte Überführungsfunktion delta_hat_snoc, wie in der Vorlesung definiert.*)
 Fixpoint delta_hat_snoc (q : Q) (w : @Word Sigma) : Q :=
    match w with
@@ -78,6 +91,20 @@ Lemma delta_hat_cons_snoc (q : Q) (l : list Sigma) :
 Proof.
 generalize q.
 induction l.
+  - simpl.
+    reflexivity.
+  - simpl.
+    intro q1.
+    rewrite (IHl (delta q1 a)).
+    rewrite (delta_hat_snoc_Lemma q1 a (list_to_word_rec l)).
+    reflexivity.
+Defined.
+
+Lemma delta_hat_snoc_cons (q : Q) (w : @Word Sigma) :
+  delta_hat_snoc q w = delta_hat_cons q (word_to_list_rec w).
+Proof.
+generalize q.
+induction w.
   - simpl.
     reflexivity.
   - simpl.
