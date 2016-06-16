@@ -1,5 +1,5 @@
 Load Definitions_vector.
-Load Comparison.
+(* Load Comparison. *)
 Require Import Vector.
 Require Import Arith.
 Require Import Decidable.
@@ -102,6 +102,8 @@ dependent induction p.
     pose (cons A h (S n) t).
     assumption.
 Defined.
+
+(*
 Print insert_at.
 Print False_rect.
 
@@ -131,9 +133,6 @@ match p in (Fin.t (S m')) return (t A m') -> t A (S m') with
              | cons _ h n' v' => cons _ h (S n') (insert_at' v' p'' a)
             end) p'
 end.
-
-
-
 
 match n with
  | 0    => (fun n' => match p with 
