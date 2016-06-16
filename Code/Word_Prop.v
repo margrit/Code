@@ -362,12 +362,14 @@ Defined.
 Lemma word_to_list_rec_append {A : Type} (w1 w2 : @Word A) :
   word_to_list_rec (concat_word w1 w2) = (word_to_list_rec w1) ++ (word_to_list_rec w2).
 Proof.
-induction w1.
+induction w2.
   - simpl.
-    rewrite (concat_word_eps  w2).
+    rewrite (concat_nil (word_to_list_rec w1)).
     reflexivity.
   - simpl.
-(* hier komm ich auch nicht wirklich weiter. fehlt mir irgendwie grad die zündene idee.*)
+    rewrite IHw2.
+    apply concat_associative.
+Defined.
 
 (* Ein zusätzliches Zeichen in word_to_list_rec verarbeiten oder erst das Wort in eine Liste umwandeln
  und dann das zusätzliche Zeichen anhängen.*)
