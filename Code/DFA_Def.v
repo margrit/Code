@@ -55,17 +55,18 @@ Fixpoint delta_hat_cons (q : Q) (w : list Sigma) : Q :=
     | cons h w' => delta_hat_cons (delta q h) w'
   end.
 
-(*Lemma delta_hat_cons_Lemma (q : Q) (a : Sigma) (l : list Sigma) :
+Lemma delta_hat_cons_Lemma (q : Q) (a : Sigma) (l : list Sigma) :
   delta_hat_cons q (l ++ (a :: nil)) = delta (delta_hat_cons q l) a.
 Proof.
+generalize q.
 induction l.
   - simpl.
     reflexivity.
   - simpl.
+    intro q1.
     rewrite IHl.
     reflexivity.
 Defined.
-*)
 
 (* Erweiterte Überführungsfunktion delta_hat_snoc, wie in der Vorlesung definiert.*)
 Fixpoint delta_hat_snoc (q : Q) (w : @Word Sigma) : Q :=
@@ -99,7 +100,7 @@ induction l.
     reflexivity.
 Defined.
 
-(*Lemma delta_hat_snoc_cons (q : Q) (w : @Word Sigma) :
+Lemma delta_hat_snoc_cons (q : Q) (w : @Word Sigma) :
   delta_hat_snoc q w = delta_hat_cons q (word_to_list_rec w).
 Proof.
 generalize q.
@@ -108,11 +109,10 @@ induction w.
     reflexivity.
   - simpl.
     intro q1.
-    rewrite <- (IHw (delta_hat_snoc q1 w)).
-    rewrite (delta_hat_snoc_Lemma q1 a (list_to_word_rec l)).
+    rewrite IHw.
+    rewrite <- delta_hat_cons_Lemma.
     reflexivity.
 Defined.
-*)
 
 (* Definiert, wann ein Wort akzeptiert wird. *)
 Definition accepted_word (w : list Sigma) :=
