@@ -56,13 +56,12 @@ Fixpoint delta_hat_cons (q : Q) (w : list Sigma) : Q :=
   end.
 
 Lemma delta_hat_cons_Lemma (q : Q) (a : Sigma) (l : list Sigma) :
-  delta_hat_cons q (l ++ (a :: nil)) = delta_hat_cons (delta q a) l.
+  delta_hat_cons q (l ++ (a :: nil)) = delta (delta_hat_cons q l) a.
 Proof.
 induction l.
   - simpl.
     reflexivity.
   - simpl.
-(* glaube die Definition des Lemmas ist falsch.
     rewrite IHl.
     reflexivity.
 Defined.
