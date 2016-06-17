@@ -69,14 +69,14 @@ induction l.
 Defined.
 
 (* Erweiterte Überführungsfunktion delta_hat_snoc, wie in der Vorlesung definiert.*)
-Fixpoint delta_hat_snoc (q : Q) (w : @Word Sigma) : Q :=
+Fixpoint delta_hat (q : Q) (w : @Word Sigma) : Q :=
    match w with
     | eps          => q
-    | snoc w' h => delta (delta_hat_snoc q w' ) h
+    | snoc w' h => delta (delta_hat q w' ) h
   end.
 
-Lemma delta_hat_snoc_Lemma (q : Q) (a : Sigma) (w : @Word Sigma) :
-  delta_hat_snoc q (concat_word (snoc eps a) w) = delta_hat_snoc (delta q a) w.
+Lemma delta_hat_Lemma (q : Q) (a : Sigma) (w : @Word Sigma) :
+  delta_hat q (concat_word (snoc eps a) w) = delta_hat (delta q a) w.
 Proof.
 induction w.
   - simpl.
@@ -87,7 +87,7 @@ induction w.
 Defined.
 
 Lemma delta_hat_cons_snoc (q : Q) (l : list Sigma) :
-  delta_hat_cons q l = delta_hat_snoc q (list_to_word_rec l).
+  delta_hat_cons q l = delta_hat q (list_to_word_rec l).
 Proof.
 generalize q.
 induction l.
@@ -96,12 +96,12 @@ induction l.
   - simpl.
     intro q1.
     rewrite (IHl (delta q1 a)).
-    rewrite (delta_hat_snoc_Lemma q1 a (list_to_word_rec l)).
+    rewrite (delta_hat_Lemma q1 a (list_to_word_rec l)).
     reflexivity.
 Defined.
 
 Lemma delta_hat_snoc_cons (q : Q) (w : @Word Sigma) :
-  delta_hat_snoc q w = delta_hat_cons q (word_to_list_rec w).
+  delta_hat q w = delta_hat_cons q (word_to_list_rec w).
 Proof.
 generalize q.
 induction w.
@@ -115,11 +115,27 @@ induction w.
 Defined.
 
 (* Definiert, wann ein Wort akzeptiert wird. *)
-Definition accepted_word (w : list Sigma) :=
+Definition accepted_word_cons (w : list Sigma) :=
   is_accepting (delta_hat_cons q0 w).
 
-Definition accepted_word_snoc (w : @Word Sigma) :=
-  is_accepting (delta_hat_snoc q0 w).
+Definition accepted_word (w : @Word Sigma) :=
+  is_accepting (delta_hat q0 w).
+
+Lemma accepted_word_Lemma (w : @Word Sigma) :
+  accepted_word w = accepted_word_cons (word_to_list_rec w).
+Proof.
+unfold accepted_word.
+unfold accepted_word_cons.
+induction w.
+  - simpl.
+    reflexivity.
+  - generalize q0.
+    simpl.
+    intro q0.
+    rewrite delta_hat_cons_Lemma.
+    rewrite delta_hat_snoc_cons.
+    reflexivity.
+Defined.
 
 (* Typ der Konfigurationen eines DFA, Conf_DFA = Q x Sigma* *)
 (*Definition Conf_DFA := Q * (list Sigma) : Type.*)
