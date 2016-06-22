@@ -3,22 +3,8 @@ Allgemeine Namen im Code in englisch
 Funktionen klein mit _
 Typen Groß
 -----------
-iso delta_hat snoc / cons, accepted_word, ... (als mögliche Hausaufgabe)
 
 Kommentare überarbeiten
-
-Die verschiedenen Beweise für die (6, davon jeweils 2
-zusammengehörige) "Hin und Zurück ist Identität"-Aussagen vergleichen.
-
-Word_Prop.v in notwendige Dateien einbinden
-* beteits ins DFA_Def eingebunden.
-
-snoc als "normale" Namensfunktion und wenn die cons verwendet werden, dann mit _cons um 
-die Namen zu kürzen
-
-Lemma delta_hat_cons_snoc (q : Q) (l : list Sigma) : andersrum
-
-accepted_word = accepted_word_snoc
 
 **** aus der Mail ****
 

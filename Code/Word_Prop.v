@@ -114,7 +114,12 @@ Proof.
     reflexivity.
 Defined.
 
-(*Lemma concat_eps_word {A : Type} (w: @Word)*)
+(** Das leere Wort [eps] ist rechtsneutral bezüglich der Konkatenation. *)
+Lemma concat_eps_word  {A : Type} (w : @Word A) : concat_word w eps = w.
+Proof.
+simpl.
+reflexivity.
+Defined.
 
 (** Die Konkatenation von Wörtern ist assoziativ.*)
 Lemma concat_word_associative {A : Type} (w1 w2 w3 : @Word A) :

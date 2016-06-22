@@ -140,9 +140,8 @@ Defined.
 (* Typ der Konfigurationen eines DFA, Conf_DFA = Q x Sigma* *)
 (*Definition Conf_DFA := Q * (list Sigma) : Type.*)
 Definition Conf_DFA := Q * (@Word Sigma) : Type.
-Print Conf_DFA.
 
-(* Konfigurationsübergangsrelation *)
+(* Konfigurationsübergangsrelation mit Type*)
 
 (* Ein einzelner Konfigurationsschritt. *)
 Inductive Conf_DFA_step : Conf_DFA -> Conf_DFA -> Type :=
@@ -158,8 +157,6 @@ Inductive Conf_rel_DFA : Conf_DFA -> Conf_DFA -> Type :=
                                      Conf_rel_DFA K L ->
                                      Conf_DFA_step L M ->
                                      Conf_rel_DFA K M.
-
-Print option.
 
 (* Ableiten der nächsten Konfiguration - next_Conf.*)
 Fixpoint next_Conf  (conf : Conf_DFA) : option Conf_DFA :=
