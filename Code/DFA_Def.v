@@ -5,16 +5,18 @@
 
 *)
 
-(* Vorschlag: Hier ein kurzes Notationsverzeichnis, das in der 
-   coqdoc-Dokumentation erscheinen koennte? 
-   Und die konkreten Definitionen aus den VL-Folien dann jeweils an der Stelle, 
-   wo das entsprechende Konzept implementiert wird? *)
+(** Wie in der Vorlesung Theoretische Informatik I werden die einzelne Komponenten eines
+ deterministischen endlichen Automats (DEA, nachfolgend DFA genannt) als 5-Tupel beschrieben.
 
+DFA = (Q, Sigma, delta, q0, F) mit
 
-(*Aus Dfa.v*)
-(*
- * Die Basis Komponenten eines Automaten. 
- *)
+* Q, als nichtleere endliche Zustandsmenge
+* Sigma, als (endliches) Eingabealphabet
+* delta: Q x Sigma -> Q, als Zustandsüberführungsfunktion
+* q0, als Startzustand
+* F Teilmenge von Q, als Menge der akzeptierenden Zustände.
+
+Diese Komponenten werden nachfolgend definiert.*)
 
 Require Import Fin.
 Require Import Arith.
@@ -22,39 +24,43 @@ Load Word_Prop.
 
 Section Definitions.
 
-(* Anzahl der moeglichen Zustaende *)
+(** Die Anzahl der möglichen Zustände.*)
 Parameter Q_size : nat.
 
-(* Typ der Zustaende *)
+(** Der Typ der Zustände.*)
 Definition Q := @Fin.t Q_size.
 
-(* Anzahl der Elemente des Eingabealphabets *)
+(** Die Anzahl der Elemente des Eingabealphabets.*)
 Parameter S_size : nat.
 
-(* Typ des Eingabealphabets *)
+(** Der Typ des Eingabealphabets.*)
 Definition Sigma := @Fin.t S_size.
 
-(* Die Transitionsfunktion - delta *)
+(** Die Transitionsfunktion - delta.*)
 Parameter delta : Q -> Sigma -> Q.
 
-(* Funktion die entscheidet, ob ein Zustand ein akzeptierender Zustand ist *)
+(** Die Funktion, die entscheidet, ob ein Zustand ein akzeptierender Zustand ist. *)
 Parameter is_accepting : Q -> bool.
 
-(* Startzustand *)
+(** Der Startzustand. *)
 Parameter q0 : Q.
 
-(* Um zu definieren, wann ein Wort akzeptiert wird, muessen noch 
-einige Vorueberlegungen getroffen werden. Hierzu braucht man die 
-erweiterte Transitionsfunktion delta_hat_cons. *)
+(** Um zu definieren, wann ein Wort akzeptiert wird, mÜssen noch einige Vorüberlegungen
+getroffen werden. Hierzu wird die erweiterte Transitionsfunktion [delta_hat] bzw. 
+[delta_hat_cons] benötigt. Da im allgemeinen auf Wörtern gearbeitet werden soll, die [snoc] als
+Konstruktor haben, wird dies in den Funktionsnamen weggelassen, um diese kurz zu halten.
+Nur wenn explizit auf Listen gearbeitet werden soll, wird der [cons] Konstruktor im Namen
+verwendet.*)
 
-(* Erweiterte Überführungsfunktion - delta_hat, wird wahrscheinlich wieder rausgenommen, 
- da in der Vorlesung über snoc-Listen definiert wurde.*)
+(** Erweiterte Überführungsfunktion [delta_hat_cons], wird wahrscheinlich wieder rausgenommen,
+ da in der Vorlesung über den snoc Konstruktor definiert wurde.*)
 Fixpoint delta_hat_cons (q : Q) (w : list Sigma) : Q :=
   match w with
     | nil             => q
     | cons h w' => delta_hat_cons (delta q h) w'
   end.
 
+(** #####*)
 Lemma delta_hat_cons_Lemma (q : Q) (a : Sigma) (l : list Sigma) :
   delta_hat_cons q (l ++ (a :: nil)) = delta (delta_hat_cons q l) a.
 Proof.
@@ -68,13 +74,18 @@ induction l.
     reflexivity.
 Defined.
 
-(* Erweiterte Überführungsfunktion delta_hat_snoc, wie in der Vorlesung definiert.*)
+(** Die erweiterte Überführungsfunktion [delta_hat], wie in der Vorlesung definiert.*)
 Fixpoint delta_hat (q : Q) (w : @Word Sigma) : Q :=
    match w with
     | eps          => q
     | snoc w' h => delta (delta_hat q w' ) h
   end.
 
+(** Um ein zusätzliches Zeichen und ein Wort aus dem Eingabealphabet abzuarbeiten kann
+erst das Zeichen vor das Wort gehängt werden, um dann [delta_hat] von dem Ausgangszustand
+darauf anzuwenden. Die andere Variante ist, dass zuerst der Folgezustand mit [delta] von dem
+Zeichen und dem Ausgangszustand berechnet wird und davon ausgehend dann das Wort 
+abgearbeitet wird.*)
 Lemma delta_hat_Lemma (q : Q) (a : Sigma) (w : @Word Sigma) :
   delta_hat q (concat_word (snoc eps a) w) = delta_hat (delta q a) w.
 Proof.
@@ -86,6 +97,11 @@ induction w.
     reflexivity.
 Defined.
 
+(* Die Funktionen [delta_hat] und [delta_hat_cons] angewendet auf ein Wort bzw. eine Liste
+beschreiben den gleichen Sachverhalt. Die Liste kann durch [delta_hat_cons] direkt abgearbeitet
+werden. Bei [delta_hat] muss die Liste durch [list_to_word_rec] in ein Wort umgewandelt werden,
+da der Eingabetyp [Word] erwartet wird. Die Abbildung in die andere Richtung kann man mit
+[word_to_list_rec] analog definieren.*)
 Lemma delta_hat_cons_snoc (q : Q) (l : list Sigma) :
   delta_hat_cons q l = delta_hat q (list_to_word_rec l).
 Proof.
@@ -114,13 +130,15 @@ induction w.
     reflexivity.
 Defined.
 
-(* Definiert, wann ein Wort akzeptiert wird. *)
+(* Definiert, wann ein Wort akzeptiert wird.*)
 Definition accepted_word_cons (w : list Sigma) :=
   is_accepting (delta_hat_cons q0 w).
 
 Definition accepted_word (w : @Word Sigma) :=
   is_accepting (delta_hat q0 w).
 
+(* Die Funktionen [accepted_word] und [accepted_word_cons] beschreiben die gleiche
+Menge der akzeptierten Wörter.*)
 Lemma accepted_word_Lemma (w : @Word Sigma) :
   accepted_word w = accepted_word_cons (word_to_list_rec w).
 Proof.
@@ -137,13 +155,16 @@ induction w.
     reflexivity.
 Defined.
 
-(* Typ der Konfigurationen eines DFA, Conf_DFA = Q x Sigma* *)
+(* Der Typ der Konfigurationen eines DFA, Conf_DFA = Q x @Word Sigma*.*)
 (*Definition Conf_DFA := Q * (list Sigma) : Type.*)
 Definition Conf_DFA := Q * (@Word Sigma) : Type.
 
 (* Konfigurationsübergangsrelation mit Type*)
 
-(* Ein einzelner Konfigurationsschritt. *)
+(*### geht besser ###*)
+(* Ein einzelner Konfigurationsschritt. Ausgehend von einer Konfiguration, einem Zeichen
+aus Sigma und einem Wort, wird das Zeichen durch [delta] abgearbeitet und führt zur
+nachfolgenden Konfiguration.*)
 Inductive Conf_DFA_step : Conf_DFA -> Conf_DFA -> Type :=
  | one_step : forall (q : Q) (p : Q) (a : Sigma) (w : @Word Sigma) (eq : (delta q a) = p), 
                                     Conf_DFA_step (q, (snoc w a)) (p, w).
@@ -158,7 +179,12 @@ Inductive Conf_rel_DFA : Conf_DFA -> Conf_DFA -> Type :=
                                      Conf_DFA_step L M ->
                                      Conf_rel_DFA K M.
 
-(* Ableiten der nächsten Konfiguration - next_Conf.*)
+(** Für die Anwendung des Pumping Lemmas muss die Abarbeitung eines Wortes in einer Liste
+gespeichert werden, da diese Informationen enthält, ob ein Zustand mehrfach durchlaufen wird.
+Dies ist der Fall, wenn die Anzahl der Konfigurationen innerhalb der Liste länger ist, als die Anzahl
+der Zustände des Automaten.*)
+
+(* Ableiten der nächsten Konfiguration [next_Conf].*)
 Fixpoint next_Conf  (conf : Conf_DFA) : option Conf_DFA :=
   match conf with
     | (q, eps)         => None
@@ -187,12 +213,6 @@ Fixpoint conf_seq (conf : Conf_DFA) : list Conf_DFA :=
    ich sehe auch sonst keinen Vorteil.
    Die "Wrapper" Funktion muss dann natuerlich kein Fixpunkt sein. *)
 
-(*Definition word := list Sigma.
-
-Definition emtptyW := @nil Sigma.
-Definition concatW := @cons Sigma.
-*)
-
 Fixpoint conf_list (w : @Word Sigma) (q : Q) : list Conf_DFA :=
  let conf := (q, w) in
   match w with
@@ -205,18 +225,9 @@ Definition conf_to_conf_list (conf : Conf_DFA) : list Conf_DFA :=
 
 Print list.
 
-(*Definition eines induktiven Datentyps, der Wörter beschreibt.*)
-(*Inductive Word (S : Sigma) : Type :=
-| empty_Word : Word S
-| cons_Word : Word S -> Word S -> Word S.
-*)
 (*Definition der akzeptierten Sprache
 Definition L_DFA (w : list Sigma) : Conf_DFA:=
 exists p : Q, Conf_rel_DFA (q0 , w) (p, nil).
-*)
-(*Definition accepted_word (w : list Sigma) :=
-  is_accepting (delta_hat q0 w).
-Parameter is_accepting : Q -> bool.
 *)
 
 End Definitions.
