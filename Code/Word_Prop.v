@@ -2,7 +2,7 @@ Require Import List.
 (* Funktionen die aus der List Bibliothek importiert und hier verwendet werden sind
  - rev, app und concat. *)
 
-(*Inductive Sigma := h : Sigma | a : Sigma | l : Sigma | o : Sigma.*)
+(* Beispiel für ein Eingabealphabet: Inductive Sigma := h : Sigma | a : Sigma | l : Sigma | o : Sigma.*)
 
 (** Die Ursprungsidee war auf Listen zu arbeiten. Da die Verfahren aus der Vorlesung
  möglichst eins zu eins abgebildet werden sollen, ist es notwendig einen induktiven Typen
@@ -46,7 +46,8 @@ Fixpoint word_reverse {A : Type} (w : @Word A) : @Word A  :=
 
 (** ** Eigenschaften von [concat] und [rev] über Listen: *)
 
-(** Die leere Liste [nil] ist rechtsneutral bzgl. der Konkatenation.*)
+(** Die leere Liste [nil] ist rechtsneutral bzgl. der Konkatenation. (Per Definition ist [nil] auch
+linksneutral.)*)
 Lemma concat_nil {A : Type} (ls : list A) : (ls ++ nil) = ls.
 Proof.
   induction ls.
@@ -103,7 +104,8 @@ Defined.
 
 (** ** Eigenschaften von [concat_word] und [word_reverse].*)
 
-(** Das leere Wort [eps] ist linksneutral bzgl. der Konkatenation. *)
+(** Das leere Wort [eps] ist linksneutral bzgl. der Konkatenation. (Per Definition ist [eps] auch
+rechtsneutral.)*)
 Lemma concat_word_eps {A : Type} (w : @Word A) : concat_word eps w = w.
 Proof.
   induction w.
@@ -112,13 +114,6 @@ Proof.
   - simpl.
     rewrite IHw.
     reflexivity.
-Defined.
-
-(** Das leere Wort [eps] ist rechtsneutral bzgl. der Konkatenation. *)
-Lemma concat_eps_word  {A : Type} (w : @Word A) : concat_word w eps = w.
-Proof.
-simpl.
-reflexivity.
 Defined.
 
 (** Die Konkatenation von Wörtern ist assoziativ.*)
@@ -179,43 +174,18 @@ Defined.
  arbeitende Konstruktoren aufbauen. Die Liste wird von hinten nach vorn aufgebaut, indem das 
  nächste Zeichen vorn angehängt wird und der Aufbau eines Wortes ist entgegengesetzt. Wenn man
  die Umwandlung von einer Liste in ein Wort eins zu eins implementiert, erhält man die Funktion, die in
- [list_to_word] beschrieben ist. Das Ergebis ist jedoch ein Wort in umgedrehter Reihenfolge. Hierbei
- handelt es sich um einen Antihomomorphismus, da zwar das neutrale Element enthalten ist, die
- Konkatenation aber fehlt.*)
-Fixpoint list_to_word {A : Type} (l : list A) : @Word A :=
+ [list_to_word] beschrieben ist.*)
+Fixpoint list_to_word_simple {A : Type} (l : list A) : @Word A :=
   match l with
     | nil           => eps
-    | cons x l'  => snoc (list_to_word l') x
+    | cons x l'  => snoc (list_to_word_simple l') x
   end.
 
-(** Um eine Liste mithilfe von [list_to_word] in ein Wort unter Beachtung der Reihenfolge unzuwandeln,
- können zwei verschiedene Ansätze verwendet werden. Die Liste wird zuerst in ein Wort umgewandelt
-und anschließend wird die Reihenfolge mit [word_reverse] geändert oder die Liste wird zuerst mit [rev]
-umgedreht und anschließend in ein Wort umgewandelt. *)
-Definition list_to_word'' {A : Type} (l : list A) : @Word A := word_reverse (list_to_word l).
-
-Definition list_to_word''' {A : Type} (l : list A) : @Word A := list_to_word (rev l).
-
-(**  Um [list_to_word] als homomorphe Abbildung zu definieren, muss die Konkatenation bzgl. des
- entstehenden Monoides berücksichtigt werden. Dadurch wird die Reihenfolge bei der Umwandlung
- in [list_to_word_rec] eingehalten*)
-Fixpoint list_to_word_rec {A : Type} (l : list A) : @Word A :=
-match l with
-  | nil           => eps
-  | cons x l'  => concat_word (snoc eps x) (list_to_word_rec l')
-end.
-
-(** #########*)
-Lemma list_to_word_rec_single {A : Type} (a : A) :
-  list_to_word_rec (cons a nil) = snoc eps a.
-Proof.
-simpl.
-reflexivity.
-Defined.
-
-(** [list_to_word] ist ein Antihomomorphismus bzgl. der Konkatenation. *)
-Lemma  list_to_word_antihom {A: Type} (l1 l2 : list A) :
-  list_to_word (l1 ++ l2) = concat_word (list_to_word l2) (list_to_word l1).
+(** Das Ergebnis ist jedoch ein Wort in umgedrehter Reihenfolge. Hierbei handelt 
+es sich um einen Antihomomorphismus: Das neutrale Element wird erhalten, das Bild einer Konkatenation
+ist die umgekehrte Konkatenation der Bilder der Einzellisten.*)
+Lemma  list_to_word_simple_antihom {A: Type} (l1 l2 : list A) :
+  list_to_word_simple (l1 ++ l2) = concat_word (list_to_word_simple l2) (list_to_word_simple l1).
 Proof.
 induction l1.
 - simpl.
@@ -225,56 +195,40 @@ induction l1.
   reflexivity.
 Defined.
 
-(** Um ein zusätzliches Zeichen in [list_to_word] bzw. [list_to_word_rec] zu verarbeiten kann das
- Zeichen erst mit der Liste verknüpft und dann in ein Wort umgewandelt werden oder die
- Ursprungsliste wird in ein Wort umgewandelt und mit [concat_word] das zusätzliche Zeichen
- angehängt. Bei [list_to_word_singleappend] ist zu beachten, dass das entstehende Wort in gedrehter
- Reihenfolge abgebildet wird und somit das zusätzliche Zeichen vorn angehängt werden muss.
- Bei [list_to_word_rec_singleappend] wird das zusätzliche Zeichen hinten an das Wort gehängt.*)
-Lemma list_to_word_singleappend {A : Type} (a : A) (l : list A) :
-  list_to_word (l ++ (a :: nil)) = concat_word (snoc eps a) (list_to_word l).
+(** Um eine Liste mithilfe von [list_to_word_simple] in ein Wort unter Beachtung der Reihenfolge unzuwandeln,
+ können zwei verschiedene Ansätze verwendet werden. Die Liste wird zuerst in ein Wort umgewandelt
+und anschließend wird die Reihenfolge mit [word_reverse] geändert oder die Liste wird zuerst mit [rev]
+umgedreht und anschließend in ein Wort umgewandelt. Da jeweils zwei Antihomomorphismen hintereinander
+ausgeführt werden, sind beide entstehenden Funktionen Homomorphismen bzgl. der Konkatenationen.*)
+Definition list_to_word' {A : Type} (l : list A) : @Word A := word_reverse (list_to_word_simple l).
+
+Definition list_to_word'' {A : Type} (l : list A) : @Word A := list_to_word_simple (rev l).
+
+(**  [list_to_word'] und [list_to_word''] basieren auf Funktionen, die durch Pattern Matching definiert sind.
+Durch Auffaltung der Definitionen können auch [list_to_word'] und [list_to_word''] über Pattern Matching
+definiert werden. Es stellt sich heraus, dass in beiden Fällen dieselbe Funktion [list_to_word] entsteht.
+Die Gleichheiten werden in  [list_to_word_Lemma] und [list_to_word_Lemma'] gezeigt.*)
+Fixpoint list_to_word {A : Type} (l : list A) : @Word A :=
+match l with
+  | nil           => eps
+  | cons x l'  => concat_word (snoc eps x) (list_to_word l')
+end.
+
+(** [list_to_word_single] auf einelementigen Listen.*)
+Lemma list_to_word_single {A : Type} (a : A) :
+  list_to_word (cons a nil) = snoc eps a.
 Proof.
-  induction l.
-  - simpl.
-    reflexivity.
-  - simpl.
-    rewrite IHl.
-    reflexivity.
+simpl.
+reflexivity.
 Defined.
 
-Lemma list_to_word_rec_singleappend {A : Type} (a : A) (l : list A) :
-  list_to_word_rec (l ++ (a :: nil)) = concat_word (list_to_word_rec l) (snoc eps a).
-Proof.
-induction l.
-  - simpl.
-    reflexivity.
-  - simpl.
-    rewrite IHl.
-    simpl.
-    reflexivity.
-Defined.
-
-Lemma list_to_word''_singleappend {A : Type} (a : A) (l : list A) :
-  list_to_word'' (l ++ (a :: nil)) = concat_word (list_to_word'' l) (snoc eps a).
-Proof.
-unfold list_to_word''.
-induction l.
-  - simpl.
-    reflexivity.
-   - simpl.
-     rewrite IHl.
-    reflexivity.
-Defined.
-
-(** [list_to_word_rec_append] definiert eine Funktion, in der zwei Zeichenketten als Liste
- konkateniert werden, um sie anschließend in ein Wort umzuwandeln bzw. zwei Listen in zwei
- Wörter umwandelt und dann die beiden Wörter miteinander verknüpft.*)
-Lemma list_to_word_rec_append {A : Type} (l1 l2 : list A) :
-  list_to_word_rec (l1 ++ l2) = concat_word (list_to_word_rec l1) (list_to_word_rec l2).
+(** [list_to_word] ist ein Homomorphismus bzgl. Konkatenationen.*)
+Lemma list_to_word_hom {A : Type} (l1 l2 : list A) :
+  list_to_word (l1 ++ l2) = concat_word (list_to_word l1) (list_to_word l2).
 Proof.
 induction l1.
   - simpl.
-    rewrite (concat_word_eps (list_to_word_rec l2)).
+    rewrite (concat_word_eps (list_to_word l2)).
     reflexivity.
   - simpl.
     rewrite IHl1.
@@ -282,14 +236,11 @@ induction l1.
     apply concat_word_associative.
 Defined.
 
-(** Die Funktionen [list_to_word_rec] und [list_to_word''], sowie [list_to_word'''] und [list_to_word'']
- liefern das gleiche Ergebnis, welches in den Lemata [list_to_word_rec_Lemma], [list_to_word_Lemma]
- bzw. [list_to_word'_Lemma] bewiesen ist. Eines der beiden letzteren Lemmata kann noch entfernt
- werden. Dies wird sich im Laufe der Arbeit herausstellen, welche Richtung häufiger Verwendung findet.*)
-Lemma list_to_word_rec_Lemma {A : Type} (a : A) (l : list A) : 
-  list_to_word_rec l = list_to_word'' l.
+(** [list_to_word], [list_to_word'] und [list_to_word''] beschreiben dieselbe Funktion.*)
+Lemma list_to_word_Lemma {A : Type} (l : list A) : 
+  list_to_word l = list_to_word' l.
 Proof.
-unfold list_to_word''.
+unfold list_to_word'.
 induction l.
   - simpl.
     reflexivity.
@@ -298,73 +249,41 @@ induction l.
     reflexivity.
 Defined.
 
-Lemma list_to_word_Lemma {A : Type} (l : list A) :
-  list_to_word''' l = list_to_word'' l.
+Lemma list_to_word_Lemma' {A : Type} (l : list A) : 
+  list_to_word l = list_to_word'' l.
 Proof.
-  unfold list_to_word'''.
-  unfold list_to_word''.
-  induction l.
+unfold list_to_word''.
+induction l.
   - simpl.
     reflexivity.
   - simpl.
-    rewrite <- IHl.
-    pose (ltwsa := list_to_word_singleappend a (rev l)).
-    rewrite ltwsa.
+    rewrite list_to_word_simple_antihom.
+    rewrite IHl.
     reflexivity.
 Defined.
 
 Lemma list_to_word'_Lemma {A : Type} (l : list A) :
-  list_to_word'' l = list_to_word''' l.
+  list_to_word' l = list_to_word'' l.
 Proof.
-  unfold list_to_word'''.
-  unfold list_to_word''.
-  induction l.
-  - simpl.
-    reflexivity.
-  - simpl.
-    rewrite IHl.
-    pose (ltw'sa := list_to_word_singleappend a (rev l)).
-    rewrite ltw'sa.
-    reflexivity.
+rewrite <- list_to_word_Lemma.
+rewrite <- list_to_word_Lemma'.
+reflexivity.
 Defined.
 
 (** * Ein Wort in eine Liste umwandeln: *)
 
-(** Wie auch schon bei der Umwandlung bei einer Liste in einem Wort, besteht das Problem mit der
- Reihenfolge aufgrund der Konstruktoren auch hier. Daher entsteht durch die eins zu eins Implementierung
- der Umwandling von [word_to_list] eine Liste in umgedrehter Reihenfolge.*)
-Fixpoint word_to_list {A : Type} (w : @Word A) : list A :=
+(** Wie auch schon bei der Umwandlung von einer Liste in ein Wort, besteht das Problem mit der
+ Reihenfolge aufgrund der Konstruktoren auch hier. Die eins zu eins Implementierung der Umwandlung
+liefert die Funktion [word_to_list_simple].*)
+Fixpoint word_to_list_simple {A : Type} (w : @Word A) : list A :=
   match w with
     | eps           => nil
-    | snoc w' x  => cons x (word_to_list w')
+    | snoc w' x  => cons x (word_to_list_simple w')
   end.
 
-(** Wie schon bei [list_to_word] kann bei [word_to_list] die Reihenfolge durch das drehen der Liste nach der
- Umwandlung mit [rev] oder das zuvorige Drehen gewährleistet werden. Dies wird durch die Funktionen
- [word_to_list''] und [word_to_list'''] dargestellt.*)
-Definition word_to_list'' {A : Type} (w : @Word A) : list A := rev (word_to_list w).
-
-Definition word_to_list''' {A : Type} (w : @Word A) : list A := word_to_list (word_reverse w).
-
-(** Analog zu [list_to_word_rec] wird die Reihenfolge bei [word_to_list_rec] durch die Konkatenation von
- Listen durch [app] erhalten.*)
-Fixpoint word_to_list_rec {A: Type} (w : @Word A) : list A :=
-  match w with
-  | eps           => nil
-  | snoc w' x  => app (word_to_list_rec w') (cons x nil)
-end.
-
-(** Die Abarbeitung eines Zeichens von [word_to_list_rec].*)
-Lemma word_to_list_rec_single {A : Type} (a : A) :
-  word_to_list_rec (snoc eps a) = cons a nil.
-Proof.
-simpl.
-reflexivity.
-Defined.
-
-(** [word_to_list] ist ein Antihomomorphismus bzgl. der Konkatenation. *)
-Lemma  word_to_list_antihom {A: Type} (w1 w2 : @Word A) :
-  word_to_list (concat_word w1 w2) = (word_to_list w2) ++ (word_to_list w1).
+(** [word_to_list_simple] ist ein Antihomomorphismus bzgl. der Konkatenation. *)
+Lemma  word_to_list_simple_antihom {A: Type} (w1 w2 : @Word A) :
+  word_to_list_simple (concat_word w1 w2) = (word_to_list_simple w2) ++ (word_to_list_simple w1).
 Proof.
 induction w2.
 - simpl.
@@ -374,68 +293,46 @@ induction w2.
   reflexivity.
 Defined.
 
-(** Analog zu [list_to_word_singleappend] und [list_to_word_rec_singleappend] wird das Wort zuerst
- in eine Liste umgewandelt und dann das zusätzliche Zeichen verarbeitet oder anders herum. In
- Abhängigkeit welcher Weg gewählt wird, wird das Zeichen hinten an die Liste angehängt bzw. am
- Wort um die Reihenfolge zu wahren.*)
-Lemma word_to_list_singleappend {A : Type} (x : A) (w : @Word A) :
-  word_to_list (concat_word (snoc eps x) w) = app (word_to_list w) (x :: nil).
+(** Wie schon bei [list_to_word] kann bei [word_to_list] die Reihenfolge durch das Umdrehen der Liste nach der
+ Umwandlung mit [rev] oder das vorhrige Umdrehen gewährleistet werden. Dies wird durch die Funktionen
+ [word_to_list'] und [word_to_list''] dargestellt.*)
+Definition word_to_list' {A : Type} (w : @Word A) : list A := rev (word_to_list_simple w).
+
+Definition word_to_list'' {A : Type} (w : @Word A) : list A := word_to_list_simple (word_reverse w).
+
+(** Es entsteht durch Auffaltung beider Definitionen dieselbe Funktion [word_to_list], siehe [list_to_word].*)
+Fixpoint word_to_list {A: Type} (w : @Word A) : list A :=
+  match w with
+  | eps           => nil
+  | snoc w' x  => app (word_to_list w') (cons x nil)
+end.
+
+(** Die Abarbeitung eines Zeichens von [word_to_list].*)
+Lemma word_to_list_single {A : Type} (a : A) :
+  word_to_list (snoc eps a) = cons a nil.
 Proof.
-  induction w.
-  - simpl.
-    reflexivity.
-  - simpl.
-    rewrite IHw.
-    reflexivity.
+simpl.
+reflexivity.
 Defined.
 
-Lemma word_to_list_rec_singleappend {A : Type} (x : A) (w : @Word A):
-word_to_list_rec (concat_word (snoc eps x) w)  = app (cons x nil) (word_to_list_rec w).
-Proof.
-induction w.
-  - simpl.
-    reflexivity.
-  - simpl.
-    rewrite IHw.
-    reflexivity.
-Defined.
-
-Lemma word_to_list''_singleappend {A : Type} (x : A) (w : @Word A) :
-word_to_list'' (concat_word (snoc eps x) w)  = app (cons x nil) (word_to_list'' w).
-Proof.
-unfold word_to_list''.
-induction w.
-  - simpl.
-    reflexivity.
-  - simpl.
-    rewrite IHw.
-    reflexivity.
-Defined.
-
-(** Die Konkatenation von Wörtern und anschließender Umwandlung in einer Liste bzw.
- erst die einzelnen Wörter in eine Liste umzuwandeln und dann zu verknüpfen wird durch die
- Funktion [word_to_list_rec_append] beschrieben.*)
-Lemma word_to_list_rec_append {A : Type} (w1 w2 : @Word A) :
-  word_to_list_rec (concat_word w1 w2) = word_to_list_rec w1 ++ word_to_list_rec w2.
+(** [word_to_list] ist ein Homomorphismus bzgl. der Konkatenation. *)
+Lemma word_to_list_hom {A : Type} (w1 w2 : @Word A) :
+  word_to_list (concat_word w1 w2) = word_to_list w1 ++ word_to_list w2.
 Proof.
 induction w2.
   - simpl.
-    rewrite (concat_nil (word_to_list_rec w1)).
+    rewrite (concat_nil (word_to_list w1)).
     reflexivity.
   - simpl.
     rewrite IHw2.
     apply concat_associative.
 Defined.
 
-(*### andere Formulierung?###*)
-(** Die Funktionen [word_to_list_rec] und [word_to_list''], sowie [word_to_list'''] und [word_to_list'']
- liefern das gleiche Ergebnis, welches in den Lemata [word_to_list_rec_Lemma], [word_to_list_Lemma]
- bzw. [word_to_list'_Lemma] bewiesen ist. Eines der beiden letzteren Lemmata kann noch entfernt
- werden. Dies wird sich im Laufe der Arbeit herausstellen, welche Richtung häufiger Verwendung findet.*)
-Lemma word_to_list_rec_Lemma {A : Type} (x : A) (w : @Word A) :
-  word_to_list_rec w = word_to_list'' w.
+(** [word_to_list], [word_to_list'] und [word_to_list'] beschreiben dieselbe Funktion.*)
+Lemma word_to_list_Lemma {A : Type} (w : @Word A) :
+  word_to_list w = word_to_list' w.
 Proof.
-unfold word_to_list''.
+unfold word_to_list'.
 induction w.
   - simpl.
     reflexivity.
@@ -444,44 +341,29 @@ induction w.
     reflexivity.
 Defined.
 
-Lemma word_to_list_Lemma {A : Type} (w : @Word A) :
-  word_to_list''' w = word_to_list'' w.
+Lemma word_to_list_Lemma' {A : Type} (w : @Word A) :
+  word_to_list w = word_to_list'' w.
 Proof.
-unfold word_to_list'''.
 unfold word_to_list''.
 induction w.
- - simpl.
-   reflexivity.
   - simpl.
-    rewrite <- IHw.
-    pose (wtl := word_to_list_singleappend a (word_reverse w)).
-    rewrite wtl.
+    reflexivity.
+  - simpl.
+    rewrite word_to_list_simple_antihom.
+    rewrite IHw.
     reflexivity.
 Defined.
 
 Lemma word_to_list'_Lemma {A : Type} (w : @Word A) :
-  word_to_list'' w = word_to_list''' w.
+  word_to_list' w = word_to_list'' w.
 Proof.
-unfold word_to_list'''.
-unfold word_to_list''.
-induction w.
- - simpl.
-   reflexivity.
-  - simpl.
-    rewrite IHw.
-    pose (wtl' := word_to_list_singleappend a (word_reverse w)).
-    rewrite wtl'.
-    reflexivity.
+rewrite <- word_to_list_Lemma.
+rewrite <- word_to_list_Lemma'.
+reflexivity.
 Defined.
 
-(** Um die Schreibweise innerhalb der Kommentare etwas zu vereinfachen, werden nachfolgend die
- Funktionen [list_to_word], [list_to_word''], [list_to_word'''] und [list_to_word_rec] durch [list_to_word*]
- bzw. [word_to_list], [word_to_list'], [word_to_list''] und [word_to_list_rec] durch [word_to_list*] benannt.*)
-
-(** Mit den bisher definierten Funktionen können weitere Eigenschaften abgeleitet werden.
- Wendet man die Funktionen [list_to_word*] und [word_to_list*] aufeinander an, erhält man die
- Identität.*)
-Lemma list_word_list {A : Type} (l : list A) : word_to_list (list_to_word l) = l.
+(** [list_to_word_simple] und [word_to_list_simple*] sind zueinander inverse Isomorphismen.*)
+Lemma list_word_list_simple {A : Type} (l : list A) : word_to_list_simple (list_to_word_simple l) = l.
 Proof.
 induction l.
   - simpl.
@@ -491,60 +373,34 @@ induction l.
     reflexivity.
 Qed.
 
-Lemma list_word_list'' {A : Type} (l : list A) : word_to_list'' (list_to_word'' l) = l.
+Lemma word_list_word_simple {A : Type} (w : @Word A) : list_to_word_simple (word_to_list_simple w) = w.
 Proof.
-unfold list_to_word''.
-pose (wtl'L := word_to_list'_Lemma (word_reverse (list_to_word l))).
-rewrite wtl'L.
-unfold word_to_list'''.
-pose (wrip := word_reverse_idempotent (list_to_word l)).
-rewrite wrip.
-apply list_word_list.
-Defined.
+induction w.
+  - simpl.
+    reflexivity.
+  - simpl.
+    rewrite IHw.
+    reflexivity.
+Qed.
 
-Lemma list_word_list_rec {A : Type} (l : list A) : word_to_list_rec (list_to_word_rec l) = l.
+(** [list_to_word] und [word_to_list*] sind zueinander inverse Isomorphismen.*)
+
+Lemma list_word_list {A : Type} (l : list A) : word_to_list (list_to_word l) = l.
 Proof.
-induction l.
-  - simpl.
-    reflexivity.
-  - simpl.
-    pose (word_to_list_rec_singleappend a (list_to_word_rec l)).
-    rewrite e.
-    rewrite IHl.
-    simpl.
-    reflexivity.
+rewrite list_to_word_Lemma.
+rewrite word_to_list_Lemma'.
+unfold list_to_word'.
+unfold word_to_list''.
+rewrite word_reverse_idempotent.
+apply list_word_list_simple.
 Defined.
 
 Lemma word_list_word {A : Type} (w : @Word A) : list_to_word (word_to_list w) = w.
 Proof.
-induction w.
-  - simpl.
-    reflexivity.
-  - simpl.
-    rewrite IHw.
-    reflexivity.
-Qed.
-
-Lemma word_list_word'' {A : Type} (w : @Word A) : list_to_word'' (word_to_list'' w) = w.
-Proof.
+rewrite list_to_word_Lemma.
+rewrite word_to_list_Lemma'.
+unfold list_to_word'.
 unfold word_to_list''.
-pose (ltw'L := list_to_word'_Lemma (rev (word_to_list w))).
-rewrite ltw'L.
-unfold list_to_word'''.
-pose (revip := rev_idempotent (word_to_list w)).
-rewrite revip.
-apply word_list_word.
-Defined.
-
-Lemma word_list_word_rec {A : Type} (w : @Word A) : list_to_word_rec (word_to_list_rec w) = w.
-Proof.
-induction w.
-  - simpl.
-    reflexivity.
-  - simpl.
-    pose (list_to_word_rec_singleappend a (word_to_list_rec w)).
-    rewrite e.
-    rewrite IHw.
-    simpl.
-    reflexivity.
+rewrite word_list_word_simple.
+apply word_reverse_idempotent.
 Defined.
