@@ -56,7 +56,8 @@ Proof.
     reflexivity.
   (* l = cons _ _ *)
   - simpl.
-    dfa_rew . (*muss umgeschrieben werden*)
+    rewrite map_length.
+    congruence.
 Qed.
 
 Hint Rewrite inits_len : dfa_trans.
@@ -173,7 +174,7 @@ Proof.
             split.
             + reflexivity.
             + simpl.
-              auto. (*an dieser Stelle muss noch mal was verändert werden - auto weg*)
+              auto. (*an dieser Stelle muss noch mal was verändert werden - auto weg (1>0 beweisen)*)
           - inversion H1.
             simpl in *.
             clear H2.
@@ -262,15 +263,17 @@ Proof.
                 } }
 Qed.
 
-Theorem inits_dec : forall X : Type, forall l : list X,
-  forall b c : list X, forall ass bs cs : list (list X),
+Theorem inits_dec : 
+  forall X : Type, 
+  forall l : list X,
+  forall b c : list X, 
+  forall ass bs cs : list (list X),
   inits l = ass ++ (b :: bs) ++ (c :: cs) ->
-  (exists ds : list X, c = b ++ ds /\
-    length ds > 0) /\
+  (exists ds : list X, c = b ++ ds /\ length ds > 0) /\
   exists es : list X, l = c ++ es.
 Proof.
   intros X l b c ass bs cs H.
-  remember H as H2.
+  remember H as H2. (* H : inits l = ass ++ (b :: bs) ++ c :: cs *)
   clear HeqH2.
   apply inits_dec_2 in H.
   destruct H as [ds].
@@ -282,8 +285,9 @@ Proof.
     + apply H0.
   - rewrite app_assoc in H2.
   eapply inits_dec_1.
-  apply H2. (*Warum das geht ist mir ein wenig schleierhaft*)
-Qed. 
+  apply H2. (*Warum das geht ist mir ein wenig schleierhaft - wahrscheinlich weil die 
+                  erste Klammer als eine Liste aufgefasst wird.*)
+Qed.
 
 Definition prefixes (q : Q) (l : list Sigma) : list Q :=
   map (ext q) (inits l).
@@ -293,8 +297,14 @@ Lemma prefixes_len : forall l : list Sigma, forall q : Q,
 Proof.
   intros.
   unfold prefixes.
-  dfa_rew. (*muss umgeschrieben werden*)
+  rewrite map_length.
+  rewrite inits_len.
+  reflexivity.
 Qed.
+
+(* Dieses Axiom beschreibt das Pigeohole Principle *)
+Axiom states_size: forall l: list Q, length l > Q_size ->
+  repeats l.
 
 (* Pumping Lemma: *)
 Theorem pumping_lemma : forall w : list Sigma,
@@ -358,7 +368,8 @@ Proof.
               * { unfold accepted_word in *.
                   intros n.
                   assert (ext q0 (y ++ (word_replicate n x6) ++ x7) = ext q0 w).
-                  - dfa_rew. (*muss umgeschrieben werden*)
+                  - rewrite ext_app.
+                    rewrite ext_app.
                     simpl in H2.
                     inversion H2.
                     simpl in H3.
@@ -368,11 +379,13 @@ Proof.
                       rewrite H8.
                       rewrite <- H10.
                       rewrite H4.
-                      dfa_rew. (*muss umgeschrieben werden*)  
+                      rewrite ext_app.
+                      reflexivity.
                     + rewrite ext_loop;
                       auto. (*Hier muss auto noch ungeschrieben werden.*)
                       rewrite H5.
-                      dfa_rew. (*muss umgeschrieben werden*)
+                      rewrite ext_app.
+                      congruence.
                   - rewrite H7.
                     apply acc.
                 } }
