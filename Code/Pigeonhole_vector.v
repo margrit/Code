@@ -110,7 +110,7 @@ Print False_rect.
 Print nth.
 Print replace.
 Print caseS'.
-
+*)
 Fixpoint insert_at' {A : Type} {n : nat}  (v : t A n) (p: @Fin.t (S n))
                                      (a : A) : t A (S n) :=
 (*replace (A : Type) (n : nat) (v : t A n) (p : Fin.t n) (a : A) {struct p} :
