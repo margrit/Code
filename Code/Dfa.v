@@ -8,13 +8,6 @@
 Load Definitions.
 Section Transitions.
 
-Ltac dfa_rew := autorewrite with dfa_trans ; try congruence ; auto.
-
-Hint Rewrite ext_app : dfa_trans.
-Hint Rewrite map_length : dfa_trans.
-
-Print Rewrite HintDb dfa_trans.
-
 Fixpoint word_replicate (n : nat) (l : list Sigma) : list Sigma :=
   match n with
   | O    => nil
@@ -33,7 +26,7 @@ Proof.
   (* n = S n; *)
   - intros q xs H.
     simpl.
-    dfa_rew. (*muss umgeschrieben werden*) 
+    rewrite ext_app.
     rewrite H.
     apply IHn'.
     assumption.
@@ -59,8 +52,6 @@ Proof.
     rewrite map_length.
     congruence.
 Qed.
-
-Hint Rewrite inits_len : dfa_trans.
 
 Theorem inits_dec_1 :
   forall X : Type,
@@ -174,7 +165,9 @@ Proof.
             split.
             + reflexivity.
             + simpl.
-              auto. (*an dieser Stelle muss noch mal was verändert werden - auto weg (1>0 beweisen)*)
+               unfold gt.
+               unfold lt.
+               apply le_n.
           - inversion H1.
             simpl in *.
             clear H2.
@@ -225,7 +218,10 @@ Proof.
             + simpl in *.
               inversion H3.
               simpl.
-              auto with arith. (*evaluieren was hier genau passiert*)
+              unfold gt.
+              unfold lt.
+              apply le_n_S.
+              apply le_0_n.
         }
       * { simpl in *.
           inversion H.
@@ -325,7 +321,9 @@ Proof.
   assert (Hpref : Q_size < length pref).
   - unfold pref.
     rewrite prefixes_len.
-    auto with arith. (* bearbeiten mit len_w *)
+    unfold lt.
+    apply le_n_S.
+    apply len_w.
   - assert (HRep : repeats pref).
     + apply states_size.
       apply Hpref.
@@ -381,11 +379,12 @@ Proof.
                       rewrite H4.
                       rewrite ext_app.
                       reflexivity.
-                    + rewrite ext_loop;
-                      auto. (*Hier muss auto noch ungeschrieben werden.*)
-                      rewrite H5.
-                      rewrite ext_app.
-                      congruence.
+                    + rewrite ext_loop.
+                       rewrite H5.
+                       rewrite ext_app.
+                       congruence.
+                       rewrite H7.
+                       reflexivity.
                   - rewrite H7.
                     apply acc.
                 } }
