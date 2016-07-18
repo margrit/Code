@@ -269,7 +269,7 @@ Theorem inits_dec :
   exists es : list X, l = c ++ es.
 Proof.
   intros X l b c ass bs cs H.
-  remember H as H2. (* H : inits l = ass ++ (b :: bs) ++ c :: cs *)
+  remember H as H2.
   clear HeqH2.
   apply inits_dec_2 in H.
   destruct H as [ds].
@@ -283,9 +283,6 @@ Proof.
  (* pose inits_dec_1 as idec1. *)
     apply inits_dec_1 in H2.
     assumption.
-  (* eapply inits_dec_1.
-  apply H2. *)(*Warum das geht ist mir ein wenig schleierhaft - wahrscheinlich weil die 
-                  erste Klammer als eine Liste aufgefasst wird.*)
 Qed.
 
 Definition prefixes (q : Q) (l : list Sigma) : list Q :=

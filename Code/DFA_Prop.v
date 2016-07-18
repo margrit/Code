@@ -2,8 +2,8 @@ Require Import Bool.
 Load DFA_Def.
 
 (* Erweiterte Überführungsfunktion über *)
-Theorem delta_hat_append : forall (xs : list Sigma) (ys : list Sigma) (q : Q),
-  delta_hat q (xs ++ ys) = delta_hat (delta_hat q xs) ys.
+Theorem delta_hat_cons_append : forall (xs : list Sigma) (ys : list Sigma) (q : Q),
+  delta_hat_cons q (xs ++ ys) = delta_hat_cons (delta_hat_cons q xs) ys.
 Proof.
   induction xs.
   - simpl.
@@ -12,7 +12,20 @@ Proof.
   - simpl.
     intros.
     apply IHxs.
-Qed.
+Defined.
+
+Theorem delta_hat_append : forall (w1 w2 : @Word Sigma) (q : Q),
+  delta_hat q (concat_word w1 w2) = delta_hat (delta_hat q w1) w2.
+Proof.
+  induction w2.
+  - simpl.
+    intros.
+    reflexivity.
+  - simpl.
+    intros.
+    rewrite <- IHw2.
+    reflexivity.
+Defined.
 
 (*i*)
 (*
