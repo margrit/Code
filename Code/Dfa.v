@@ -280,8 +280,11 @@ Proof.
     + apply H.
     + apply H0.
   - rewrite app_assoc in H2.
-  eapply inits_dec_1.
-  apply H2. (*Warum das geht ist mir ein wenig schleierhaft - wahrscheinlich weil die 
+ (* pose inits_dec_1 as idec1. *)
+    apply inits_dec_1 in H2.
+    assumption.
+  (* eapply inits_dec_1.
+  apply H2. *)(*Warum das geht ist mir ein wenig schleierhaft - wahrscheinlich weil die 
                   erste Klammer als eine Liste aufgefasst wird.*)
 Qed.
 
