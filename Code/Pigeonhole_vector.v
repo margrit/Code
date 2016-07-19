@@ -103,60 +103,6 @@ dependent induction p.
     assumption.
 Defined.
 
-(*
-Print insert_at.
-Print False_rect.
-
-Print nth.
-Print replace.
-Print caseS'.
-*)
-Fixpoint insert_at' {A : Type} {n : nat}  (v : t A n) (p: @Fin.t (S n))
-                                     (a : A) : t A (S n) :=
-(*replace (A : Type) (n : nat) (v : t A n) (p : Fin.t n) (a : A) {struct p} :
-  t A n := *)
-  match p in (Fin.t (S n0)) return (t A n0 -> t A (S n0)) with
-  | @F1 k =>
-      fun v' : t A k => cons A a k v'
-  | @FS 0     p' => fun v' => False_rect (t A (S 0)) (match p' in |  end)
-  | @FS (S k) p' => fun v' : t A (S k) => caseS' v' (fun _ : t A (S k) => t A (S (S k)))
-                                        (fun (h : A) (t : t A (S k)) => 
-                                          cons A h (S k) (insert_at' t p' a)) 
-  end v.
-    (* : forall {A : Type} {n : nat}, t A n -> Fin.t (S n) -> A -> t A (S n)*)
-
-
-match p in (Fin.t (S m')) return (t A m') -> t A (S m') with 
- | F1  => 
-(fun p'' => match v with 
-             | nil _ => False_rect (t A (S n)) p''
-             | cons _ h n' v' => cons _ h (S n') (insert_at' v' p'' a)
-            end) p'
-end.
-
-match n with
- | 0    => (fun n' => match p with 
-            | F1    => cons A a n v
-            | FS p' => (fun n'' p'' => False_rect (t A (S n'')) p'') 0 p'
-           end) 0
- | S n' => match p with 
-            | F1    => cons A a (S n') v
-            | FS p' => match v with 
-                        | nil _      => False_rect (t A (S 0)) n'
-                        | cons _ h n'' v' => cons _ h (S n'') (insert_at' v' p' a)
-                       end
-           end
-end.
-
-match p in (Fin.t m') return (v' : t A m) with 
-
-(fun p'' => match v with 
-             | nil _ => False_rect (t A (S n)) p''
-             | cons _ h n' v' => cons _ h (S n') (insert_at' v' p'' a)
-            end) p'
-end.
-*)
-
 
 (* Eingefuegte Elemente erscheinen im Ergebnisvektor *)
 
@@ -236,7 +182,7 @@ Proof.
         compute.
         assumption. *)
 Defined.
-        
+
 
 (* Map von FS auf einen Vektor *)
 
