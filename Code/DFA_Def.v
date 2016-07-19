@@ -138,6 +138,10 @@ Definition accepted_word_cons (w : list Sigma) :=
 Definition accepted_word (w : @Word Sigma) :=
   is_accepting (delta_hat q0 w).
 
+(** Die von einem endlichen Automaten beschriebene Sprachen.*)
+Definition DFA_Lang (w : @Word Sigma) :=
+  accepted_word.
+
 Print accepted_word.
 (** Die Funktionen [accepted_word] und [accepted_word_cons] beschreiben die gleichen
 akzeptierten Wörter.*)
