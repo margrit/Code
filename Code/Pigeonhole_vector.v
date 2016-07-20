@@ -298,7 +298,7 @@ Proof.
   dependent destruction ap.
   - exists v.
     exists F1. 
-    cbn. 
+    cbn.  (*alternativ simpl?*)
     reflexivity.
   - dependent destruction n.
     + inversion ap.
