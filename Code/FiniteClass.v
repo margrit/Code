@@ -33,3 +33,9 @@ Proof.
 Qed.
 
 Print statesFinite.
+
+Print sigT.
+
+(*Finite_Sets sind endliche Typen für die wir eine Instanz der Klasse Finite definieren können.*)
+Definition Finite_Sets := sigT Finite.
+Print Finite_Sets.
