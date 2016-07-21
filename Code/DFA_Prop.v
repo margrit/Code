@@ -27,6 +27,8 @@ Proof.
     reflexivity.
 Defined.
 
+(*Zwei Automaten sind gleicht, g.d.w. sie die gleine Sprache beschreiben.*)
+
 (*i*)
 (*
 Inductive Konf_DFA_step : Konf_DFA -> Konf_DFA -> Type :=

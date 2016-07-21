@@ -62,9 +62,9 @@ induction n.
       reflexivity.
 Defined.
 
-Theorem dec_appears_in : forall a : Q, forall l : list Q, decidable (appears_in a l).
+(*Theorem dec_appears_in : forall a : Q, forall l : list Q, decidable (appears_in a l).*)
 
-Theorem appears_in_Q_size_eq_length 
+(*Theorem appears_in_Q_size_eq_length *)
 
 (* Keine Verwendung von Axiomen. *)
 Theorem states_size: forall l : list Q, length l > Q_size ->

@@ -91,7 +91,7 @@ Qed.
 
 Inductive repeats {X : Type} : list X -> Type :=
   (* extend *)
-  rp_ext : forall x : X, forall l : list X, repeats l -> repeats (x :: l)
+| rp_ext : forall x : X, forall l : list X, repeats l -> repeats (x :: l)
 | rp_intr : forall x : X, forall l : list X, appears_in x l -> repeats (x :: l).
 
 Lemma repeats_decomp : forall X : Type, forall l : list X,

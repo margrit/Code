@@ -5,6 +5,11 @@
    Deterministic Finite-State Automata.
  *)
 
+(** Die Datei wurde dahin verändert, dass nur noch einfache Taktiken verwerdet werden. 
+Die Beweise sind in die einzelnen Teilbeweise unterteilt und dies wird durch die Zeichen
+-, +, * Sichtbar gemacht. Um mehr als 3 Ebenen zu schachteln, werden die gleichen Zeichen
+wiederverwendet, nur dass sie mit einer geschweiften Klammer umrahmt sind.
+*)
 Load Definitions.
 Section Transitions.
 
@@ -280,7 +285,6 @@ Proof.
     + apply H.
     + apply H0.
   - rewrite app_assoc in H2.
- (* pose inits_dec_1 as idec1. *)
     apply inits_dec_1 in H2.
     assumption.
 Qed.
@@ -302,7 +306,7 @@ Qed.
 Axiom states_size: forall l: list Q, length l > Q_size ->
   repeats l.
 
-(* Pumping Lemma: *)
+(** Das Pumping Lemma: *)
 Theorem pumping_lemma : forall w : list Sigma,
   accepted_word w -> Q_size <= length w ->
   exists xs : list Sigma,
