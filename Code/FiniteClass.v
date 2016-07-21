@@ -20,9 +20,9 @@ Instance statesFinite : Finite States := {
     | P3 => FS (FS (F1))
   end;
   from i := match i with
-    | F1 _          => P1
-    | FS _ (F1 _)   => P2
-    | FS _ (FS _ _) => P3
+    | F1         => P1
+    | FS  (F1 )  => P2
+    | FS  (FS _) => P3
   end
 }.
 Proof.
