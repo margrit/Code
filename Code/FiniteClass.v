@@ -26,15 +26,9 @@ Instance statesFinite : Finite States := {
   end
 }.
 Proof.
-  + intro i.
-    dependent destruction i.
-    - reflexivity.
-    - dependent destruction i.
-      * reflexivity.
-      * dependent destruction i.
-        { reflexivity. }
-        { dependent destruction i. }
-  + intro x.
+  - intro i.
+    repeat dependent destruction i; reflexivity.
+  - intro x.
     destruct x;reflexivity.
 Qed.
 
