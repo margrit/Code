@@ -34,31 +34,31 @@ reflexivity.
 Defined.
 
 
-(* Entscheidbarkeit von appears und repeats fuer den Fall, 
+(* Entscheidbarkeit von Appears und Repeats fuer den Fall, 
    dass die Elemente des Vektors vom Typ Fin.t sind        *)
 
-Theorem dec_appears_fin : forall {n m : nat} (f : @Fin.t n) (v : Vector.t (@Fin.t n) m), 
-     (appears_in f v) + ((appears_in f v) -> False).
+Theorem dec_Appears_fin : forall {n m : nat} (f : @Fin.t n) (v : Vector.t (@Fin.t n) m), 
+     (Appears_in f v) + ((Appears_in f v) -> False).
 Proof.
   intros.
-  apply dec_appears_in.
+  apply dec_Appears_in.
   apply fin_eq_dec.
 Defined. 
 
-Theorem dec_repeats_fin : forall {n m : nat} (v : Vector.t (@Fin.t n) m), 
-     (repeats v) + ((repeats v) -> False).
+Theorem dec_Repeats_fin : forall {n m : nat} (v : Vector.t (@Fin.t n) m), 
+     (Repeats v) + ((Repeats v) -> False).
 Proof.
   intros.
-  apply dec_repeats.
+  apply dec_Repeats.
   apply fin_eq_dec.
 Defined. 
 
 
 (* "Funktorialitaets" Lemmata *)
 
-Fixpoint funct_appears_in {A B : Type} {n : nat} (f : A -> B)
+Fixpoint funct_Appears_in {A B : Type} {n : nat} (f : A -> B)
                         (x : A) (v : Vector.t A n) :
-                        appears_in x v -> appears_in (f x) (map f v).
+                        Appears_in x v -> Appears_in (f x) (map f v).
 intro.
 induction n.
 - inversion X.
@@ -69,8 +69,8 @@ induction n.
     assumption.
 Defined.
 
-Fixpoint funct_repeats {A B : Type} {n : nat} (f : A -> B) (v : Vector.t A n) :
-                        repeats v -> repeats (map f v).
+Fixpoint funct_Repeats {A B : Type} {n : nat} (f : A -> B) (v : Vector.t A n) :
+                        Repeats v -> Repeats (map f v).
 intro.
 induction v.
 - inversion X.
@@ -79,7 +79,7 @@ induction v.
     apply IHv.
     assumption.
   + apply rp_intr.
-    apply funct_appears_in.
+    apply funct_Appears_in.
     assumption.
 Defined.
 
@@ -106,9 +106,9 @@ Defined.
 
 (* Eingefuegte Elemente erscheinen im Ergebnisvektor *)
 
-Lemma insert_appears {A : Type} {n : nat} : 
+Lemma insert_Appears {A : Type} {n : nat} : 
               forall (x : A) (v : Vector.t A n ) (f : @Fin.t (S n)),
-                appears_in x (insert_at v f x).
+                Appears_in x (insert_at v f x).
 Proof.
   intros x v.
   dependent induction v; intro f.
@@ -153,9 +153,9 @@ Defined.
 (* Wenn ein Element, das schon in der Liste vorkommt, 
    eingefuegt wird, dann widerholt es sich             *)
 
-Lemma ins_app_repeats {A : Type} {n : nat}:
+Lemma ins_app_Repeats {A : Type} {n : nat}:
           forall (x : A) (v : Vector.t A n) (f : @Fin.t (S n)), 
-                  appears_in x v -> repeats (insert_at v f x).
+                  Appears_in x v -> Repeats (insert_at v f x).
 Proof.
   intros x v f.
   dependent induction f.
@@ -167,7 +167,7 @@ Proof.
   - induction v; intro ap. 
     + inversion ap.
     + inversion ap; dependent destruction H2.
-      * pose (insert_appears h v f) as a.     
+      * pose (insert_Appears h v f) as a.     
         apply rp_intr in a.
         compute.
         assumption.
@@ -192,7 +192,7 @@ Definition map_fs {n m : nat} (v : Vector.t (@Fin.t n) m) := map FS v.
 
 Lemma ins_pres_app {A : Type} {n : nat} (x y : A):
  forall (v : Vector.t A n) (f: @Fin.t (S n)),
-               appears_in x v -> appears_in x (insert_at v f y).
+               Appears_in x v -> Appears_in x (insert_at v f y).
 Proof.
 induction n; intros v f ap.
 dependent induction v.
@@ -211,7 +211,7 @@ Defined.
 (* Das Einfuegen eines Elements erhaelt vorhandene Wiederholungen *)
 
 Lemma ins_pres_rep {A : Type} {n : nat} (x : A) : forall (v : Vector.t A n) (f: @Fin.t (S n)), 
-                    repeats v -> repeats (insert_at v f x).
+                    Repeats v -> Repeats (insert_at v f x).
 Proof.
 intros v f r.
 dependent induction v.
@@ -236,7 +236,7 @@ Defined.
    und die Information, um den urspruenglichen Vektor wiederherstellen zu koennen *)
 
 Lemma remove_app {A : Type} {n : nat} (x : A) (v : Vector.t A (S n)) :
-             appears_in x v -> { v' : Vector.t A n & { f : @Fin.t (S n) &
+             Appears_in x v -> { v' : Vector.t A n & { f : @Fin.t (S n) &
              ((insert_at v' f x) = v) }}.
 Proof.
   intro ap.
@@ -261,9 +261,9 @@ Defined.
 
 (* Entfernen des Kopfelements erhaelt Nicht-Enthaltensein *)
 
-Lemma not_appears_in_tl {A : Type} {n : nat} (x y : A) (v : Vector.t A n) : 
-                                (appears_in x (cons A y n v) -> False) ->
-                                (appears_in x v) -> False.
+Lemma not_Appears_in_tl {A : Type} {n : nat} (x y : A) (v : Vector.t A n) : 
+                                (Appears_in x (cons A y n v) -> False) ->
+                                (Appears_in x v) -> False.
 Proof.
 intros.
 pose (ai_later x y v X).
@@ -276,7 +276,7 @@ Defined.
    dann entsteht er als Mapping aus einem Fin n-Vektor *)
 
 Lemma fin_vec_from_below {n m : nat} (v : Vector.t (@Fin.t (S n)) m) : 
-            (appears_in F1 v -> False) -> {v' | map FS v' = v}.
+            (Appears_in F1 v -> False) -> {v' | map FS v' = v}.
 Proof.
 intro not_ap.
 dependent induction v.
@@ -286,7 +286,7 @@ dependent induction v.
 - dependent destruction h. 
   + contradict not_ap.
     apply ai_here.
-  + pose (not_appears_in_tl F1 (FS h) v not_ap) as not_ap_F1.
+  + pose (not_Appears_in_tl F1 (FS h) v not_ap) as not_ap_F1.
     pose (IHv not_ap_F1) as ex_v'.
     destruct ex_v' as [v' eq_map].
     exists (cons (Fin.t n) h n0 v').
@@ -303,8 +303,8 @@ Defined.
 (*-------------------------------------------------------------------------------------------*)
 
 
-Theorem pigeon_hole_repeats: forall (n m : nat) (n_lt_m: n < m) (v : Vector.t (@Fin.t n) m), 
-                   repeats v.
+Theorem pigeon_hole_Repeats: forall (n m : nat) (n_lt_m: n < m) (v : Vector.t (@Fin.t n) m), 
+                   Repeats v.
 Proof.
 dependent induction n; intros m n_lt_m v.
 - inversion v. 
@@ -317,24 +317,24 @@ dependent induction n; intros m n_lt_m v.
   + contradict n_lt_m.
     intro ff.
     inversion ff.
-  + pose (dec_repeats_fin v) as dec_rp_tl.
+  + pose (dec_Repeats_fin v) as dec_rp_tl.
     destruct dec_rp_tl.
     (* Die Liste enthaelt eine Wiederholung *)
     * assumption.
 
     (* Die Liste enthaelt keine Wiederholung *)
-    * pose (dec_appears_fin F1 v) as dec_ap_tl.
+    * pose (dec_Appears_fin F1 v) as dec_ap_tl.
       destruct dec_ap_tl as [ap_f1 | not_ap_f1].
 
       (* F1 kommt in der Liste vor *)
       pose (remove_app F1 v ap_f1).
       dependent destruction s.
       dependent destruction s.
-      pose (dec_appears_fin F1 x0) as dec_ap_tl'.
+      pose (dec_Appears_fin F1 x0) as dec_ap_tl'.
       destruct dec_ap_tl' as [ap_f1_x0 | not_ap_f1_x0].
 
       (* F1 kommt noch einmal in der Liste vor *)
-      { pose (ins_app_repeats F1 x0 x ap_f1_x0).
+      { pose (ins_app_Repeats F1 x0 x ap_f1_x0).
         rewrite e in r.
         assumption. } 
 
@@ -343,7 +343,7 @@ dependent induction n; intros m n_lt_m v.
         dependent destruction x'_ex.
         pose (lt_S_n n m n_lt_m).
         pose (IHn m l x1).
-        pose (funct_repeats FS x1 r).
+        pose (funct_Repeats FS x1 r).
         rewrite e0 in r0.
         pose (ins_pres_rep F1 x0 x r0).
         rewrite e in r1.
@@ -356,7 +356,7 @@ dependent induction n; intros m n_lt_m v.
         dependent destruction x.
         pose (lt_S_n n m n_lt_m).
         pose (IHn m l x). 
-        pose (funct_repeats FS x r).
+        pose (funct_Repeats FS x r).
         simpl.
         apply rp_ext.
         assumption.
@@ -370,8 +370,8 @@ Defined.
    an denen die Wiederholungen vorkommen:                    *)
 
 
-Lemma pos_appears {A : Type} {n : nat} : forall (a : A) (v : Vector.t A n), 
-    appears_in a v -> {i : @Fin.t n & nth v i = a }.
+Lemma pos_Appears {A : Type} {n : nat} : forall (a : A) (v : Vector.t A n), 
+    Appears_in a v -> {i : @Fin.t n & nth v i = a }.
 Proof.
 intros a v ap.
 dependent induction ap.
@@ -385,8 +385,8 @@ dependent induction ap.
 Defined.
 
 
-Lemma pos_repeats {A : Type} {n : nat} : forall (v : Vector.t A n), 
-    repeats v -> {i : @Fin.t n & { j : @Fin.t n & nth v i = nth v j } }.
+Lemma pos_Repeats {A : Type} {n : nat} : forall (v : Vector.t A n), 
+    Repeats v -> {i : @Fin.t n & { j : @Fin.t n & nth v i = nth v j } }.
 Proof.
 intros v rp.
 dependent induction rp.
@@ -397,7 +397,7 @@ dependent induction rp.
   simpl.
   assumption.
 - exists F1.
-  pose (pos_appears x v a).
+  pose (pos_Appears x v a).
   destruct s.
   exists (FS x0).
   simpl.

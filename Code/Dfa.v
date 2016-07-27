@@ -302,7 +302,7 @@ Proof.
   reflexivity.
 Qed.
 
-(* Dieses Axiom beschreibt das Pigeohole Principle *)
+(* Das Axiom des Pigeohole Principle. *)
 Axiom states_size: forall l: list Q, length l > Q_size ->
   repeats l.
 

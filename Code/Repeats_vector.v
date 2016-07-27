@@ -16,24 +16,21 @@ Load Fin_ext.
 Local Open Scope vector_scope.
 
 (* Vorkommen von x in einer Liste. *)
-
-Inductive appears_in {X : Type} (a : X): forall {n : nat}, (Vector.t X n) -> Type :=
-  | ai_here  {m} : forall (v : Vector.t X m), appears_in a (cons X a m v)
-  | ai_later {m} : forall b (v : Vector.t X m), appears_in a v -> appears_in a (cons X b m v).
+Inductive Appears_in {X : Type} (a : X): forall {n : nat}, (Vector.t X n) -> Type :=
+  | ai_here  {m} : forall (v : Vector.t X m), Appears_in a (cons X a m v)
+  | ai_later {m} : forall b (v : Vector.t X m), Appears_in a v -> Appears_in a (cons X b m v).
 
 (* Vorkommen von Wiederholungen in einer Liste *)
+Inductive Repeats {X : Type} : forall {n : nat}, Vector.t X n -> Type :=
+ | rp_ext  {m} : forall x : X, forall v : Vector.t X m, Repeats v -> Repeats (cons X x m v)
+ | rp_intr {m} : forall x : X, forall v : Vector.t X m, Appears_in x v -> Repeats (cons X x m v).
 
-Inductive repeats {X : Type} : forall {n : nat}, Vector.t X n -> Type :=
- | rp_ext  {m} : forall x : X, forall v : Vector.t X m, repeats v -> repeats (cons X x m v)
- | rp_intr {m} : forall x : X, forall v : Vector.t X m, appears_in x v -> repeats (cons X x m v).
 
-
-(* Entscheidbarkeit von appears und repeats *)
-
-Theorem dec_appears_in : forall {A : Type}
+(* Entscheidbarkeit von Appears und Repeats *)
+Theorem dec_Appears_in : forall {A : Type}
             (d : forall a a': A, (a = a') + ((a = a') -> False))
             {n : nat} (a : A),
-            forall v : (Vector.t A n) , (appears_in a v) + ((appears_in a v) -> False).
+            forall v : (Vector.t A n) , (Appears_in a v) + ((Appears_in a v) -> False).
 Proof.
 intros A d n a v.
 induction v.
@@ -61,9 +58,9 @@ Defined.
 
 
 
-Theorem dec_repeats : forall {A : Type} (d : forall a a': A, (a = a') + ((a = a') -> False))
+Theorem dec_Repeats : forall {A : Type} (d : forall a a': A, (a = a') + ((a = a') -> False))
                              {n : nat} (v : Vector.t A n), 
-                            (repeats v) + ((repeats v) -> False).
+                            (Repeats v) + ((Repeats v) -> False).
 Proof.
 intro A.
 induction n; intro.
@@ -77,8 +74,8 @@ induction n; intro.
     * left.
       apply rp_ext.
       assumption.
-    * assert (sum (appears_in h v) ((appears_in h v) -> False)).
-      { apply (dec_appears_in d h v). }
+    * assert (sum (Appears_in h v) ((Appears_in h v) -> False)).
+      { apply (dec_Appears_in d h v). }
       { destruct X.
         - left. 
           apply rp_intr.
@@ -100,8 +97,8 @@ Defined.
 (* Wenn x in der Konkatenation von zwei Listen vorkommt, 
    dann kommt x auch entweder in Liste 1 oder Liste 2 vor. *)
 
-Lemma appears_in_app : forall {X : Type} {n m : nat} (xs : Vector.t X n) (ys : Vector.t X m) (x : X),
-     appears_in x (append xs ys) -> appears_in x xs + appears_in x ys.
+Lemma Appears_in_app : forall {X : Type} {n m : nat} (xs : Vector.t X n) (ys : Vector.t X m) (x : X),
+     Appears_in x (append xs ys) -> Appears_in x xs + Appears_in x ys.
 Proof.
   intros X n m xs ys x.
   induction xs.
@@ -129,9 +126,9 @@ Qed.
 (* Wenn x in Liste 1 oder Liste 2 vorkommt, 
    dann kommt x auch in der Konkatenation der Listen vor. *)
 
-Lemma app_appears_in : forall {X : Type} {n m : nat} 
+Lemma app_Appears_in : forall {X : Type} {n m : nat} 
                           (xs : Vector.t X n) (ys : Vector.t X m) (x : X),
-               appears_in x xs + appears_in x ys -> appears_in x (append xs ys).
+               Appears_in x xs + Appears_in x ys -> Appears_in x (append xs ys).
 Proof.
   intros X n m xs ys x dec_ap.
   destruct dec_ap.
@@ -215,8 +212,8 @@ induction n.
 
 (*Vorkommen von x in einer Teilliste. *)
 
-Lemma appears_in_app_split : forall {X : Type} {n : nat} (x : X) (v : Vector.t X n),  
-                   appears_in x v -> 
+Lemma Appears_in_app_split : forall {X : Type} {n : nat} (x : X) (v : Vector.t X n),  
+                   Appears_in x v -> 
                      { n1 : nat &  { v1 : Vector.t X n1 & 
                      { n2 : nat &  { v2 : Vector.t X n2 & 
                      { eq : n1 + S n2 = n &
@@ -252,9 +249,9 @@ Defined.
 (* Wenn eine von zwei Teillisten (mind.) eine Wiederholung besitzt, 
    so enthaelt auch ihre Verkettung eine Wiederholung               *)
 
-Lemma repeats_in_app : forall {X: Type} {n1 n2 : nat} 
+Lemma Repeats_in_app : forall {X: Type} {n1 n2 : nat} 
                               (v1 : Vector.t X n1) (v2 : Vector.t X n2), 
-   repeats v1 + repeats v2 -> repeats (append v1 v2).  
+   Repeats v1 + Repeats v2 -> Repeats (append v1 v2).  
 Proof.
 intros X n1 n2 v1.
 dependent induction v1; intros v2 rp.
@@ -271,7 +268,7 @@ dependent induction v1; intros v2 rp.
       assumption.
     * simpl.
       apply rp_intr.
-      apply app_appears_in.
+      apply app_Appears_in.
       left.
       assumption.
   + simpl.
@@ -284,8 +281,8 @@ Defined.
 
 (* Zerlegung einer Liste mit Wiederholungen *)
 
-Lemma repeats_decomp : forall {X : Type} {n : nat}, forall v : Vector.t X n,
-  repeats v ->
+Lemma Repeats_decomp : forall {X : Type} {n : nat}, forall v : Vector.t X n,
+  Repeats v ->
     { x  : X   &
     { n1 : nat & { xs : Vector.t X n1  &
     { n2 : nat & { ys : Vector.t X n2  & 
@@ -322,7 +319,7 @@ Proof.
       simpl in *.
       reflexivity.  
 
-  - apply appears_in_app_split in a.
+  - apply Appears_in_app_split in a.
 
     destruct a as [n1' a1].
     destruct a1 as [v1' a2].
@@ -349,7 +346,7 @@ Proof.
       reflexivity. 
 Defined.
 
-Lemma repeats_comp : forall {X : Type} {n : nat}, forall v : Vector.t X n,
+Lemma Repeats_comp : forall {X : Type} {n : nat}, forall v : Vector.t X n,
       { x  : X   &
       { n1 : nat & { v1 : Vector.t X n1  &
       { n2 : nat & { v2 : Vector.t X n2  & 
@@ -357,7 +354,7 @@ Lemma repeats_comp : forall {X : Type} {n : nat}, forall v : Vector.t X n,
       { eq : n1 + (S n2 + S n3) = n      &
         v = eq_rect (n1 + (S n2 + S n3)) (Vector.t X) 
          (append v1 (append (cons X x n2 v2) (cons X x n3 v3))) n eq } }} }} }} }
-   -> repeats v.
+   -> Repeats v.
 Proof.
   intros X n v ex.
 
@@ -371,9 +368,9 @@ Proof.
   destruct ex7 as [eq_n eq_v].
 
   pose (ai_here x v3) as x_in_v3. 
-  assert (appears_in x (append v2 (cons X x n3 v3))) as x_in_v2xv3.
+  assert (Appears_in x (append v2 (cons X x n3 v3))) as x_in_v2xv3.
   
-  - apply app_appears_in.
+  - apply app_Appears_in.
     right.
     assumption.
   
@@ -382,7 +379,7 @@ Proof.
     rewrite eq_v.
     dependent destruction eq_n.
     simpl in *.
-    apply repeats_in_app.
+    apply Repeats_in_app.
     right.
     assumption.
 Defined.

@@ -1,3 +1,5 @@
+(** Um sicher zu stellen, dass die Zustandsmenge und die Menge des Eingabealphabets endliche
+ Typen sind, sind sie Instanzen einer endlichen Klasse.*)
 
 Require Import Fin.
 Require Import Program.
@@ -33,6 +35,28 @@ Proof.
 Qed.
 
 Print statesFinite.
+
+Inductive Alphabet : Type := a | b | c.
+
+Instance alphabetFinite : Finite Alphabet := {
+  card := 3;
+  to x := match x with
+    | a => F1
+    | b => FS (F1)
+    | c => FS (FS (F1))
+  end;
+  from i := match i with
+    | F1         => a
+    | FS  (F1 )  => b
+    | FS  (FS _) => c
+  end
+}.
+Proof.
+  - intro i.
+    repeat dependent destruction i; reflexivity.
+  - intro x.
+    destruct x;reflexivity.
+Qed.
 
 Print sigT.
 
