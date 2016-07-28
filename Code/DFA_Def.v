@@ -20,6 +20,7 @@ Diese Komponenten werden nachfolgend definiert.*)
 
 Require Import Fin.
 Require Import Arith.
+Load Repeats_vector.
 Load Word_Prop.
 
 Section Definitions.
@@ -75,6 +76,18 @@ induction l.
     reflexivity.
 Defined.
 
+Theorem delta_hat_cons_app : forall xs ys : list Sigma, forall q : Q,
+  delta_hat_cons q (xs ++ ys) = delta_hat_cons (delta_hat_cons q xs) ys.
+Proof.
+  induction xs.
+  - simpl.
+    intros ys q.
+    reflexivity.
+  - simpl.
+    intros.
+    apply IHxs.
+Defined.
+
 (** Die erweiterte Überführungsfunktion [delta_hat], wie in der Vorlesung definiert.*)
 Fixpoint delta_hat (q : Q) (w : @Word Sigma) : Q :=
    match w with
@@ -95,6 +108,19 @@ induction w.
     reflexivity.
   - simpl.
     rewrite IHw.
+    reflexivity.
+Defined.
+
+Theorem delta_hat_app : forall w v : @Word Sigma, forall q : Q,
+  delta_hat q (concat_word w v) = delta_hat (delta_hat q w) v.
+Proof.
+  induction v.
+  - simpl.
+    intros q.
+    reflexivity.
+  - simpl.
+    intros.
+    rewrite <- IHv.
     reflexivity.
 Defined.
 
