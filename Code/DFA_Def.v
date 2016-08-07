@@ -19,8 +19,7 @@ DFA = (Q, Sigma, delta, q0, F) mit
 Diese Komponenten werden nachfolgend definiert.*)
 
 Require Import Fin.
-Require Import Arith.
-Load Repeats_vector.
+Load Pigeonhole_vector.
 Load Word_Prop.
 
 Section Definitions.

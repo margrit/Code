@@ -1,4 +1,4 @@
-Load Definitions_vector.
+Load Repeats_vector.
 (* Load Comparison. *)
 Require Import Vector.
 Require Import Arith.
@@ -243,7 +243,7 @@ Proof.
   dependent induction v.
   dependent destruction ap.
   - exists v.
-    exists F1. 
+    exists F1.
     cbn.  (*alternativ simpl?*)
     reflexivity.
   - dependent destruction n.

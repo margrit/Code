@@ -11,6 +11,7 @@ Die Beweise sind in die einzelnen Teilbeweise unterteilt und dies wird durch die
 wiederverwendet, nur dass sie mit einer geschweiften Klammer umrahmt sind.
 *)
 Load DFA_Def.
+
 Section Transitions.
 
 Fixpoint word_replicate (n : nat) (l : list Sigma) : list Sigma :=
