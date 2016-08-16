@@ -8,7 +8,6 @@ Require Import Structures.Equalities.
 
 
 (* Spielereien mit Gleichheit *)
-
 Lemma eq_app : forall (A B : Type) (f : A -> B) (x y  : A), x = y -> (f x = f y).
 Proof.
 intros.
@@ -23,7 +22,6 @@ destruct p.
 assumption.
 Defined.
 
-
 Lemma eq_app_dep : forall {A : Type} {x y : A} {B : A -> Type} (f : forall (x : A ), (B x)) (p : x = y), 
     (subst B p (f x) = f y).
 Proof.
@@ -34,9 +32,8 @@ reflexivity.
 Defined.
 
 
-(* Entscheidbarkeit von Appears und Repeats fuer den Fall, 
-   dass die Elemente des Vektors vom Typ Fin.t sind        *)
-
+(* Entscheidbarkeit von Appears und Repeats fuer den Fall,
+   dass die Elemente des Vektors vom Typ Fin.t sind. *)
 Theorem dec_Appears_fin : forall {n m : nat} (f : @Fin.t n) (v : Vector.t (@Fin.t n) m), 
      (Appears_in f v) + ((Appears_in f v) -> False).
 Proof.

@@ -1,16 +1,20 @@
 Load DFA_Def.
 
-(** Mit dem Table Filling Algorithmus indet man heraus, ob Zustände äquivalent sind. Man unterscheidet
+(** Mit dem Table Filling Algorithmus findet man heraus, ob Zustände äquivalent sind. Man unterscheidet
  zuerst Endzustände von allen anderen und geht dann iterativ vor, indem man prüft, ob zwei Zustände mit
- dem gleichen Eingabesymbol in den gleichen Folgezustand abbilden. Es werden Äquivalenzklassen über
- Zustände aufgebaut.*)
+ dem gleichen Eingabesymbol in den gleichen Folgezustand abbilden. Es werden so Äquivalenzklassen
+ über Zustände aufgebaut.*)
 
 (* Die akzeptierenden Zustände werden durch [is_accepting] beschrieben.*)
 
 (* erreichbare Zustände*)
-Definition reachable := [fun x y => [exists a, Conf_DFA_step x a = y]].
+Fixpoint reachable (q : Q) : bool :=
+  if q = q0 then true else exists w, Conf_rel_DFA
 
-Definition Q_reachable := (nil ++ reachable Q).
+Definition reachable := [fun x y => [exists a, Conf_DFA_step x a = y]].
+Print reachable.
+
+(*Definition Q_reachable := (nil ++ reachable Q).*)
 
 (* Um zu zeigen, dass Zustände gleich sind, müssen sie durch die gleiche Eingabe in den gleichen
  Folgezustand abbilden.*)

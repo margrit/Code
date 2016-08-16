@@ -18,7 +18,7 @@ Print FinSet.
 Print option.
 
 
-Instance optionFin (X : Type) `{xFin : Finite X} : Finite (option X) := {
+Instance optionFin (X : Type) {xFin : Finite X} : Finite (option X) := {
   card := S card;
   to x := match x with
     | None => F1
@@ -26,8 +26,8 @@ Instance optionFin (X : Type) `{xFin : Finite X} : Finite (option X) := {
   end;
   (* funktioniert so leider nicht: *)
   from i := match i with
-    | F1    => None
-    | FS i' => Some (from i')
+    | @F1 _   => None
+    | @FS card i' => Some (from i')
   end
 }.
 Proof. 
