@@ -8,6 +8,58 @@ Load DFA_Def.
 (* Die akzeptierenden Zustände werden durch [is_accepting] beschrieben.*)
 
 (* erreichbare Zustände*)
+
+Lemma eq_Q_eq_delta_hat : forall (w : @Word Sigma)(p q : Q)(d : forall q p : Q, (p = q) ),
+delta_hat q w = delta_hat p w.
+Proof.
+intros.
+induction w.
+- simpl.
+  apply d.
+- simpl.
+  rewrite IHw.
+  reflexivity.
+Qed.
+
+Lemma eq_Q_eq_delta_hat_left : forall (w : @Word Sigma)(p q : Q),
+q = p -> delta_hat q w = delta_hat p w.
+Proof.
+intros.
+induction w.
+- simpl.
+  assumption.
+- simpl.
+  rewrite IHw.
+  reflexivity.
+Defined.
+
+Lemma delta_hat_eps (q : Q) (w : @Word Sigma) :
+delta_hat q eps = q.
+Proof.
+simpl.
+reflexivity.
+Defined.
+
+Lemma eq_Q_eq_delta_hat_right : forall (w : @Word Sigma)(p q : Q),
+delta_hat q w = delta_hat p w -> q = p.
+Proof.
+intros.
+induction w.
+
+
+Lemma eq_Q_F : forall (w : @Word Sigma)(p q : Q)(d : forall q p : Q, (p = q) + ((p = q) -> False)),
+(delta_hat q w = delta_hat p w) + ((delta_hat q w = delta_hat p w) -> False).
+Proof.
+intros w q p d.
+generalize q.
+intros.
+induction w.
+- simpl.
+  right.
+  intro H.
+
+
+
 Fixpoint reachable (q : Q) : bool :=
   if q = q0 then true else exists w, Conf_rel_DFA
 

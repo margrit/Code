@@ -128,6 +128,6 @@ induction e1.
   congruence.
 - decide equality.
   + right.
-     apply 
+     rewrite negb.
 
 End RegExp.
