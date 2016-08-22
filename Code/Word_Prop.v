@@ -328,7 +328,7 @@ induction w2.
     apply concat_associative.
 Defined.
 
-(** [word_to_list], [word_to_list'] und [word_to_list'] beschreiben dieselbe Funktion.*)
+(** [word_to_list], [word_to_list'] und [word_to_list''] beschreiben dieselbe Funktion.*)
 Lemma word_to_list_Lemma {A : Type} (w : @Word A) :
   word_to_list w = word_to_list' w.
 Proof.
