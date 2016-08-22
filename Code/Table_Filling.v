@@ -45,6 +45,13 @@ delta_hat q w = delta_hat p w -> q = p.
 Proof.
 intros.
 induction w.
+- simpl in H.
+  assumption.
+- simpl in H.
+  rewrite IHw.
+  + reflexivity.
+  + apply eq_Q_eq_delta_hat.
+     intros.
 
 
 Lemma eq_Q_F : forall (w : @Word Sigma)(p q : Q)(d : forall q p : Q, (p = q) + ((p = q) -> False)),
@@ -57,6 +64,23 @@ induction w.
 - simpl.
   right.
   intro H.
+
+(*zwei Wörter haben die gleiche Länge*)
+Lemma eq_length_word (w1 w2: @Word Sigma) : word_length w1 = word_length w2.
+Proof.
+induction w1.
+- simpl.
+  induction w2.
+  + simpl.
+     reflexivity.
+  + simpl.
+     rewrite <- IHw2.
+
+(*Äquivalenz zwischen Wörtern *)
+Lemma w_eq_v : forall w v : @Word Sigma, forall q : Q,
+  delta_hat q w = delta_hat q v -> w = v.
+Proof.
+intros.
 
 
 
