@@ -141,7 +141,6 @@ induction e1.
 - right.
   congruence.
 - decide equality.
-  + right.
-     rewrite negb.
+  +
 
 End RegExp.
