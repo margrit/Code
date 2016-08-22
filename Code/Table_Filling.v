@@ -66,15 +66,15 @@ induction w.
   intro H.
 
 (*zwei Wörter haben die gleiche Länge*)
-Lemma eq_length_word (w1 w2: @Word Sigma) : word_length w1 = word_length w2.
+Lemma eq_length_word (w1 w2: @Word Sigma) : (S(word_length w1) = S(word_length w2)) 
+-> word_length w1 = word_length w2.
 Proof.
-induction w1.
+intros.
+induction w1, w2.
 - simpl.
-  induction w2.
-  + simpl.
-     reflexivity.
-  + simpl.
-     rewrite <- IHw2.
+  reflexivity.
+- simpl in *.
+  
 
 (*Äquivalenz zwischen Wörtern *)
 Lemma w_eq_v : forall w v : @Word Sigma, forall q : Q,
