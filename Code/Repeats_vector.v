@@ -25,7 +25,6 @@ Inductive Repeats {X : Type} : forall {n : nat}, Vector.t X n -> Type :=
  | rp_ext  {m} : forall x : X, forall v : Vector.t X m, Repeats v -> Repeats (cons X x m v)
  | rp_intr {m} : forall x : X, forall v : Vector.t X m, Appears_in x v -> Repeats (cons X x m v).
 
-
 (* Entscheidbarkeit von Appears und Repeats *)
 Theorem dec_Appears_in : forall {A : Type}
             (d : forall a a': A, (a = a') + ((a = a') -> False))
@@ -55,8 +54,6 @@ induction v.
         contradict f.
         assumption. }
 Defined.
-
-
 
 Theorem dec_Repeats : forall {A : Type} (d : forall a a': A, (a = a') + ((a = a') -> False))
                              {n : nat} (v : Vector.t A n), 
@@ -92,11 +89,8 @@ induction n; intro.
        }
 Defined. 
 
-
-
 (* Wenn x in der Konkatenation von zwei Listen vorkommt, 
    dann kommt x auch entweder in Liste 1 oder Liste 2 vor. *)
-
 Lemma Appears_in_app : forall {X : Type} {n m : nat} (xs : Vector.t X n) (ys : Vector.t X m) (x : X),
      Appears_in x (append xs ys) -> Appears_in x xs + Appears_in x ys.
 Proof.
@@ -122,10 +116,8 @@ Proof.
         }
 Qed.
 
-
 (* Wenn x in Liste 1 oder Liste 2 vorkommt, 
    dann kommt x auch in der Konkatenation der Listen vor. *)
-
 Lemma app_Appears_in : forall {X : Type} {n m : nat} 
                           (xs : Vector.t X n) (ys : Vector.t X m) (x : X),
                Appears_in x xs + Appears_in x ys -> Appears_in x (append xs ys).
@@ -149,7 +141,6 @@ Proof.
       assumption.
 Qed.
 
-
 (*(* Axiom eq_rect_eq :
   forall (U:Type) (p:U) (Q:U -> Type) (x:Q p) (h:p = p), x = eq_rect p Q x p h.*)
 
@@ -158,9 +149,7 @@ Check (eq_rect_eq nat 0 (Vector.t nat) (nil nat) ......*)
 Print eq_rect.
 Check (eq_rect 1 (Vector.t nat) (cons nat 2 0 (nil nat)) 1 eq_refl). 
 
-
 (* Liste verknüpft mit der leeren Liste ergibt die ursprüngliche Liste *)
-
 Lemma app_v_nil {X : Type} {n : nat} : forall (v : @Vector.t X n),
                      {v' : Vector.t X (n+0) & (append v (nil X)) = v'}.
 Proof.
@@ -180,7 +169,6 @@ Proof.
      rewrite e.
      reflexivity.
 Defined.
-
 
 Lemma vec_pl0 {A : Type} {n : nat} (v : @Vector.t A (n + 0)) : @Vector.t A n.
 Proof.
@@ -211,7 +199,6 @@ induction n.
 *)
 
 (*Vorkommen von x in einer Teilliste. *)
-
 Lemma Appears_in_app_split : forall {X : Type} {n : nat} (x : X) (v : Vector.t X n),  
                    Appears_in x v -> 
                      { n1 : nat &  { v1 : Vector.t X n1 & 
@@ -245,10 +232,8 @@ dependent induction ap.
     reflexivity.
 Defined.
 
-
 (* Wenn eine von zwei Teillisten (mind.) eine Wiederholung besitzt, 
    so enthaelt auch ihre Verkettung eine Wiederholung               *)
-
 Lemma Repeats_in_app : forall {X: Type} {n1 n2 : nat} 
                               (v1 : Vector.t X n1) (v2 : Vector.t X n2), 
    Repeats v1 + Repeats v2 -> Repeats (append v1 v2).  
@@ -278,9 +263,7 @@ dependent induction v1; intros v2 rp.
     assumption.
 Defined. 
 
-
 (* Zerlegung einer Liste mit Wiederholungen *)
-
 Lemma Repeats_decomp : forall {X : Type} {n : nat}, forall v : Vector.t X n,
   Repeats v ->
     { x  : X   &
@@ -293,7 +276,6 @@ Lemma Repeats_decomp : forall {X : Type} {n : nat}, forall v : Vector.t X n,
 Proof.
   intros X n v rp.
   dependent induction rp.
-
   - destruct IHrp as [x' IHrp1]. 
     destruct IHrp1 as [n1 IHrp2].
     destruct IHrp2 as [v1 IHrp3].
@@ -302,44 +284,33 @@ Proof.
     destruct IHrp5 as [n3 IHrp6].
     destruct IHrp6 as [v3 IHrp7].
     destruct IHrp7 as [eq_n eq_v].
-
     exists x'.
     exists (S n1). exists (cons X x n1 v1).
     exists n2. exists v2.
     exists n3. exists v3.
-
     simpl in *.
     assert (S (n1 + S (n2 + S n3)) = S m) as eq_Sm.
-
     + rewrite eq_n.
       reflexivity.
-
     + exists eq_Sm.
       dependent destruction eq_Sm.
       simpl in *.
-      reflexivity.  
-
+      reflexivity.
   - apply Appears_in_app_split in a.
-
     destruct a as [n1' a1].
     destruct a1 as [v1' a2].
     destruct a2 as [n2' a3].
     destruct a3 as [v2' a4].
     destruct a4 as [eq_m eq_v].
-
     simpl in *.
-
     exists x.
     exists 0. exists (nil X).
     exists n1'. exists v1'.
     exists n2'. exists v2'.
-
     simpl in *.
     assert (S (n1' + S n2') = S m) as eq_Sm.
-
     + rewrite eq_m.
       reflexivity.
-
     + exists eq_Sm.
       dependent destruction eq_Sm.
       simpl in *.
@@ -357,7 +328,6 @@ Lemma Repeats_comp : forall {X : Type} {n : nat}, forall v : Vector.t X n,
    -> Repeats v.
 Proof.
   intros X n v ex.
-
   destruct ex  as [x  ex1].
   destruct ex1 as [n1 ex2].
   destruct ex2 as [v1 ex3].
@@ -366,16 +336,12 @@ Proof.
   destruct ex5 as [n3 ex6].
   destruct ex6 as [v3 ex7].
   destruct ex7 as [eq_n eq_v].
-
   pose (ai_here x v3) as x_in_v3. 
   assert (Appears_in x (append v2 (cons X x n3 v3))) as x_in_v2xv3.
-  
   - apply app_Appears_in.
     right.
     assumption.
-  
   - pose (rp_intr x (append v2 (cons X x n3 v3)) x_in_v2xv3) as rp_xv2xv3.
-
     rewrite eq_v.
     dependent destruction eq_n.
     simpl in *.
@@ -383,7 +349,6 @@ Proof.
     right.
     assumption.
 Defined.
-
 
 (*Länge von konkatenierten Listen und einem Element ist gleich. 
 
@@ -399,7 +364,6 @@ Proof.
     simpl.
     reflexivity.
 Qed.
-
 *)
 
 Lemma sum_0 (n1 n2 : nat) : n1 + n2 = 0 -> ((n1 = 0) * (n2 = 0))%type.
@@ -502,7 +466,6 @@ dependent induction v; intros n1' n2' eq_n v1 v2 map_f_v.
         }
 Defined.
 
-
 Lemma map_dec_3 {X Y :Type} {n n1 n2 n3 : nat} : forall (f : X -> Y) 
                 (v : Vector.t X n) (eq : n1 + (n2 + n3) = n)
                 (v1 : Vector.t Y n1) (v2 : Vector.t Y n2) (v3 : Vector.t Y n3),
@@ -515,27 +478,22 @@ intros f v eq v1 v2 v3 eq_map_f_v.
 remember eq_map_f_v as eq_map_f_v'.
 clear Heqeq_map_f_v'.
 apply map_dec_2 in eq_map_f_v'.
-
 destruct eq_map_f_v' as [v1' ex_v2].
 destruct ex_v2 as [v2' eq_prod].
 destruct eq_prod as [eq_prod1 eq_v2].
 destruct eq_prod1 as [eq_v eq_v1].
-
 exists v1'.
 assert (append v2 v3 = adapt_vec (n2 + n3) (n2 + n3) (append v2 v3) eq_refl) as eq_v2'.
 - simpl.
   reflexivity.
 - rewrite eq_v2' in eq_v2.
   apply map_dec_2 in eq_v2. 
-
   destruct eq_v2 as [v2'' ex_v3].
   destruct ex_v3 as [v3'' eq_prod].
   destruct eq_prod as [eq_prod1 eq_v3''].
   destruct eq_prod1 as [eq_v' eq_v2''].
-
   exists v2''.
   exists v3''.
-
   split.
   + split.
     * split.
