@@ -3,6 +3,7 @@ Load DFA_Def.
 Section RegExp.
 (*Variable char : Sigma. allerdings nur ein einzelnes Zeichen*)
 
+(** Der Typ eines regulären Ausdrucks induktiv definiert.*)
 Inductive Reg_Exp {A: Type} :=
 | Void : @Reg_Exp A
 | Eps : @Reg_Exp A
@@ -15,6 +16,7 @@ Inductive Reg_Exp {A: Type} :=
 
 (*boolsche Funktion auf Wörtern -> Sprache*)
 
+(* Anhängen eines Zeichens an das zweite Teilwort eines aus zwei Teilwörtern bestehenden Wortes.*)
 Fixpoint appsec {A : Type} (ps : @Word (@Word A * @Word A)) (x : A) : 
   @Word (@Word A * @Word A) :=
 match ps with
@@ -24,57 +26,69 @@ end.
 
 Eval compute in (appsec (snoc eps (eps, eps)) 2).
 
+(* Aufsplitten eines Wortes in zwei Teilwötern. Das erste Teilword wird dabei immer länger und das
+ Zweite dem entsprechend kürzer.*)
+(*------ oder wird das zweite wort länger? -------*)
 Fixpoint splits {A : Type} (w : @Word A) : @Word (@Word A * @Word A):=
 match w with
 | eps => snoc eps (eps, eps)
 | snoc w x => snoc (appsec (splits w) x) (snoc w x, eps)
 end.
 
-Eval compute in (splits (snoc (snoc eps 2) 3)).
+Eval compute in (splits (snoc (snoc (snoc eps 2) 3)4)).
 
+(* Formalisierung des Existenzquantors auf Wörtern analog zu [existsb], der auf Listen arbeitet.*)
 Fixpoint existsbw {A : Type} (p : A -> bool) (w : @Word A) : bool :=
 match w with
   | eps => false
   | snoc w' x => p x || existsbw p w'
 end.
 
+(* Formalisierung des Allquantors auf Wörtern analog zu [forallb], der auf Listen arbeitet.*)
 Fixpoint forallbw {A : Type} (p : A -> bool) (w : @Word A) : bool :=
 match w with
   | eps => true
   | snoc w' x => p x && forallbw p w'
 end.
 
+(**)
 Fixpoint pair_pred {A : Type} (p1 p2 : A -> bool) (a : A * A) : bool :=
 match a with
 | (a1,a2) => p1 a1 && p2 a2
 end.
 
+(* Map-Funktion auf Wörtern.*)
 Fixpoint map_word {A B : Type} (f : A -> B) (w : @Word A) : @Word B :=
  match w with
    | eps => eps
    | snoc w' x => snoc (map_word f w') (f x)
  end.
 
+(* Ein einzelnes Zeichen an ein Wort anhängen.*)
 Definition concat_word_single {A : Type} (x : A) (w : @Word(@Word A)) : @Word(@Word A) :=
   snoc w (snoc eps x).
 
 Eval compute in (concat_word_single 2 (snoc eps (snoc eps 3))).
 
+(* Eine Liste von Wörtern (Wort über Wörtern) in ein Word umwandeln.*)
 Fixpoint flatten_word {A : Type} (w : @Word (@Word A)) : @Word A :=
   match w with
     | eps => eps
     | snoc w1 w2 => concat_word (flatten_word w1) w2
   end.
 
+(**)
 Definition concat_map_word {A B : Type} (f : A -> @Word B) (w : @Word A) : @Word B :=
 flatten_word(map_word f w).
 
+(**)
 Fixpoint last_snoc {A : Type} (x : A) (w : @Word(@Word A)) : @Word(@Word(@Word A)) :=
   match w with
     | eps => eps
     | snoc w1 w2  => snoc eps (snoc w1 (snoc w2 x))
   end.
 
+(**)
 Fixpoint split2 {A : Type} (w : @Word A) : @Word (@Word (@Word A)) :=
 match w with
   | eps => snoc eps eps
