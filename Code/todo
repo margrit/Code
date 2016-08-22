@@ -1,8 +1,10 @@
-Kommentare überarbeiten
+delta_hat_dec
 
-Reihenfolge der Funktionen überarbeiten
+w1 = w2
 
-Umdrehen der Liste nicht drehen
+offene Lemma in der Table Filling Datei
+
+Kommentare Reg_Exp überarbeiten
 
 **** aus der Mail ****
 
@@ -20,10 +22,6 @@ Frage: Sollte Conf_rel_DFA nicht besser gleich nach bool statt Type gehen?
 dieselbe Sprache definieren.
 
 conf_list w q Zustand im letzten Element der Liste = delta_hat w q
-
-6. Definiere einen (induktiven) Typen für reguläre Ausdrücke über einem Alphabet A (Man
-  braucht einzelne Zeichen aus A, Verkettung von 2 reg. Ausdrücken, Oder-Verknüpfung
-  von 2 reg. Ausdrücken, Kleensche Hülle eines reg. Ausdrucks).
 
 7. Definiere eine Funktion, die einem regulären Ausdruck über A die durch diesen
   Ausdruck definierte Sprache zuordnet.

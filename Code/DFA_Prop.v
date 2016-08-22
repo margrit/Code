@@ -1,31 +1,9 @@
 Require Import Bool.
 Load DFA_Def.
 
-(* Erweiterte Überführungsfunktion über *)
-Theorem delta_hat_cons_append : forall (xs : list Sigma) (ys : list Sigma) (q : Q),
-  delta_hat_cons q (xs ++ ys) = delta_hat_cons (delta_hat_cons q xs) ys.
-Proof.
-  induction xs.
-  - simpl.
-    intros ys q.
-    reflexivity.
-  - simpl.
-    intros.
-    apply IHxs.
-Defined.
+Lemma Lang : accepted_word (delta_hat) = accepted_word (Conf_rel_DFA).
 
-Theorem delta_hat_append : forall (w1 w2 : @Word Sigma) (q : Q),
-  delta_hat q (concat_word w1 w2) = delta_hat (delta_hat q w1) w2.
-Proof.
-  induction w2.
-  - simpl.
-    intros.
-    reflexivity.
-  - simpl.
-    intros.
-    rewrite <- IHw2.
-    reflexivity.
-Defined.
+(* Erweiterte Überführungsfunktion über *)
 
 (*Zwei Automaten sind gleicht, g.d.w. sie die gleine Sprache beschreiben.*)
 
