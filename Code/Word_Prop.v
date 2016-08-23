@@ -15,6 +15,9 @@ Inductive Word {A : Type} : Type:=
   | eps   : @Word A
   | snoc : @Word A -> A -> @Word A.
 
+Notation "[ ]" := eps.
+Notation "[ x ; .. ; y ]" := (snoc ( .. (snoc eps x) .. ) y).
+
 (** ** Grundoperationen auf dem Typ [Word]: *)
 
 (** Berechnung der Wortlänge: *)

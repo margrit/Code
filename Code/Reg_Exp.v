@@ -11,8 +11,7 @@ Inductive Reg_Exp {A: Type} :=
 | Star : @Reg_Exp A -> @Reg_Exp A
 | Plus : @Reg_Exp A ->  @Reg_Exp A -> @Reg_Exp A
 | Conc : @Reg_Exp A -> @Reg_Exp A -> @Reg_Exp A
-| Not : @Reg_Exp A -> @Reg_Exp A
-| Minus : @Reg_Exp A -> A -> @Reg_Exp A.
+| Not : @Reg_Exp A -> @Reg_Exp A.
 
 (*boolsche Funktion auf Wörtern -> Sprache*)
 
@@ -26,9 +25,8 @@ end.
 
 Eval compute in (appsec (snoc eps (eps, eps)) 2).
 
-(* Aufsplitten eines Wortes in zwei Teilwötern. Das erste Teilword wird dabei immer länger und das
- Zweite dem entsprechend kürzer.*)
-(*------ oder wird das zweite wort länger? -------*)
+(* Aufsplitten eines Wortes in zwei Teilwörter. Das erste Teilword wird dabei immer länger und das
+ zweite Teilwort dementsprechend kürzer.*)
 Fixpoint splits {A : Type} (w : @Word A) : @Word (@Word A * @Word A):=
 match w with
 | eps => snoc eps (eps, eps)
@@ -37,27 +35,27 @@ end.
 
 Eval compute in (splits (snoc (snoc (snoc eps 2) 3)4)).
 
-(* Formalisierung des Existenzquantors auf Wörtern analog zu [existsb], der auf Listen arbeitet.*)
+(* Formalisierung des Existenzquantors auf Wörtern analog zu [existsb], das auf Listen arbeitet.*)
 Fixpoint existsbw {A : Type} (p : A -> bool) (w : @Word A) : bool :=
 match w with
   | eps => false
   | snoc w' x => p x || existsbw p w'
 end.
 
-(* Formalisierung des Allquantors auf Wörtern analog zu [forallb], der auf Listen arbeitet.*)
+(* Formalisierung des Allquantors auf Wörtern analog zu [forallb], das auf Listen arbeitet.*)
 Fixpoint forallbw {A : Type} (p : A -> bool) (w : @Word A) : bool :=
 match w with
   | eps => true
   | snoc w' x => p x && forallbw p w'
 end.
 
-(**)
-Fixpoint pair_pred {A : Type} (p1 p2 : A -> bool) (a : A * A) : bool :=
-match a with
-| (a1,a2) => p1 a1 && p2 a2
+(* "Kreuzprodukt" zweier Prädikate *)
+Fixpoint pair_andb {A B : Type} (p : A -> bool) (q : B -> bool) (c : A * B) : bool :=
+match c with
+| (a,b) => p a && q b
 end.
 
-(* Map-Funktion auf Wörtern.*)
+(* Map-Funktion auf Wörtern (Word ist ein Funktor) *)
 Fixpoint map_word {A B : Type} (f : A -> B) (w : @Word A) : @Word B :=
  match w with
    | eps => eps
@@ -70,25 +68,25 @@ Definition concat_word_single {A : Type} (x : A) (w : @Word(@Word A)) : @Word(@W
 
 Eval compute in (concat_word_single 2 (snoc eps (snoc eps 3))).
 
-(* Eine Liste von Wörtern (Wort über Wörtern) in ein Word umwandeln.*)
+(* Ein Wort über Wörtern in ein Wort umwandeln (Monadenmultiplikation von Word).*)
 Fixpoint flatten_word {A : Type} (w : @Word (@Word A)) : @Word A :=
   match w with
     | eps => eps
     | snoc w1 w2 => concat_word (flatten_word w1) w2
   end.
 
-(**)
+(* bind-Operation der Monade Word*)
 Definition concat_map_word {A B : Type} (f : A -> @Word B) (w : @Word A) : @Word B :=
 flatten_word(map_word f w).
 
-(**)
+(* Hilfsfunktion für [split2]*)
 Fixpoint last_snoc {A : Type} (x : A) (w : @Word(@Word A)) : @Word(@Word(@Word A)) :=
   match w with
     | eps => eps
     | snoc w1 w2  => snoc eps (snoc w1 (snoc w2 x))
   end.
 
-(**)
+(* Generierung aller Zerlegungen eines Wortes in alle nichtleeren Teilwörter *)
 Fixpoint split2 {A : Type} (w : @Word A) : @Word (@Word (@Word A)) :=
 match w with
   | eps => snoc eps eps
@@ -98,8 +96,11 @@ end.
 
 Eval compute in (split2 (snoc (snoc(snoc(snoc eps 1)2)3)4)).
 Eval compute in (split2 eps).
+Eval compute in (split2 [ 1 ]).
+Eval compute in (split2 [ 1 ; 2 ]).
+Eval compute in (split2 [ 1 ; 2 ; 3]).
 
-(*Die Sprache, die von einem regulären Ausdruck beschrieben wird, wenn auch etwas kompliziert.*)
+(*Die Sprache, die von einem regulären Ausdruck beschrieben wird. *)
 Fixpoint reg_match {A : Type} (e : @Reg_Exp A) (eq: A -> A -> bool) (w : @Word A)  : bool :=
   match e, w with
   | Void  ,_ => false
@@ -107,8 +108,7 @@ Fixpoint reg_match {A : Type} (e : @Reg_Exp A) (eq: A -> A -> bool) (w : @Word A
   | Eps ,_=> false
   | Single x, snoc eps y => eq x y
   | Single _, _ => false
-  | Minus e1 x, w => reg_match e1 eq (snoc w x)
-  | Conc e1 e2, w => existsbw (pair_pred (reg_match e1 eq) (reg_match e2 eq))(splits w)
+  | Conc e1 e2, w => existsbw (pair_andb (reg_match e1 eq) (reg_match e2 eq))(splits w)
   | Star e1, w' => existsbw (forallbw (reg_match e1 eq)) (split2 w')
   | Plus e1 e2, w' => (reg_match e1 eq w') || (reg_match e2 eq w')
   | Not e1, w' => negb (reg_match e1 eq w')

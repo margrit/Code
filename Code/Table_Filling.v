@@ -40,41 +40,18 @@ simpl.
 reflexivity.
 Defined.
 
-Lemma eq_Q_eq_delta_hat_right : forall (w : @Word Sigma)(p q : Q),
-delta_hat q w = delta_hat p w -> q = p.
+Lemma eq_Q_eq_delta_hat_right : forall (p q : Q),
+(forall (w : @Word Sigma), delta_hat q w = delta_hat p w) -> q = p.
 Proof.
 intros.
-induction w.
-- simpl in H.
-  assumption.
-- simpl in H.
-  rewrite IHw.
-  + reflexivity.
-  + apply eq_Q_eq_delta_hat.
-     intros.
-
-
-Lemma eq_Q_F : forall (w : @Word Sigma)(p q : Q)(d : forall q p : Q, (p = q) + ((p = q) -> False)),
-(delta_hat q w = delta_hat p w) + ((delta_hat q w = delta_hat p w) -> False).
-Proof.
-intros w q p d.
-generalize q.
-intros.
-induction w.
-- simpl.
-  right.
-  intro H.
+pose (H eps).
+simpl in e.
+assumption.
+Defined.
 
 (*zwei Wörter haben die gleiche Länge*)
-Lemma eq_length_word (w1 w2: @Word Sigma) : (S(word_length w1) = S(word_length w2))
--> word_length w1 = word_length w2.
-Proof.
-intros.
-induction w1, w2.
-- simpl.
-  reflexivity.
-- simpl in *.
-  
+Lemma dec_eq_word {A : Type} (w1 w2: @Word A) : 
+
 
 (*Äquivalenz zwischen Wörtern *)
 Lemma w_eq_v : forall w v : @Word Sigma, forall q : Q,
