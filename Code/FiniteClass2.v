@@ -17,26 +17,25 @@ Print FinSet.
 
 Print option.
 
+Print Finite.
 
-Instance optionFin (X : Type) {xFin : Finite X} : Finite (option X) := {
-  card := S card;
+
+Fixpoint pred_fin {n : nat} (f : @Fin.t (S n)) : option (Fin.t n) :=
+match f with
+| F1 => None
+| FS f' => Some f'
+end.
+
+Instance optionFin (X : Type) {xFin : Finite X} : Finite (option X) := 
+  {
+  card :=  S card;
   to x := match x with
     | None => F1
     | Some x' => FS (to x')
   end;
-  (* funktioniert so leider nicht: *)
-  from i := match i with
-    | @F1 _   => None
-    | @FS card i' => Some (from i')
-  end
+  from i := match pred_fin i with
+                          | None    => None
+                          | Some i' => Some (from i')
+                        end
 }.
 Proof. 
-
-
-
-  (* das hier funktioniet auch nicht
-  from i := match i with
-    | @F1 _ => None
-    | @FS card i' => Some (from i')
-  end
- *)
