@@ -106,27 +106,56 @@ Lemma indFinite (B : nat -> Type)
 
 (* let's do the operations we need "by hand" *)
 
-Fixpoint optionFin {n : nat} (f : @Fin.t (S n)) : option (Fin.t n) :=
+Fixpoint optionFinTo {n : nat} (f : @Fin.t (S n)) : option (Fin.t n) :=
+match f with
+| F1 => None
+| FS f' => Some f'
+end.
+Inductive Auto (A : Type) : Type := MkAuto : (A -> A) -> Auto A. 
+ 
+Fixpoint optionFinFrom {n : nat} (of : option (Fin.t n)) : @Fin.t (S n) :=
+match of with
+| None => F1
+| Some f' => FS f'
+end.
+
+Fixpoint optionFinIso {n : nat} : Iso (@Fin.t (S n)) (option (Fin.t n)).
+Proof.
+  apply (MkIso (t (S n)) (option (t n)) (@optionFinTo n) (@optionFinFrom n));
+  induction n; intro a; dependent induction a; simpl; reflexivity.
+Defined.
+
+    
 match f with
 | F1 => None
 | FS f' => Some f'
 end.
 
-Fixpoint optionFinite (X : FiniteType) : FiniteType.
+Fixpoint optionFinite (X : FiniteType) : FiniteType :=
+  let XT := projT1 X in
+   let Xfinite := projT2 X in
+    let cardX := card XT Xfinite in
+     let isoX := isoFin XT Xfinite  in
+       match isoX with
+          | (MkIso to from toFrom fromTo) =>
+              existT (option X) (MkFinite (S cardX) (MkIso (fun ox => match ox with None => F1 | (Some a) => FS (xf a) end)
+                                                           (fun )))
+        
+
+
+
 Proof.
   destruct X as [X [card iso]].
   destruct iso as [xf fx xffx fxxf].
+
+  
   assert (oxsf : option X -> @Fin.t (S card)).
   - intro ox.
-    induction ox.
-    + exact (FS (xf a)).
-    + exact F1.
+    exact ( match ox with None => F1 | (Some a) => FS (xf a) end).
   - assert (sfox : @Fin.t (S card) -> option X).
     + intro sf.
       pose (optionFin sf) as osf.
-      induction osf.
-      * exact (Some (fx a)).
-      * exact None.
+      exact ( match osf with None => None | Some i => Some (fx i) end). 
     + assert (sfoxoxsf : forall (ox: option X), sfox (oxsf ox) = ox).
       * intro ox.
         induction ox.
