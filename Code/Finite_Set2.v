@@ -125,38 +125,35 @@ Proof.
   induction n; intro a; dependent induction a; simpl; reflexivity.
 Defined.
 
-    
-match f with
-| F1 => None
-| FS f' => Some f'
+Fixpoint mapOption {A B : Type} (f: A -> B) (oa : option A) : option B :=
+match oa with
+| None   => None
+| Some a => Some (f a)
 end.
+ 
+Fixpoint optionIso {A B : Type} (AIsoB : Iso A B) : Iso (option A) (option B).
+Proof.
+  destruct AIsoB as [ab ba abba baab].
+  apply (MkIso (option A) (option B) (mapOption ab) (mapOption ba)).
+  - intro ob; induction ob as [ b | ]; simpl.
+    + rewrite (abba b); reflexivity.
+    + reflexivity.
+  - intro oa; induction oa as [ a | ]; simpl.
+    + rewrite (baab a); reflexivity.
+    + reflexivity.
+Defined.
 
-Fixpoint optionFinite (X : FiniteType) : FiniteType :=
-  let XT := projT1 X in
-   let Xfinite := projT2 X in
-    let cardX := card XT Xfinite in
-     let isoX := isoFin XT Xfinite  in
-       match isoX with
-          | (MkIso to from toFrom fromTo) =>
-              existT (option X) (MkFinite (S cardX) (MkIso (fun ox => match ox with None => F1 | (Some a) => FS (xf a) end)
-                                                           (fun )))
-        
-
-
-
+Fixpoint optionFinite (X : FiniteType) : FiniteType.
 Proof.
   destruct X as [X [card iso]].
-  destruct iso as [xf fx xffx fxxf].
+  pose (optionIso iso) as oIso.
+  pose (transIso _ _ _ 
+          (symIso _ _ (@optionFinIso card))
+          oIso
+          ) as oIso2.
+  assert (Finite (option X)) as optionIsFinite.
+  apply (MkFinite (option X) (S card) oIso2).
+  exact (existT Finite (option X) optionIsFinite).
+Defined.
 
   
-  assert (oxsf : option X -> @Fin.t (S card)).
-  - intro ox.
-    exact ( match ox with None => F1 | (Some a) => FS (xf a) end).
-  - assert (sfox : @Fin.t (S card) -> option X).
-    + intro sf.
-      pose (optionFin sf) as osf.
-      exact ( match osf with None => None | Some i => Some (fx i) end). 
-    + assert (sfoxoxsf : forall (ox: option X), sfox (oxsf ox) = ox).
-      * intro ox.
-        induction ox.
-        { - compute.
