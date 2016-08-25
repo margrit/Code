@@ -100,6 +100,10 @@ Eval compute in (split2 [ 1 ]).
 Eval compute in (split2 [ 1 ; 2 ]).
 Eval compute in (split2 [ 1 ; 2 ; 3]).
 
+
+(*7. Definiere eine Funktion, die einem regulären Ausdruck über A die durch diesen
+  Ausdruck definierte Sprache zuordnet.
+*)
 (** Die Sprache, die von einem regulären Ausdruck beschrieben wird. *)
 Fixpoint reg_match {A : Type} (e : @Reg_Exp A) (eq: A -> A -> bool) (w : @Word A)  : bool :=
   match e, w with
@@ -119,28 +123,5 @@ Definition testreg : @Reg_Exp nat := Star( Conc (Single 1)(Single 2) ).
 Eval compute in (reg_match testreg Nat.eqb eps).
 Eval compute in (reg_match testreg Nat.eqb (snoc eps 1)).
 Eval compute in (reg_match testreg Nat.eqb (snoc (snoc eps 1)2)).
-
-Lemma eq_Reg_Exp_dec {A : Type} (e1 e2 : @Reg_Exp A) : {e1 = e2} + {e1 <> e2}.
-Proof.
-induction e2.
-induction e1.
-- left.
-  reflexivity.
-- right.
-  congruence.
-- right.
-  congruence.
-- right.
-  congruence.
-- right.
-  congruence.
-- right.
-  congruence.
-- right.
-  congruence.
-- right.
-  congruence.
-- decide equality.
-  +
 
 End RegExp.

@@ -41,7 +41,7 @@ simpl in e.
 assumption.
 Defined.
 
-Lemma Lang : accepted_word (delta_hat) = accepted_word (Conf_rel_DFA).
+Lemma Lang : accepted_word (delta_hat q w) = accepted_word (Conf_rel_DFA).
 
 (* Erweiterte Überführungsfunktion über *)
 

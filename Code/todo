@@ -23,9 +23,6 @@ dieselbe Sprache definieren.
 
 conf_list w q Zustand im letzten Element der Liste = delta_hat w q
 
-7. Definiere eine Funktion, die einem regulären Ausdruck über A die durch diesen
-  Ausdruck definierte Sprache zuordnet.
-
 8. Definiere die Beispielautomaten aus Einheit 2.1 der TI1-Vorlesung (den Wechselschalter
   und den "TI1" Automaten)
 
