@@ -9,45 +9,6 @@ Load DFA_Def.
 
 (* erreichbare Zustände*)
 
-Lemma eq_Q_eq_delta_hat : forall (w : @Word Sigma)(p q : Q)(d : forall q p : Q, (p = q) ),
-delta_hat q w = delta_hat p w.
-Proof.
-intros.
-induction w.
-- simpl.
-  apply d.
-- simpl.
-  rewrite IHw.
-  reflexivity.
-Qed.
-
-Lemma eq_Q_eq_delta_hat_left : forall (w : @Word Sigma)(p q : Q),
-q = p -> delta_hat q w = delta_hat p w.
-Proof.
-intros.
-induction w.
-- simpl.
-  assumption.
-- simpl.
-  rewrite IHw.
-  reflexivity.
-Defined.
-
-Lemma delta_hat_eps (q : Q) (w : @Word Sigma) :
-delta_hat q eps = q.
-Proof.
-simpl.
-reflexivity.
-Defined.
-
-Lemma eq_Q_eq_delta_hat_right : forall (p q : Q),
-(forall (w : @Word Sigma), delta_hat q w = delta_hat p w) -> q = p.
-Proof.
-intros.
-pose (H eps).
-simpl in e.
-assumption.
-Defined.
 
 (*zwei Wörter haben die gleiche Länge*)
 Lemma dec_eq_word {A : Type} (w1 w2: @Word A) : 
@@ -58,8 +19,6 @@ Lemma w_eq_v : forall w v : @Word Sigma, forall q : Q,
   delta_hat q w = delta_hat q v -> w = v.
 Proof.
 intros.
-
-
 
 Fixpoint reachable (q : Q) : bool :=
   if q = q0 then true else exists w, Conf_rel_DFA

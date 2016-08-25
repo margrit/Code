@@ -15,6 +15,7 @@ Inductive Word {A : Type} : Type:=
   | eps   : @Word A
   | snoc : @Word A -> A -> @Word A.
 
+(** Anpassung der Notation der Wörter zur Verbesserung der Lesbarkeit. *)
 Notation "[ ]" := eps.
 Notation "[ x ; .. ; y ]" := (snoc ( .. (snoc eps x) .. ) y).
 

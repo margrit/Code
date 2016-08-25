@@ -167,7 +167,6 @@ Definition accepted_word (w : @Word Sigma) :=
 Definition DFA_Lang (w : @Word Sigma) :=
   accepted_word.
 
-Print accepted_word.
 (** Die Funktionen [accepted_word] und [accepted_word_cons] beschreiben die gleichen
 akzeptierten Wörter.*)
 Lemma accepted_word_Lemma (w : @Word Sigma) :
