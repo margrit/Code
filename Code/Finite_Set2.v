@@ -26,24 +26,35 @@ Proof.
   exact (MkIso B A from to fromTo toFrom).
 Defined.
 
+(* we even have: *)
+Lemma symIsoIso (A B : Type) : Iso (Iso A B) (Iso B A).
+Proof.
+  apply (MkIso _ _ (symIso A B) (symIso B A));
+  intro isoab;destruct isoab; compute; reflexivity.
+Defined.
+  
 (* composition of isomorphisms *)
 Lemma transIso (A B C : Type) : Iso B C -> Iso A B -> Iso A C.
 Proof.
   intros isoBC isoAB.  
   destruct isoBC as [bc cb bccb cbbc].
   destruct isoAB as [ab ba abba baab].
-  cut (forall c : C, bc (ab (ba (cb c))) = c).
-    - intro acca.
-      cut (forall a : A, ba (cb (bc (ab a))) = a).
-      + intro caac.
-        exact (MkIso A C (compose bc ab) (compose ba cb) acca caac).
-      + intro a.
-        rewrite (cbbc (ab a)).
-        exact (baab a).
-     - intro c.
-       rewrite (abba (cb c)).
-       exact (bccb c).
+  apply (MkIso _ _ (compose bc ab) (compose ba cb)).
+  + intro c; compute; rewrite (abba (cb c)); rewrite (bccb c); reflexivity.
+  + intro a; compute; rewrite (cbbc (ab a)); rewrite (baab a); reflexivity.
 Defined.      
+
+(*
+(* with function extensionality, we would even have: *)
+Lemma transIsoIso (A B C : Type) (isoBC : Iso B C) : Iso (Iso A B) (Iso A C).
+Proof.
+  apply (MkIso _ _ (transIso A _ _ isoBC) (transIso A _ _ (symIso _ _ isoBC))).
+  + intro isoAB.
+    destruct isoAB as [ab ba abba baab].
+    destruct isoBC as [bc cb bccb cbbc].
+
+  but not here... 
+*)
 
 (* finite types *)
 
@@ -69,7 +80,7 @@ Defined.
    idea: things about finite types are determined
          if they are determined for the standard finite types
    very preliminary
- *)
+*)
 
 Lemma recFinite0 (B : Type) (onFin : forall (card : nat), B) (X : FiniteType) : B.
 Proof.
@@ -105,6 +116,8 @@ Lemma indFinite (B : nat -> Type)
 *)
 
 (* let's do the operations we need "by hand" *)
+
+(* towards optionFinite *)
 
 Fixpoint optionFinTo {n : nat} (f : @Fin.t (S n)) : option (Fin.t n) :=
 match f with
@@ -156,4 +169,101 @@ Proof.
   exact (existT Finite (option X) optionIsFinite).
 Defined.
 
+Print sigT.
+
+
+Fixpoint decideFin (X : Type) (Xfin : Finite X) : (Iso X (Fin.t 0)) + {n : nat & Iso X (option (Fin.t n))}.
+Proof.
+  destruct Xfin as [card iso].
+  induction card.
+  + exact (inl iso).
+  + apply inr.
+    pose (@optionFinIso card0) as iso2.    
+    pose (transIso _ _ _ iso2 iso) as iso3.
+    apply (existT _ card0 iso3).
+Defined.
+
+Fixpoint optionSumTo (X Y : Type) ( oxY : (option X) + Y) : option (X + Y) :=
+  match oxY with
+      | (inl None)      => None
+      | (inl (Some x))  => Some (inl x)
+      | (inr y)         => Some (inr y)
+  end.
+
+Fixpoint optionSumFrom (X Y : Type) (oXy : option (X + Y)) : (option X) + Y :=
+  match oXy with
+      | None            => inl None
+      | Some (inl x)    => inl (Some x)
+      | Some (inr y)    => inr y
+  end.
+                               
+
+Lemma optionSumIso (X Y : Type) : Iso ((option X) + Y) (option (X + Y)).
+Proof.
+  apply (MkIso _ _ (optionSumTo X Y) (optionSumFrom X Y)).  
+  + intro oxy; induction oxy as [xy | ].    
+    - induction xy; simpl; reflexivity.
+    - simpl; reflexivity.
+  + intro oxy; induction oxy as [ox | y].
+    - induction ox as [x | ]; simpl; reflexivity.
+    - simpl; reflexivity.
+Defined.
+
+Fixpoint sumFlip (X Y : Type) (xy : X + Y) : (Y + X) :=
+  match xy with
+      | inl x => inr x
+      | inr y => inl y
+  end.
+
+Lemma sumCommutative (X Y : Type) : Iso (X + Y) (Y + X).
+Proof.
+  apply (MkIso _ _ (sumFlip X Y) (sumFlip Y X)).
+  intro yx; induction yx; simpl; reflexivity.
+  intro xy; induction xy; simpl; reflexivity.
+Defined.
+
+Definition univSum {X Y Z : Type} (f : X -> Z) (g : Y -> Z) (xy: X + Y) : Z :=
+  match xy with
+      | inl x => f x
+      | inr y => g y
+  end.
+
+Definition sumMap {X Y Z W : Type} (f : X -> Z) (g : Y -> W) : (X + Y) -> (Z + W) :=
+  univSum (compose inl f) (compose inr g).
+
+Lemma sumIsoLeft (X Y Z : Type) (isoXY: Iso X Y) : Iso (X + Z) (Y + Z).
+Proof.  
+  destruct isoXY as [xy yx xyyx yxxy].
+  apply (MkIso _ _ (sumMap xy id) (sumMap yx id)).
+  + intro oyz; induction oyz as [y | z].
+    - compute; rewrite (xyyx y); reflexivity.
+    - trivial.
+  + intro oxz; induction oxz as [x | z].
+    - compute; rewrite (yxxy x); reflexivity.
+    - trivial. 
+Defined.
+
+Lemma sumIsoRight (X Y Z : Type) (isoXY: Iso X Y) : Iso (Z + X) (Z + Y).
+Proof. (* couldn't we deduce this from sumIsoLeft and symmetry properties ?*)     
+  destruct isoXY as [xy yx xyyx yxxy].
+  apply (MkIso _ _ (sumMap id xy) (sumMap id yx)).
+  + intro ozy; induction ozy as [z | y].
+    - trivial.
+    - compute. rewrite (xyyx y); reflexivity.
+  + intro ozx; induction ozx as [z | x].
+    - trivial.
+    - compute; rewrite (yxxy x); reflexivity.
+Defined.
+      
+Lemma sumFinite (X Y : Type) (Xfin : Finite X) (Yfin : Finite Y) : Finite (X + Y).
+Proof.
+  destruct Xfin as [card isoX].
+  induction card.
+
   
+Fixpoint addFinite (X Y : FiniteType) : FiniteType.
+Proof.
+   destruct X as [X [cardX isoX]].
+   induction cardX.
+   + exact Y.
+   + 
