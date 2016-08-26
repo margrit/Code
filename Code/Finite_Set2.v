@@ -1,3 +1,12 @@
+(* "Design"-Fragen: - Benutzung von "assumption" oder lieber das praezisere "exact hypname"?
+                    - Benutzung von "induction" immer oder
+                      lieber "destruct" wenn Induktion gar nicht benoetigt wird? 
+
+   Ich habe dort, wo dependent induction oder destruction vorhommt/kam, Alternativen hingeschrieben, 
+   die Schemata aus der Fin-Bibliothek benutzen; so koennten wir auf "Program" verzichten.
+*)
+
+
 Require Import Fin.
 Require Import Program.
 
@@ -13,9 +22,11 @@ Record Iso (A B : Type) : Type :=
 
 (* identity isomorphism *)
 Lemma idIso (A : Type) : Iso A A.
-Proof.    
-  exact (MkIso _ _ id id (fun b => eq_refl) (fun b => eq_refl)).  
+Proof. 
+  exact (MkIso _ _ id id (fun _ => eq_refl) (fun _ => eq_refl)).
 Defined.
+
+Print idIso.
 
 (* inversion of isomorphisms *)
 Lemma symIso (A B : Type) : Iso A B -> Iso B A.
@@ -51,7 +62,8 @@ Proof.
 Defined.
   
 (*
-(* with function extensionality, we would even have: *)
+(* with function extensionality, we would even have:
+ *)
 Lemma transIsoIso (A B C : Type) (isoBC : Iso B C) : Iso (Iso A B) (Iso A C).
 Proof.
   apply (MkIso _ _ (transIso A _ _ isoBC) (transIso A _ _ (symIso _ _ isoBC))).
@@ -78,8 +90,15 @@ Definition FiniteType : Type :=
 
 Definition FinFinite (card : nat) : FiniteType.
 Proof.
-  unfold FiniteType.  
+  unfold FiniteType.
   exact (existT Finite (@Fin.t card) (MkFinite (@Fin.t card) card (idIso (@Fin.t card)))).
+
+ (* alternativ:
+
+  exists (@Fin.t card).
+  apply (MkFinite (@Fin.t card) card (idIso (@Fin.t card))).
+
+*)
 Defined.
 
 (* recursion and induction "principles"...
@@ -130,6 +149,7 @@ match f with
 | F1 => None
 | FS f' => Some f'
 end.
+
 Inductive Auto (A : Type) : Type := MkAuto : (A -> A) -> Auto A. 
  
 Fixpoint optionFinFrom {n : nat} (of : option (Fin.t n)) : @Fin.t (S n) :=
@@ -140,8 +160,16 @@ end.
 
 Fixpoint optionFinIso {n : nat} : Iso (@Fin.t (S n)) (option (Fin.t n)).
 Proof.
-  apply (MkIso (t (S n)) (option (t n)) (@optionFinTo n) (@optionFinFrom n));
-  induction n; intro a; dependent induction a; simpl; reflexivity.
+ apply (MkIso (t (S n)) (option (t n)) (@optionFinTo n) (@optionFinFrom n)); 
+ induction n; intro a; dependent destruction a; simpl; reflexivity.
+
+(* Variante, die zwar nicht so kurz ist, aber "dependent destruction" vermeidet:
+
+  apply (MkIso (t (S n)) (option (t n)) (@optionFinTo n) (@optionFinFrom n)).
+  - induction n; intro b; destruct b; simpl;reflexivity.
+  - induction n; intro a; apply (caseS' a); simpl; reflexivity.
+
+*)
 Defined.
 
 Fixpoint mapOption {A B : Type} (f: A -> B) (oa : option A) : option B :=
@@ -173,6 +201,17 @@ Proof.
   assert (Finite (option X)) as optionIsFinite.
   apply (MkFinite (option X) (S card) oIso2).
   exact (existT Finite (option X) optionIsFinite).
+
+(* Variante:
+
+  destruct X as [X [card iso]].
+  apply optionIso in iso as oIso.
+  apply (transIso _ _ _ 
+          (symIso _ _ (@optionFinIso card))) in oIso as oIso2.
+  exists (option X).
+  apply (MkFinite (option X) (S card) oIso2).
+*)
+
 Defined.
 
 Print sigT.
@@ -182,11 +221,22 @@ Fixpoint decideFin (X : Type) (Xfin : Finite X) : (Iso X (Fin.t 0)) + {n : nat &
 Proof.
   destruct Xfin as [card iso].
   induction card.
-  + exact (inl iso).
-  + apply inr.
-    pose (@optionFinIso card0) as iso2.    
+  + exact (inl iso). (* Alternativ: "left. exact iso." *)
+  + apply inr. (* Die "normale" zugehoerige Taktik waere "right" *)  
+    pose (@optionFinIso card0) as iso2.
     pose (transIso _ _ _ iso2 iso) as iso3.
-    apply (existT _ card0 iso3).
+    apply (existT _ card0 iso3). (* oder: "exists card0. exact iso3." *)
+
+(* Alternative:
+
+  + left. exact iso.
+  + right.
+    exists card0.
+    apply (transIso X (t (S card0)) (option (t card0))).
+    - apply optionFinIso.
+    - exact iso.
+*)
+
 Defined.
 
 Fixpoint optionSumTo (X Y : Type) ( oxY : (option X) + Y) : option (X + Y) :=
@@ -208,7 +258,7 @@ Lemma optionSumIso (X Y : Type) : Iso ((option X) + Y) (option (X + Y)).
 Proof.
   apply (MkIso _ _ (optionSumTo X Y) (optionSumFrom X Y)).  
   + intro oxy; induction oxy as [xy | ].    
-    - induction xy; simpl; reflexivity.
+    - induction xy; simpl; reflexivity. (* oder mit "destruct xy;..." *)
     - simpl; reflexivity.
   + intro oxy; induction oxy as [ox | y].
     - induction ox as [x | ]; simpl; reflexivity.
@@ -263,14 +313,14 @@ Defined.
 
 Lemma falseFromFin0 (x : Fin.t 0) : False.
 Proof.
-  dependent induction x.
+  apply case0; exact x.
 Defined.
 
 Lemma finZeroIsoFalse : Iso False (Fin.t 0).
 Proof.
   apply (MkIso _ _ (False_rect (t 0)) falseFromFin0).
-  + intro x; dependent induction x.
-  + intro a; apply False_rect; exact a.
+  + intro x; dependent induction x. (* "case0." wuerde reichen; sonst ginge auch "dependent destruction x" *)
+  + intro a; apply False_rect; exact a. (* "intro a; destruct a." reicht *)
 Defined.
 
 Lemma sumFalseIso (X : Type) : Iso (False + X) X.
@@ -278,7 +328,7 @@ Proof.
   apply (MkIso _ _ (univSum (False_rect X) id) inr).
   + intro x; compute; reflexivity.
   + intro fx; induction fx as [f | x].
-    - apply False_rect; exact f.  
+    - destruct f.  
     - compute; reflexivity.
 Defined.
 
