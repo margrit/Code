@@ -1,10 +1,87 @@
-Load Repeats_vector.
-(* Load Comparison. *)
+
+Load Fin_ext.
 Require Import Vector.
 Require Import Arith.
 Require Import Decidable.
 Require Import Program.
 Require Import Structures.Equalities.
+
+
+
+(* Vorkommen von x in einer Liste. *)
+Inductive Appears_in {X : Type} (a : X): forall {n : nat}, (Vector.t X n) -> Type :=
+  | ai_here  {m} : forall (v : Vector.t X m), Appears_in a (cons X a m v)
+  | ai_later {m} : forall b (v : Vector.t X m), Appears_in a v -> Appears_in a (cons X b m v).
+
+(* Vorkommen von Wiederholungen in einer Liste *)
+Inductive Repeats {X : Type} : forall {n : nat}, Vector.t X n -> Type :=
+ | rp_ext  {m} : forall x : X, forall v : Vector.t X m, Repeats v -> Repeats (cons X x m v)
+ | rp_intr {m} : forall x : X, forall v : Vector.t X m, Appears_in x v -> Repeats (cons X x m v).
+
+(* Entscheidbarkeit von Appears und Repeats *)
+Theorem dec_Appears_in : forall {A : Type}
+            (d : forall a a': A, (a = a') + ((a = a') -> False))
+            {n : nat} (a : A),
+            forall v : (Vector.t A n) , (Appears_in a v) + ((Appears_in a v) -> False).
+Proof.
+intros A d n a v.
+induction v.
+- right.
+  intro X.
+  inversion X.
+- destruct IHv.
+  + left.
+    apply ai_later.
+    assumption.
+  + pose (d a h).
+    destruct s.
+    * left.
+      rewrite e.
+      apply ai_here.
+    * right.
+      intro.
+      inversion X.
+      { contradict H.
+        assumption. }
+      { dependent destruction H2. 
+        contradict f.
+        assumption. }
+Defined.
+
+Theorem dec_Repeats : forall {A : Type} (d : forall a a': A, (a = a') + ((a = a') -> False))
+                             {n : nat} (v : Vector.t A n), 
+                            (Repeats v) + ((Repeats v) -> False).
+Proof.
+intro A.
+induction n; intro.
+- dependent destruction v.
+  right.
+  intro. 
+  inversion X.
+- dependent destruction v.
+  + pose (IHn v).
+    destruct s. 
+    * left.
+      apply rp_ext.
+      assumption.
+    * assert (sum (Appears_in h v) ((Appears_in h v) -> False)).
+      { apply (dec_Appears_in d h v). }
+      { destruct X.
+        - left. 
+          apply rp_intr.
+          assumption.
+        - right.
+          intro.
+          inversion X.
+          + apply f.
+            dependent destruction H2.
+            assumption.
+          + apply f0.
+            dependent destruction H2.
+            assumption.
+       }
+Defined. 
+
 
 
 (* Spielereien mit Gleichheit *)

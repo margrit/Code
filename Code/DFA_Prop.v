@@ -1,7 +1,47 @@
 Require Import Bool.
 Load DFA_Def.
 
-Lemma Lang : accepted_word (delta_hat) = accepted_word (Conf_rel_DFA).
+Lemma eq_Q_eq_delta_hat : forall (w : @Word Sigma)(p q : Q)(d : forall q p : Q, (p = q) ),
+delta_hat q w = delta_hat p w.
+Proof.
+intros.
+induction w.
+- simpl.
+  apply d.
+- simpl.
+  rewrite IHw.
+  reflexivity.
+Qed.
+
+Lemma delta_hat_eps (q : Q) (w : @Word Sigma) :
+delta_hat q eps = q.
+Proof.
+simpl.
+reflexivity.
+Defined.
+
+Lemma eq_Q_eq_delta_hat_left : forall (w : @Word Sigma)(p q : Q),
+q = p -> delta_hat q w = delta_hat p w.
+Proof.
+intros.
+induction w.
+- simpl.
+  assumption.
+- simpl.
+  rewrite IHw.
+  reflexivity.
+Defined.
+
+Lemma eq_Q_eq_delta_hat_right : forall (p q : Q),
+(forall (w : @Word Sigma), delta_hat q w = delta_hat p w) -> q = p.
+Proof.
+intros.
+pose (H eps).
+simpl in e.
+assumption.
+Defined.
+
+Lemma Lang : accepted_word (delta_hat q w) = accepted_word (Conf_rel_DFA).
 
 (* Erweiterte Überführungsfunktion über *)
 
