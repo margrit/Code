@@ -14,7 +14,7 @@ Record Iso (A B : Type) : Type :=
 (* identity isomorphism *)
 Lemma idIso (A : Type) : Iso A A.
 Proof.    
-  exact (MkIso _ _ id id (fun b => eq_refl) (fun b => eq_refl)).  
+  exact (MkIso _ _ id id (fun _ => eq_refl) (fun _ => eq_refl)).  
 Defined.
 
 (* inversion of isomorphisms *)
@@ -38,7 +38,7 @@ Proof.
   intros isoBC isoAB.  
   destruct isoBC as [bc cb bccb cbbc].
   destruct isoAB as [ab ba abba baab].
-  apply (MkIso _ _ (compose bc ab) (compose ba cb)).
+  apply (MkIso _ _ (bc ∘ ab) (ba ∘ cb)).
   + intro c; compute; rewrite (abba (cb c)); rewrite (bccb c); reflexivity.
   + intro a; compute; rewrite (cbbc (ab a)); rewrite (baab a); reflexivity.
 Defined.      
@@ -69,7 +69,7 @@ Lemma shiftIso {A A' B B' : Type} :
          Iso A A' -> Iso B B' -> Iso A B -> Iso A' B'.
 Proof.
   intros isoaa' isobb' isoab.
-  pose (transIso isobb' isoab) as isoab'.
+  apply (transIso isobb') in isoab as isoab'.
   exact (transIso isoab' (symIso isoaa')).
 Defined.
 
@@ -78,7 +78,7 @@ Defined.
 Record Finite (X : Type) : Type :=
   MkFinite {
       card : nat;
-      isoFin : Iso X (@Fin.t card)
+      isoFin : Iso X (t card)
   }.
 
 Definition FiniteType : Type := sigT Finite.
@@ -88,11 +88,10 @@ Definition FiniteType : Type := sigT Finite.
 
 Definition FinFinite (card : nat) : FiniteType.
 Proof.
-  unfold FiniteType.  
-  exact (existT Finite (t card) 
-                       (MkFinite (t card) card (idIso (t card)))).
+  unfold FiniteType.
+  exists (t card).
+  apply (MkFinite (t card) card (idIso (t card))).
 Defined.
-
 
 (* let's do the operations we need "by hand" *)
 
@@ -112,8 +111,9 @@ end.
 
 Fixpoint optionFinIso {n : nat} : Iso (t (S n)) (option (t n)).
 Proof.
-  apply (MkIso (t (S n)) (option (t n)) (@optionFinTo n) (@optionFinFrom n));
-  induction n; intro a; dependent induction a; simpl; reflexivity.
+  apply (MkIso (t (S n)) (option (t n)) (@optionFinTo n) (@optionFinFrom n)).
+  - induction n; intro b; destruct b; simpl; reflexivity.
+  - induction n; intro a; apply (caseS' a); simpl; reflexivity.
 Defined.
 
 (* option is a functor: here is map *)
@@ -128,10 +128,10 @@ Fixpoint optionIso {A B : Type} (AIsoB : Iso A B) : Iso (option A) (option B).
 Proof.
   destruct AIsoB as [ab ba abba baab].
   apply (MkIso (option A) (option B) (mapOption ab) (mapOption ba)).
-  - intro ob; induction ob as [ b | ]; simpl.
+  - intro ob; destruct ob as [ b | ]; simpl.
     + rewrite (abba b); reflexivity.
     + reflexivity.
-  - intro oa; induction oa as [ a | ]; simpl.
+  - intro oa; destruct oa as [ a | ]; simpl.
     + rewrite (baab a); reflexivity.
     + reflexivity.
 Defined.
@@ -140,11 +140,10 @@ Defined.
 Fixpoint optionFinite (X : FiniteType) : FiniteType.
 Proof.
   destruct X as [X [cardX isoX]].
-  pose (optionIso isoX) as isoOXOtc.
-  pose (transIso (symIso (@optionFinIso cardX)) isoOXOtc) as isoOX.
-  assert (Finite (option X)) as OXFinite.
-  apply (MkFinite (option X) (S cardX) isoOX).
-  exact (existT Finite (option X) OXFinite).
+  apply optionIso in isoX as isoOXOtc.
+  apply (transIso (symIso (@optionFinIso cardX))) in isoOXOtc as isoOXtSc.
+  exists (option X).
+  apply (MkFinite (option X) (S cardX) isoOXtSc).
 Defined.
 
 (* to be done: define Hom, id, comp,... to make FiniteType
@@ -162,11 +161,12 @@ Fixpoint decideFin (X : Type) (Xfin : Finite X) :
 Proof.
   destruct Xfin as [cardX isoX].
   induction cardX.
-  + exact (inl isoX).
-  + apply inr.
-    pose (@optionFinIso cardX) as isotScOtc.    
-    pose (transIso isotScOtc isoX) as isoXOtc.
-    apply (existT _ cardX isoXOtc).
+  + left; exact isoX.
+  + right.
+    exists cardX.
+    apply (@transIso X (t (S cardX))).
+    - apply optionFinIso.    
+    - exact isoX.
 Defined.
 
 (* towards optionSumIso *)
@@ -188,11 +188,11 @@ Fixpoint optionSumFrom (X Y : Type) (oSumXY : option (X + Y)) : (option X) + Y :
 Lemma optionSumIso (X Y : Type) : Iso ((option X) + Y) (option (X + Y)).
 Proof.
   apply (MkIso _ _ (optionSumTo X Y) (optionSumFrom X Y)).  
-  + intro oxy; induction oxy as [xy | ].    
-    - induction xy; simpl; reflexivity.
+  + intro oxy; destruct oxy as [xy | ].    
+    - destruct xy; simpl; reflexivity.
     - simpl; reflexivity.
-  + intro oxy; induction oxy as [ox | y].
-    - induction ox as [x | ]; simpl; reflexivity.
+  + intro oxy; destruct oxy as [ox | y].
+    - destruct ox as [x | ]; simpl; reflexivity.
     - simpl; reflexivity.
 Defined.
 
@@ -206,8 +206,8 @@ Fixpoint sumFlip (X Y : Type) (xy : X + Y) : (Y + X) :=
 Lemma sumCommutative (X Y : Type) : Iso (X + Y) (Y + X).
 Proof.
   apply (MkIso _ _ (sumFlip X Y) (sumFlip Y X)).
-  intro yx; induction yx; simpl; reflexivity.
-  intro xy; induction xy; simpl; reflexivity.
+  intro yx; destruct yx; simpl; reflexivity.
+  intro xy; destruct xy; simpl; reflexivity.
 Defined.
 
 (* universal property of sum *)
@@ -231,10 +231,10 @@ Proof.
   destruct isoXY as [xy yx xyyx yxxy].
   destruct isoZW as [zw wz zwwz wzzw].
   apply (MkIso _ _ (xy ⊞ zw) (yx ⊞ wz)).
-  + intro sumYW; induction sumYW as [y | w].
+  + intro sumYW; destruct sumYW as [y | w].
     - compute; rewrite (xyyx y); reflexivity.
     - compute; rewrite (zwwz w); reflexivity.
-  + intro sumXZ; induction sumXZ as [x | z].
+  + intro sumXZ; destruct sumXZ as [x | z].
     - compute; rewrite (yxxy x); reflexivity.
     - compute; rewrite (wzzw z); reflexivity.
 Defined.
@@ -251,16 +251,16 @@ Defined.
 
 (* we'll often need that (t 0) is uninhabitad, i.e. isomorphic to False *)
 
-Lemma falseFromFin0 (x : Fin.t 0) : False.
+Lemma falseFromFin0 (x : t 0) : False.
 Proof.
-  dependent induction x.
+  dependent destruction x.
 Defined.
 
-Lemma isoFalseFin0 : Iso False (Fin.t 0).
+Lemma isoFalseFin0 : Iso False (t 0).
 Proof.
   apply (MkIso _ _ (False_rect (t 0)) falseFromFin0).
-  + intro x; dependent induction x.
-  + intro a; apply False_rect; exact a.
+  + intro x; dependent destruction x.
+  + intro a; destruct a.
 Defined.
 
 (* in particular, False is Finite *)
@@ -274,8 +274,8 @@ Lemma sumFalseIso (X : Type) : Iso (False + X) X.
 Proof.
   apply (MkIso _ _ ((False_rect X) ▿ id) inr).
   + intro x; compute; reflexivity.
-  + intro fx; induction fx as [f | x].
-    - apply False_rect; exact f.  
+  + intro fx; destruct fx as [f | x].
+    - destruct f.  
     - compute; reflexivity.
 Defined.
 
@@ -286,24 +286,15 @@ Proof.
   induction n.
   + intros X Y isoXt0 isoYtm.
     compute.
-    pose (transIso (symIso isoFalseFin0) isoXt0) as isoXF.
-    pose (sumIsoLeft Y isoXF) as isoSumXYSumFY.   
-    apply (transIso' isoSumXYSumFY).
-    apply (transIso' (sumFalseIso Y)).
-    assumption.    
+    apply (transIso (sumFalseIso (t m))).
+    apply (transIso (sumIsoLeft (t m) (symIso isoFalseFin0))).
+    exact (sumIso isoXt0 isoYtm).
   + intros X Y isoXtSn isoYtm.
-    pose (sumIsoLeft Y isoXtSn) as isoSumXYSumtSnY.
-    apply (transIso' isoSumXYSumtSnY).
-    clear isoXtSn isoSumXYSumtSnY X.
-    pose (sumIsoLeft Y (@optionFinIso n)) as isoSumtSnYSumOtn.
-    apply (transIso' isoSumtSnYSumOtn).
-    clear isoSumtSnYSumOtn.
-    apply (transIso' (optionSumIso (t n) Y)).
-    pose (IHn (t n) Y (idIso (t n)) isoYtm) as isoSumtnYtnm.
-    apply (transIso' (optionIso isoSumtnYtnm)).
-    clear isoYtm isoSumtnYtnm Y.
-    apply (transIso' (symIso (@optionFinIso (n + m)))).
-    exact (idIso (t (S n + m))).    
+    apply (transIso (symIso (@optionFinIso (n + m)))).
+    apply (transIso (optionIso (IHn (t n) (t m) (idIso (t n)) (idIso (t m))))).
+    apply (transIso (optionSumIso (t n) (t m))).
+    apply (transIso (sumIsoLeft (t m) (@optionFinIso n))).
+    exact (sumIso isoXtSn isoYtm).
 Defined.
     
 Lemma sumFinite (X Y : Type) (Xfin : Finite X) (Yfin : Finite Y) : Finite (X + Y).
@@ -318,6 +309,6 @@ Fixpoint addFinite (X Y : FiniteType) : FiniteType.
 Proof.
    destruct X as [X Xfin].
    destruct Y as [Y Yfin].
-   exact (existT Finite (sum X Y) (sumFinite X Y Xfin Yfin)).
+   exists (sum X Y).
+   exact (sumFinite X Y Xfin Yfin).
 Defined.
-   
