@@ -55,11 +55,6 @@ Defined.
 (*
 (* with function extensionality, we would even have: *)
 Lemma transIsoIso (A B C : Type) (isoBC : B ≅ C) : (A ≅ B) ≅ (A ≅ C).
-Proof.
-  apply (MkIso _ _ (transIso A _ _ isoBC) (transIso A _ _ (symIso _ _ isoBC))).
-  + intro isoAB.
-    destruct isoAB as [ab ba abba baab].
-    destruct isoBC as [bc cb bccb cbbc].
 
   but not here... 
 *)
@@ -295,6 +290,43 @@ Proof.
     - compute; reflexivity.
 Defined.
 
+(* (t 0) is also neutral for + *)
+Lemma sumFin0Iso (X : Type) : ((t 0) + X) ≅ X.
+Proof.
+  apply (transIso (sumFalseIso X)).
+  exact (sumIsoLeft X (symIso isoFalseFin0)).
+Defined.
+
+(* adding (t 1) is option *)
+Fixpoint sumFin1IsoTo (X : Type) (t1X : (t 1) + X ) : (option X) :=
+   match t1X with
+   | inl _ => None
+   | inr x => Some x
+   end.
+
+Fixpoint sumFin1IsoFrom (X : Type) (OX : option X) : (t 1) + X  :=
+   match OX with
+   | None   => inl F1
+   | Some x => inr x
+   end.
+
+Lemma sumFin1Iso (X : Type) : ((t 1) + X) ≅ (option X).
+Proof.
+  apply (MkIso _ _ (sumFin1IsoTo X) (sumFin1IsoFrom X)).
+  + intro OX; destruct OX; simpl; reflexivity.
+  + intro sumt1X; destruct sumt1X as [t | x].
+    - simpl. 
+      dependent destruction t. 
+      * reflexivity.
+      * dependent destruction t.
+    - simpl; reflexivity.
+Defined.
+
+Lemma sumFin1FinNIso (n : nat) : ((t 1) + (t n)) ≅ (t (S n)).
+Proof.
+  apply (transIso (symIso (@optionFinIso n))).
+  exact (sumFin1Iso (t n)).
+Defined.
 
 (* the sum of two finite types is finite *)
 
@@ -387,10 +419,29 @@ Proof.
   + intro tx; destruct tx as [t x]; destruct t; compute; reflexivity.
 Defined.
 
-Lemma distSumProdIso (X Y Z : Type) : (X * (Y + Z)) ≅ ((X * Y) + (X * Z)).
+Fixpoint prodDistSumIsoTo (X Y Z : Type) (xyz : X * (Y + Z)) : (X * Y) + (X * Z) :=
+  match xyz with
+  | (x , inl y) => inl (x , y)
+  | (x , inr z) => inr (x , z)
+  end.
+
+Lemma prodDistSumIsoLeft (X Y Z : Type) : (X * (Y + Z)) ≅ ((X * Y) + (X * Z)).
 Proof.
-  to be completed...
-  
+  apply (MkIso _ _ (prodDistSumIsoTo X Y Z) ((id ⊠ inl) ▿ (id ⊠ inr))).
+  + intro sumXYXZ; destruct sumXYXZ as [pair | pair];
+    destruct pair; compute; reflexivity.
+  + intro pairXSumYZ. 
+    destruct pairXSumYZ as [x [y | z]]; compute; reflexivity.
+Defined.
+
+Lemma prodDistSumIsoRight (X Y Z : Type) : ((Y + Z) * X) ≅ ((Y * X) + (Z * X)). 
+Proof.
+  apply (shiftIso (prodCommutative X (Y + Z)) 
+                  (sumIso (prodCommutative X Y) (prodCommutative X Z))).
+  exact (prodDistSumIsoLeft X Y Z).
+Defined.
+
+
 Lemma prodIsFiniteLemma (n m : nat) : forall (X Y : Type),
                                    (Iso X (t n)) -> (Iso Y (t m)) ->
                                    (Iso (X * Y) (t (n * m))).
@@ -399,3 +450,33 @@ Proof.
   + intros X Y isoXt0 isoYtm.
     compute.
     apply (transIso isoFalseFin0).
+    apply (transIso (prodFalseIso (t m))).
+    apply (transIso (prodIsoLeft (t m) (symIso isoFalseFin0))).
+    exact (prodIso isoXt0 isoYtm).
+  + intros X Y isoXtSn isoYtm.
+    apply (transIso (sumIsFiniteLemma _ _ _ _ (idIso (t m)) 
+                   (idIso (t (n * m))))).
+    apply (transIso (sumIsoRight (t m) (IHn (t n) (t m) (idIso _) (idIso _)))).
+    pose (prodTrueIso (t m)).
+    apply (transIso (sumIsoLeft (t n * t m) (prodTrueIso (t m)))).
+    apply (transIso (sumIsoLeft (t n * t m) (prodIsoLeft (t m) (symIso (isoTrueFin1))))).
+    apply (transIso (prodDistSumIsoRight (t m) (t 1) (t n))).
+    apply (transIso (prodIsoLeft (t m) (symIso (sumFin1FinNIso n)))).
+    exact (prodIso isoXtSn isoYtm).
+Defined.
+
+Lemma prodIsFinite (X Y : Type) (Xfin : Finite X) (Yfin : Finite Y) : Finite (X * Y).
+Proof.
+   destruct Xfin as [cardX isoX].
+   destruct Yfin as [cardY isoY].
+   apply (MkFinite _ (cardX * cardY)).
+   apply (prodIsFiniteLemma cardX cardY X Y isoX isoY).
+Defined.
+
+Lemma prodFinite (X Y : FiniteType) : FiniteType.
+Proof.
+   destruct X as [X Xfin].
+   destruct Y as [Y Yfin].
+   exists (prod X Y).
+   exact (prodIsFinite X Y Xfin Yfin).
+Defined.
