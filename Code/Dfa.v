@@ -1,4 +1,4 @@
-(*Quelle: https://github.com/wjzz/PumpingLemma/blob/master/Dfa.v*)
+  (*Quelle: https://github.com/wjzz/PumpingLemma/blob/master/Dfa.v*)
 
 (* In this file we try to formalize some notions from the 
    formal languages field, precisely 
@@ -44,6 +44,7 @@ Fixpoint inits {X : Type} (l : list X) : list (list X) :=
   end.
 
 Eval compute in (inits (1 :: 2 :: nil)).
+Eval compute in (inits (1 :: 2 :: 3 :: nil)).
 Eval compute in (inits nil : list (list nat)).
 
 Theorem inits_len : forall X : Type, forall l : list X,

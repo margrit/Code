@@ -50,8 +50,8 @@ Print map_word.
 
 Fixpoint inits {X : Type} (w : @Word X) : @Word (@Word X) :=
   match w with
-  | eps       => snoc eps eps
-  | snoc xs x => snoc eps (map_word (inits xs) (snoc x))
+  | eps       =>  snoc eps eps
+  | snoc xs x => snoc eps (map_word x (inits xs))
   end.
 
   | x :: xs => nil :: map (cons x) (inits xs)
