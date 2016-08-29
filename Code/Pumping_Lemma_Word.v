@@ -51,7 +51,7 @@ Print map_word.
 Fixpoint inits {X : Type} (w : @Word X) : @Word (@Word X) :=
   match w with
   | eps       =>  snoc eps eps
-  | snoc xs x => snoc eps (map_word x (inits xs))
+  | snoc xs x => snoc (map_word (inits xs)) x
   end.
 
 (*Fixpoint inits {X : Type} (l : list X) : list (list X) :=
