@@ -1,6 +1,5 @@
 Require Import Fin.
 Require Import Arith.
-Require Import Program.
 
 
 (* We need some Extensions to the Vectors.Fin library, first of all *)
@@ -72,88 +71,26 @@ Theorem fin_eq_dec {n : nat} (a b : @Fin.t n): (a = b) + ~(a = b).
 Proof.
 induction n.
 - inversion a.
-- dependent destruction a;
-  dependent destruction b.
- + left.
+- apply (caseS' a); apply (caseS' b).
+  + left.
     reflexivity.
- + right.
+  + right.
     discriminate.
- + right.
+  + right.
     discriminate.
- + destruct (IHn a b).
+  + intros b' a'.
+    destruct (IHn a' b').
     * left.
       rewrite e.
       reflexivity.
     * right.
-      simplify_eq.
-      intro.
-      apply FS_inj in H.
+      unfold not.
+      intro eq_a'b'.
+      apply FS_inj in eq_a'b'.
       contradict n0.
       assumption.
-
-      (* das geht auch: 
-      dependent destruction H.
-      destruct n0.
-      reflexivity. *)
-         
-      (* So ginge es weiter mit dem, was wir am Schluss versucht haben, 
-         allerdings immer noch mit dependent destruction, 
-         d.h. wir haben implizit "Axiom K" benutzt):
-          
-         contradict H.
-         pose (eq_app_dep (@projT2 nat @Fin.t) H).
-         compute in e.
-         dependent destruction H.
-         reflexivity. *)
 Defined.
 
-
-Inductive fin_le : forall {n : nat}, (@Fin.t n) -> (@Fin.t n) -> Type
-  := 
-  | le_f1 : forall {n : nat} (f' : @Fin.t (S n)),fin_le F1 f'
-  | le_fs : forall {n : nat} (f : @Fin.t (S n)) (f' : @Fin.t (S n)), fin_le f f' -> fin_le (FS f) (FS f').
-
-Check le_f1.
-
-Definition fin_lt {n : nat} (i : @Fin.t (S n)) (j : @Fin.t (S (S n)))
-  := fin_le (FS i) j.
-
-Lemma dec_fin_lt {n : nat} (i j : @Fin.t (S n)): (fin_le i j) + (fin_le j i) + (i = j).
-Proof.
-dependent induction n.
-- dependent induction i.
-  + dependent induction j.
-    * right.
-      reflexivity.
-    * dependent destruction j.
-  + dependent destruction i.
-- dependent destruction i.
-  + dependent destruction j.
-    * right.
-      reflexivity.
-    * left.
-      left.
-      apply le_f1.
-  + dependent destruction j.
-    * left.
-      right.
-      apply le_f1.
-    * destruct (IHn i j).
-      { destruct s.
-        - left.
-          left. 
-          apply le_fs.
-          assumption.
-        - left.
-          right.
-          apply le_fs.
-          assumption.
-       }
-       { right.
-         rewrite e. 
-         reflexivity.
-       }
-Defined.
 
 
 (* Lemmata zur Typanpassung *)
@@ -191,5 +128,3 @@ Proof.
   assumption.
 Defined.
 
-Print eqb.
-Print Nat.eqb.
