@@ -54,7 +54,12 @@ Fixpoint inits {X : Type} (w : @Word X) : @Word (@Word X) :=
   | snoc xs x => snoc eps (map_word x (inits xs))
   end.
 
+(*Fixpoint inits {X : Type} (l : list X) : list (list X) :=
+  match l with
+  | nil       => nil :: nil
   | x :: xs => nil :: map (cons x) (inits xs)
+  end.
+*)
 
 Eval compute in (inits (1 :: 2 :: nil)).
 Eval compute in (inits nil : list (list nat)).
