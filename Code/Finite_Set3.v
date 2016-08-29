@@ -1,4 +1,5 @@
 Require Import Fin.
+(*Require Import Vector. *)
 Require Import Program.
 
 (* type isomorphisms a.s.o. *)
@@ -74,7 +75,7 @@ Defined.
 Record Finite (X : Type) : Type :=
   MkFinite {
       card : nat;
-      isoFin : Iso X (t card)
+      isoFin : Iso X (Fin.t card)
   }.
 
 Definition FiniteType : Type := sigT Finite.
@@ -85,29 +86,29 @@ Definition FiniteType : Type := sigT Finite.
 Definition FinFinite (card : nat) : FiniteType.
 Proof.
   unfold FiniteType.
-  exists (t card).
-  apply (MkFinite (t card) card (idIso (t card))).
+  exists (Fin.t card).
+  apply (MkFinite (Fin.t card) card (idIso (Fin.t card))).
 Defined.
 
 (* towards optionFinIso *)
 
-Fixpoint optionFinTo {n : nat} (f : t (S n)) : option (t n) :=
+Fixpoint optionFinTo {n : nat} (f : Fin.t (S n)) : option (Fin.t n) :=
 match f with
 | F1 => None
 | FS f' => Some f'
 end.
  
-Fixpoint optionFinFrom {n : nat} (of : option (t n)) : t (S n) :=
+Fixpoint optionFinFrom {n : nat} (of : option (Fin.t n)) : Fin.t (S n) :=
 match of with
 | None => F1
 | Some f' => FS f'
 end.
 
-Fixpoint optionFinIso {n : nat} : Iso (t (S n)) (option (t n)).
+Fixpoint optionFinIso {n : nat} : Iso (Fin.t (S n)) (option (Fin.t n)).
 Proof.
-  apply (MkIso (t (S n)) (option (t n)) (@optionFinTo n) (@optionFinFrom n)).
+  apply (MkIso (Fin.t (S n)) (option (Fin.t n)) (@optionFinTo n) (@optionFinFrom n)).
   - induction n; intro b; destruct b; simpl; reflexivity.
-  - induction n; intro a; apply (caseS' a); simpl; reflexivity.
+  - induction n; intro a; dependent destruction a; simpl; reflexivity.
 Defined.
 
 (* option is a functor *)
@@ -146,20 +147,20 @@ Defined.
    and in particular iso-preservation! ... *)
 
 (* any finite type is either isomorphic to False or isomorphic to
-   optionFinite of some (t ..) 
+   optionFinite of some (Fin.t ..) 
    need's a nicer formulation
    have to figure out how this can be used for 
    "induction" analoguous to nat induction    *)
 
 Fixpoint decideFin (X : Type) (Xfin : Finite X) : 
-         (X ≅ (t 0)) + {n : nat & X ≅ (option (t n))}.
+         (X ≅ (Fin.t 0)) + {n : nat & X ≅ (option (Fin.t n))}.
 Proof.
   destruct Xfin as [cardX isoX].
   induction cardX.
   + left; exact isoX.
   + right.
     exists cardX.
-    apply (@transIso X (t (S cardX))).
+    apply (@transIso X (Fin.t (S cardX))).
     - apply optionFinIso.    
     - exact isoX.
 Defined.
@@ -242,16 +243,16 @@ Proof.
   exact (sumIso (idIso Z) isoXY).
 Defined. 
 
-(* we'll often need that (t 0) is uninhabitad, i.e. isomorphic to False *)
+(* we'll often need that (Fin.t 0) is uninhabitad, i.e. isomorphic to False *)
 
-Lemma falseFromFin0 (x : t 0) : False.
+Lemma falseFromFin0 (x : Fin.t 0) : False.
 Proof.
   dependent destruction x.
 Defined.
 
-Lemma isoFalseFin0 : False ≅ (t 0).
+Lemma isoFalseFin0 : False ≅ (Fin.t 0).
 Proof.
-  apply (MkIso _ _ (False_rect (t 0)) falseFromFin0).
+  apply (MkIso _ _ (False_rect (Fin.t 0)) falseFromFin0).
   + intro x; dependent destruction x.
   + intro a; destruct a.
 Defined.
@@ -264,7 +265,7 @@ Proof.
 Defined.
 
 (* t 1 is isomorphic to True *)
-Lemma isoTrueFin1 : True ≅ (t 1).
+Lemma isoTrueFin1 : True ≅ (Fin.t 1).
 Proof.
   apply (MkIso _ _ (fun _ => F1) (fun _ => I)).
   + intro i.
@@ -290,27 +291,27 @@ Proof.
     - compute; reflexivity.
 Defined.
 
-(* (t 0) is also neutral for + *)
-Lemma sumFin0Iso (X : Type) : ((t 0) + X) ≅ X.
+(* (Fin.t 0) is also neutral for + *)
+Lemma sumFin0Iso (X : Type) : ((Fin.t 0) + X) ≅ X.
 Proof.
   apply (transIso (sumFalseIso X)).
   exact (sumIsoLeft X (symIso isoFalseFin0)).
 Defined.
 
-(* adding (t 1) is option *)
-Fixpoint sumFin1IsoTo (X : Type) (t1X : (t 1) + X ) : (option X) :=
+(* adding (Fin.t 1) is option *)
+Fixpoint sumFin1IsoTo (X : Type) (t1X : (Fin.t 1) + X ) : (option X) :=
    match t1X with
    | inl _ => None
    | inr x => Some x
    end.
 
-Fixpoint sumFin1IsoFrom (X : Type) (OX : option X) : (t 1) + X  :=
+Fixpoint sumFin1IsoFrom (X : Type) (OX : option X) : (Fin.t 1) + X  :=
    match OX with
    | None   => inl F1
    | Some x => inr x
    end.
 
-Lemma sumFin1Iso (X : Type) : ((t 1) + X) ≅ (option X).
+Lemma sumFin1Iso (X : Type) : ((Fin.t 1) + X) ≅ (option X).
 Proof.
   apply (MkIso _ _ (sumFin1IsoTo X) (sumFin1IsoFrom X)).
   + intro OX; destruct OX; simpl; reflexivity.
@@ -322,28 +323,29 @@ Proof.
     - simpl; reflexivity.
 Defined.
 
-Lemma sumFin1FinNIso (n : nat) : ((t 1) + (t n)) ≅ (t (S n)).
+Lemma sumFin1FinNIso (n : nat) : ((Fin.t 1) + (Fin.t n)) ≅ (Fin.t (S n)).
 Proof.
   apply (transIso (symIso (@optionFinIso n))).
-  exact (sumFin1Iso (t n)).
+  exact (sumFin1Iso (Fin.t n)).
 Defined.
 
 (* the sum of two finite types is finite *)
 
 Lemma sumIsFiniteLemma (n m : nat) : forall (X Y : Type),
-                          (X ≅ (t n)) -> (Y ≅ (t m)) -> ((X + Y) ≅ (t (n + m))).
+                          (X ≅ (Fin.t n)) -> (Y ≅ (t m)) -> ((X + Y) ≅ (t (n + m))).
 Proof.
   induction n.
   + intros X Y isoXt0 isoYtm.
     compute.
-    apply (transIso (sumFalseIso (t m))).
-    apply (transIso (sumIsoLeft (t m) (symIso isoFalseFin0))).
+    apply (transIso (sumFalseIso (Fin.t m))).
+    apply (transIso (sumIsoLeft (Fin.t m) (symIso isoFalseFin0))).
     exact (sumIso isoXt0 isoYtm).
   + intros X Y isoXtSn isoYtm.
     apply (transIso (symIso (@optionFinIso (n + m)))).
-    apply (transIso (optionIso (IHn (t n) (t m) (idIso (t n)) (idIso (t m))))).
-    apply (transIso (optionSumIso (t n) (t m))).
-    apply (transIso (sumIsoLeft (t m) (@optionFinIso n))).
+    apply (transIso (optionIso 
+             (IHn (Fin.t n) (Fin.t m) (idIso (Fin.t n)) (idIso (Fin.t m))))).
+    apply (transIso (optionSumIso (Fin.t n) (Fin.t m))).
+    apply (transIso (sumIsoLeft (Fin.t m) (@optionFinIso n))).
     exact (sumIso isoXtSn isoYtm).
 Defined.
     
@@ -443,25 +445,26 @@ Defined.
 
 
 Lemma prodIsFiniteLemma (n m : nat) : forall (X Y : Type),
-                                   (Iso X (t n)) -> (Iso Y (t m)) ->
-                                   (Iso (X * Y) (t (n * m))).
+        (X ≅ (Fin.t n)) -> (Y ≅ (Fin.t m)) -> ((X * Y) ≅ (Fin.t (n * m))).
 Proof.
   induction n.
   + intros X Y isoXt0 isoYtm.
     compute.
     apply (transIso isoFalseFin0).
-    apply (transIso (prodFalseIso (t m))).
-    apply (transIso (prodIsoLeft (t m) (symIso isoFalseFin0))).
+    apply (transIso (prodFalseIso (Fin.t m))).
+    apply (transIso (prodIsoLeft (Fin.t m) (symIso isoFalseFin0))).
     exact (prodIso isoXt0 isoYtm).
   + intros X Y isoXtSn isoYtm.
-    apply (transIso (sumIsFiniteLemma _ _ _ _ (idIso (t m)) 
-                   (idIso (t (n * m))))).
-    apply (transIso (sumIsoRight (t m) (IHn (t n) (t m) (idIso _) (idIso _)))).
-    pose (prodTrueIso (t m)).
-    apply (transIso (sumIsoLeft (t n * t m) (prodTrueIso (t m)))).
-    apply (transIso (sumIsoLeft (t n * t m) (prodIsoLeft (t m) (symIso (isoTrueFin1))))).
-    apply (transIso (prodDistSumIsoRight (t m) (t 1) (t n))).
-    apply (transIso (prodIsoLeft (t m) (symIso (sumFin1FinNIso n)))).
+    apply (transIso (sumIsFiniteLemma _ _ _ _ (idIso (Fin.t m)) 
+                    (idIso (Fin.t (n * m))))).
+    apply (transIso (sumIsoRight (Fin.t m) 
+                    (IHn (Fin.t n) (Fin.t m) (idIso _) (idIso _)))).
+    pose (prodTrueIso (Fin.t m)).
+    apply (transIso (sumIsoLeft (Fin.t n * Fin.t m) (prodTrueIso (Fin.t m)))).
+    apply (transIso (sumIsoLeft (Fin.t n * Fin.t m) 
+                    (prodIsoLeft (Fin.t m) (symIso (isoTrueFin1))))).
+    apply (transIso (prodDistSumIsoRight (Fin.t m) (Fin.t 1) (Fin.t n))).
+    apply (transIso (prodIsoLeft (Fin.t m) (symIso (sumFin1FinNIso n)))).
     exact (prodIso isoXtSn isoYtm).
 Defined.
 
@@ -479,4 +482,50 @@ Proof.
    destruct Y as [Y Yfin].
    exists (prod X Y).
    exact (prodIsFinite X Y Xfin Yfin).
+Defined.
+
+(* now for the exponential:
+
+   problem: we cannot show that for finite X and Y
+   X -> Y is finite: 
+
+   The cardinality should of course be cardY ^ cardX. But then already for
+   X ≅ t 0 ≅ False, we would have to show that there is exactly one map 
+   False -> Y for any type Y, so we'd have to show that any map 
+   False -> Y is equal to False_rect Y, and since we don't have function 
+   extensionality, there is no chance to do that.
+
+   Instead, we define Hom for finite sets to be
+          Hom X Y  :=  Vect (t cardY) cardX
+
+   That looks strange since the right hand side does not depend
+   on X and Y themselves, but only on their cardinalities.
+
+   However, since the finite sets come with their isomorphisms to (t card),
+   we can define maps
+
+       X -> Y   --- toHom --->   Hom X Y
+                <-- fromHom --
+
+   Without function extensionality, we cannot prove
+
+            fromHom . toHom = id (X -> Y).
+
+   But it should be possible to prove 
+
+            toHom . fromHom = id (Hom X Y).
+
+   And it shouldn't be hard to prove 
+
+            (Vect cardX (t cardY)) ≅ t (cardY ^ cardX)),
+
+   i.e. Hom X Y finite for finite X and Y.
+ *)
+
+
+Definition FinHom (X Y : FiniteType) : Type.
+Proof.
+  destruct X as [X [cardX isoX]].
+  destruct Y as [Y [cardY isoY]].
+  exact (Vector.t (Fin.t cardY) cardX).
 Defined.
