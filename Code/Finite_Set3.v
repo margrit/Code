@@ -16,13 +16,11 @@ Record Iso (A B : Type) : Type :=
 Notation " A ≅ B " := (Iso A B) (at level 9).
 
 (* identity isomorphism *)
-Lemma idIso (A : Type) : A ≅ A.
-Proof.    
-  exact (MkIso _ _ id id (fun _ => eq_refl) (fun _ => eq_refl)).  
-Defined.
+Definition idIso (A : Type) : A ≅ A := 
+  (MkIso _ _ id id (fun _ => eq_refl) (fun _ => eq_refl)).
 
 (* inversion of isomorphisms *)
-Lemma symIso {A B : Type} : A ≅ B -> B ≅ A.
+Definition symIso {A B : Type} : A ≅ B -> B ≅ A.
 Proof.
   intro isoAB.
   destruct isoAB as [to from toFrom fromTo].
@@ -37,7 +35,7 @@ Proof.
 Defined.
   
 (* composition of isomorphisms *)
-Lemma transIso {A B C : Type} : B ≅ C -> A ≅ B -> A ≅ C.
+Definition transIso {A B C : Type} : B ≅ C -> A ≅ B -> A ≅ C.
 Proof.
   intros isoBC isoAB.  
   destruct isoBC as [bc cb bccb cbbc].
@@ -47,12 +45,20 @@ Proof.
   + intro a; compute; rewrite (cbbc (ab a)); rewrite (baab a); reflexivity.
 Defined.      
 
-(* "flipped" version just for convenience *)
-Lemma transIso' {A B C : Type} : A ≅ B -> B ≅ C -> A ≅ C.
+(* ∘≅  = \circ\cong *)
+Notation " iso1 ∘≅ iso2 " := (transIso iso1 iso2) (at level 20).
+
+Definition flipTransIso {A B C : Type} : A ≅ B -> B ≅ C -> A ≅ C.
 Proof.
-  intros isoab isobc.  
-  exact (transIso isobc isoab).
+   intros isoAB isoBC.  
+   exact (isoBC ∘≅ isoAB).
 Defined.
+
+(* ⇛  = \Rrightarrow , ⇚  = \Lleftarrow *)
+Notation " iso ⇛ " := (transIso iso) (at level 19).
+Notation " iso ⇚ " := (transIso (symIso iso)) (at level 19).
+Notation " ⇛ iso " := (flipTransIso iso) (at level 19).
+Notation " ⇚ iso " := (flipTransIso (symIso iso)) (at level 19).
   
 (*
 (* with function extensionality, we would even have: *)
@@ -67,8 +73,8 @@ Lemma transIsoIso (A B C : Type) (isoBC : B ≅ C) : (A ≅ B) ≅ (A ≅ C).
 Lemma shiftIso {A A' B B' : Type} : A ≅ A' -> B ≅ B' -> A ≅ B -> A' ≅ B'.
 Proof.
   intros isoaa' isobb' isoab.
-  apply (transIso isobb') in isoab as isoab'.
-  exact (transIso isoab' (symIso isoaa')).
+  apply (isobb' ⇛) in isoab as isoab'.
+  exact (isoab' ∘≅ (symIso isoaa')).
 Defined.
 
 (* finite types *)
@@ -93,27 +99,27 @@ Defined.
 
 (* towards optionFinIso *)
 
-Fixpoint optionFinTo {n : nat} (f : Fin.t (S n)) : option (Fin.t n) :=
+Definition optionFinTo {n : nat} (f : Fin.t (S n)) : option (Fin.t n) :=
 match f with
 | F1 => None
 | FS f' => Some f'
 end.
  
-Fixpoint optionFinFrom {n : nat} (of : option (Fin.t n)) : Fin.t (S n) :=
+Definition optionFinFrom {n : nat} (of : option (Fin.t n)) : Fin.t (S n) :=
 match of with
 | None => F1
 | Some f' => FS f'
 end.
 
-Fixpoint optionFinIso {n : nat} : Iso (Fin.t (S n)) (option (Fin.t n)).
+Definition optionFinIso {n : nat} : Iso (Fin.t (S n)) (option (Fin.t n)).
 Proof.
-  apply (MkIso (Fin.t (S n)) (option (Fin.t n)) (@optionFinTo n) (@optionFinFrom n)).
+  apply (MkIso _ _ (@optionFinTo n) (@optionFinFrom n)).
   - induction n; intro b; destruct b; simpl; reflexivity.
   - induction n; intro a; dependent destruction a; simpl; reflexivity.
 Defined.
 
 (* option is a functor *)
-Fixpoint mapOption {A B : Type} (f: A -> B) (oa : option A) : option B :=
+Definition mapOption {A B : Type} (f: A -> B) (oa : option A) : option B :=
 match oa with
 | None   => None
 | Some a => Some (f a)
@@ -440,11 +446,10 @@ Defined.
 
 Lemma prodDistSumIsoRight (X Y Z : Type) : ((Y + Z) * X) ≅ ((Y * X) + (Z * X)). 
 Proof.
-  apply (shiftIso (prodCommutative X (Y + Z)) 
-                  (sumIso (prodCommutative X Y) (prodCommutative X Z))).
+  apply (⇚ (prodCommutative X (Y + Z))).
+  apply ((sumIso (prodCommutative X Y) (prodCommutative X Z)) ⇛).
   exact (prodDistSumIsoLeft X Y Z).
 Defined.
-
 
 Lemma prodIsFiniteLemma (n m : nat) : forall (X Y : Type),
         (X ≅ (Fin.t n)) -> (Y ≅ (Fin.t m)) -> ((X * Y) ≅ (Fin.t (n * m))).
@@ -452,21 +457,18 @@ Proof.
   induction n.
   + intros X Y isoXt0 isoYtm.
     compute.
-    apply (transIso isoFalseFin0).
-    apply (transIso (prodFalseIso (Fin.t m))).
-    apply (transIso (prodIsoLeft (Fin.t m) (symIso isoFalseFin0))).
+    apply (isoFalseFin0 ⇛).
+    apply ((prodFalseIso (Fin.t m)) ⇛).
+    apply ((prodIsoLeft _ isoFalseFin0) ⇚).
     exact (prodIso isoXt0 isoYtm).
   + intros X Y isoXtSn isoYtm.
-    apply (transIso (sumIsFiniteLemma _ _ _ _ (idIso (Fin.t m)) 
-                    (idIso (Fin.t (n * m))))).
-    apply (transIso (sumIsoRight (Fin.t m) 
-                    (IHn (Fin.t n) (Fin.t m) (idIso _) (idIso _)))).
-    pose (prodTrueIso (Fin.t m)).
-    apply (transIso (sumIsoLeft (Fin.t n * Fin.t m) (prodTrueIso (Fin.t m)))).
-    apply (transIso (sumIsoLeft (Fin.t n * Fin.t m) 
-                    (prodIsoLeft (Fin.t m) (symIso (isoTrueFin1))))).
-    apply (transIso (prodDistSumIsoRight (Fin.t m) (Fin.t 1) (Fin.t n))).
-    apply (transIso (prodIsoLeft (Fin.t m) (symIso (sumFin1FinNIso n)))).
+    apply ((sumIsFiniteLemma _ _ _ _ (idIso (Fin.t m)) 
+                                     (idIso (Fin.t (n * m)))) ⇛).
+    apply ((sumIsoRight _  (IHn (Fin.t n) (Fin.t m) (idIso _) (idIso _))) ⇛).
+    apply ((sumIsoLeft _ (prodTrueIso (Fin.t m))) ⇛).
+    apply ((sumIsoLeft _ (prodIsoLeft _ isoTrueFin1)) ⇚).
+    apply ((prodDistSumIsoRight _ _ _) ⇛).
+    apply ((prodIsoLeft _ (sumFin1FinNIso n)) ⇚).
     exact (prodIso isoXtSn isoYtm).
 Defined.
 
