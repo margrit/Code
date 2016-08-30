@@ -1,60 +1,61 @@
 (*Quelle: https://github.com/wjzz/PumpingLemma/blob/master/Repeats.v*)
 
 Require Import List.
+Load Word_Prop.
 
 (* Vorkommen von x in einer Liste. *)
-Inductive appears_in {X : Type} (a : X) : list X -> Type :=
-  | ai_here : forall l, appears_in a (a :: l)
-  | ai_later : forall b l, appears_in a l -> appears_in a (b :: l).
+Inductive appears_in {X : Type} (a : X) : @Word X -> Type :=
+  | ai_here : forall w, appears_in a (snoc w a)
+  | ai_later : forall b w, appears_in a w -> appears_in a (snoc w b).
 
-Lemma appears_in_app : forall {X : Type} (xs ys : list X) (x : X),
-     appears_in x (xs ++ ys) -> appears_in x xs + appears_in x ys.
+Lemma appears_in_app : forall {X : Type} (w1 w2 : @Word X) (x : X),
+     appears_in x (concat_word w1 w2) -> appears_in x w1 + appears_in x w2.
 Proof.
-  intros X xs ys x.
-  induction xs.
+  intros X w1 w2 x.
+  induction w2.
   - simpl.
     intro H1.
-    right.
+    left.
     assumption.
   - intro H.
     inversion H.
-    + left.
+    + right.
       apply ai_here.
-    + apply IHxs in X0.
-       inversion H1.
+    + apply IHw2 in X0.
        destruct X0.
       * { left.
-           apply ai_later.
            assumption.
         }
       * { right.
+          apply ai_later.
           assumption.
         }
 Qed.
 
 (* Liste verknüpft mit der leeren Liste ergibt die ursprüngliche Liste *)
-Lemma app_l_nil : forall {X : Type} (l : list X),
-  l ++ nil = l.
+Lemma app_w_nil : forall {X : Type} (w : @Word X),
+ concat_word w eps = w.
 Proof.
-  induction l.
-  - simpl.
-    reflexivity.
-  - simpl.
-    rewrite IHl.
-    reflexivity.
+intros.
+simpl.
+reflexivity.
 Qed.
 
 (* Wenn x in Liste 1 oder Liste 2 vorkommt, 
 dann kommt x auch in der Konkatenation der Listen vor. *)
-Lemma app_appears_in : forall {X : Type} (xs ys : list X) (x : X),
-     appears_in x xs + appears_in x ys -> appears_in x (xs ++ ys).
+Lemma app_appears_in : forall {X : Type} (w1 w2 : @Word X) (x : X),
+     appears_in x w1 + appears_in x w2 -> appears_in x (concat_word w1 w2).
 Proof.
-  intros X xs ys x H.
-  destruct H as [xInxs | xInys].
-  - induction xs.
-    + inversion xInxs.
-    + inversion xInxs.
-      * { apply ai_here. }
+  intros X w1 w2 x H.
+  destruct H as [xInw1 | xInw2].
+  - induction w2.
+    + simpl.
+       assumption.
+    + inversion xInw1.
+      * { rewrite H.
+...
+          apply IHw2.
+          apply ai_here. }
       * { simpl.
           apply ai_later.
           apply IHxs.
