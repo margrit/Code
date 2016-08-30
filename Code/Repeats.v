@@ -3,13 +3,13 @@
 Require Import List.
 Load Word_Prop.
 
-(* Vorkommen von x in einer Liste. *)
-Inductive appears_in {X : Type} (a : X) : @Word X -> Type :=
-  | ai_here : forall w, appears_in a (snoc w a)
-  | ai_later : forall b w, appears_in a w -> appears_in a (snoc w b).
-
-Lemma appears_in_app : forall {X : Type} (w1 w2 : @Word X) (x : X),
-     appears_in x (concat_word w1 w2) -> appears_in x w1 + appears_in x w2.
+(* Vorkommen von x in einem Word. *)
+Inductive Appears_Word {X : Type} (a : X) : @Word X -> Type :=
+  | ai_here_w : forall w, Appears_Word a (snoc w a)
+  | ai_there_w : forall b w, Appears_Word a w -> Appears_Word a (snoc w b).
+(*
+Lemma Appears_app_w : forall {X : Type} (w1 w2 : @Word X) (x : X),
+     Appears_Word x (concat_word w1 w2) -> Appears_Word x w1 + Appears_Word x w2.
 Proof.
   intros X w1 w2 x.
   induction w2.
@@ -18,16 +18,16 @@ Proof.
     left.
     assumption.
   - intro H.
-    inversion H.
+    inversion H as [w [w_eq_w1w2 x_eq_a] | x' w App_x_w1w2 [w_eq_w1w2 x'_eq_a ]].
     + right.
-      apply ai_here.
-    + apply IHw2 in X0.
-       destruct X0.
+      apply ai_here_w.
+    + apply IHw2 in App_x_w1w2.
+       destruct App_x_w1w2.
       * { left.
            assumption.
         }
       * { right.
-          apply ai_later.
+          apply ai_there_w.
           assumption.
         }
 Qed.
@@ -40,11 +40,11 @@ intros.
 simpl.
 reflexivity.
 Qed.
-
+(*
 (* Wenn x in Liste 1 oder Liste 2 vorkommt, 
 dann kommt x auch in der Konkatenation der Listen vor. *)
-Lemma app_appears_in : forall {X : Type} (w1 w2 : @Word X) (x : X),
-     appears_in x w1 + appears_in x w2 -> appears_in x (concat_word w1 w2).
+Lemma app_Appears : forall {X : Type} (w1 w2 : @Word X) (x : X),
+     Appears x w1 + Appears x w2 -> Appears x (concat_word w1 w2).
 Proof.
   intros X w1 w2 x H.
   destruct H as [xInw1 | xInw2].
@@ -68,118 +68,134 @@ Proof.
       apply ai_later.
       assumption.
 Qed.
-
+*)*)
 (*Vorkommen von x in einer Teilliste. *)
-Lemma appears_in_app_split : forall {X : Type} (x : X) (l : list X),
-  appears_in x l ->
-  exists l1, exists l2, l = l1 ++ (x :: l2).
+Lemma Appears_app_split_w : forall {X : Type} (x : X) (w : @Word X),
+  Appears_Word x w ->
+  exists w1, exists w2, w = concat_word (snoc w1 x) w2.
 Proof.
-  intros X x l A.
+  intros X x w A.
   induction A.
-  - exists nil.
-    exists l.
+  - exists w.
+    exists eps.
     simpl.
     reflexivity.
-  - destruct IHA as [x0].
-    destruct H as [x1].
-    exists (b :: x0).
-    exists (x1).
+  - destruct IHA as [w1'].
+    destruct H as [w2'].
+    exists w1'.
+    exists (snoc w2' b).
     simpl.
-    intros.
     rewrite H.
     reflexivity.
 Qed.
 
-Inductive repeats {X : Type} : list X -> Type :=
+Inductive Repeats_Word {X : Type} : @Word X -> Type :=
   (* extend *)
-| rp_ext : forall x : X, forall l : list X, repeats l -> repeats (x :: l)
-| rp_intr : forall x : X, forall l : list X, appears_in x l -> repeats (x :: l).
+| rp_intr_w : forall x : X, forall w : @Word X, Appears_Word x w -> Repeats_Word (snoc w x)
+| rp_ext_w : forall x : X, forall w : @Word X, Repeats_Word w -> Repeats_Word (snoc w x).
 
-Lemma repeats_decomp : forall X : Type, forall l : list X,
-  repeats l ->
+(*Das müsste die eigentliche Zerlegung eines Wortes sein, die für das Pumping Lemma benötigt wird.*)
+Lemma Repeats_decomp_w : forall X : Type, forall w : @Word X,
+  Repeats_Word w ->
   exists x : X,
-  exists xs : list X,
-  exists ys : list X,
-  exists zs : list X,
-  l = xs ++ (x :: ys) ++ (x :: zs).
+  exists xs : @Word X,
+  exists ys : @Word X,
+  exists zs : @Word X,
+  w = concat_word (concat_word (snoc xs x) (snoc ys x)) zs.
 Proof.
-  intros X l H.
+  intros X w H.
   induction H.
-  - inversion IHrepeats.
-    inversion H0.
-    inversion H1.
-    inversion H2.
-    clear IHrepeats H0 H1 H2.
-    exists x0.
-    exists (x :: x1).
-    exists x2.
-    exists x3.
-    simpl in *.
-    rewrite H3.
-    reflexivity.
-  - apply appears_in_app_split in a.
-    destruct a as [l1].
-    destruct H as [l2].
-    rewrite H.
+  - apply Appears_app_split_w in a.
+    destruct a as [w1'].
+    destruct H as [w2'].
     exists x.
-    exists nil.
+    exists w1'.
+    exists w2'.
+    exists eps.
+    rewrite H.
     simpl.
-    exists l1.
-    exists l2.
     reflexivity.
-Qed. 
+  - destruct IHRepeats_Word as [x'  IH].
+    destruct IH as [xs'  IH].
+    destruct IH as [ys'  IH].
+    destruct IH as [zs'  IH].
+    exists x'.
+    exists xs'.
+    exists ys'.
+    exists (snoc zs' x).
+    rewrite IH.
+    simpl.
+    reflexivity.
+Qed.
 
 (*Länge von konkatenierten Listen und einem Element ist gleich. *)
-Lemma length_app_2 : forall X:Type, forall x:X, forall xs ys: list X,
-  length (xs ++ x :: ys) = length (x :: xs ++ ys).
+Lemma length_app_2_w : forall X:Type, forall x:X, forall xs ys: @Word X,
+  word_length (concat_word (snoc xs x) ys) = word_length (concat_word xs (snoc ys x)).
 Proof.
-  induction xs.
+  induction ys.
   - simpl.
     reflexivity.
-  - intro ys.
-    simpl.
-    rewrite IHxs.
+  - simpl.
+    rewrite IHys.
     simpl.
     reflexivity.
 Qed.
 
-Lemma map_dec_2 : forall X Y :Type, forall f : X -> Y, forall l : list X,
-  forall xs ys : list Y,
-  map f l = xs ++ ys -> exists xs' : list X, exists ys' : list X,
-  l = xs' ++ ys' /\ map f xs' = xs /\ map f ys' = ys.
+Lemma map_decomp_2_w : forall X Y :Type, forall f : X -> Y, forall w : @Word X,
+  forall xs ys : @Word Y,
+  map_word f w = concat_word xs ys -> exists xs' : @Word X, exists ys' : @Word X,
+  w = concat_word xs'  ys' /\ map_word f xs' = xs /\ map_word f ys' = ys.
 Proof.
   intros X Y f.
-  induction l.
-  (* l = [] *)
+  induction w.
+  (* w = eps *)
   - intros xs ys H.
-    exists nil.
-    exists nil.
+    exists eps.
+    exists eps.
     simpl in H.
     split.
     + simpl.
       reflexivity.
-    + assert (xs = nil).
-      * { destruct xs.
+    + assert (ys = eps).
+      * { destruct ys.
           - reflexivity.
           - inversion H.
         }
       * { subst.
           simpl in *.
           split.
+          - exact H.
           - reflexivity.
-          - apply H.
         }
-  (* l~ = a :: l *)
+  (* w = snoc w' a *)
   - intros xs ys H.
     simpl in H.
-    destruct xs as [|x xs].
-    (* xs = nil *)
+    destruct xs as [|xs x].
+    (* xs = eps *)
     + simpl in H.
       destruct ys.
-      (* ys = nil *)
+      (* ys = eps *)
       * { inversion H. }
-      (* ys = y :: ys *)
-      * { assert (map f l = ys).
+      (* ys = snoc ys' y *)
+      * { simpl in H.
+          rewrite concat_word_eps in H.
+          inversion H.
+          exists eps.
+          exists (snoc w a).
+          simpl.
+          rewrite concat_word_eps.
+          split.
+          - reflexivity.
+          - split ; reflexivity.
+        } (**)
+    + pose (IHw (snoc xs x) ys).
+       assert
+       rewrite e.
+simpl in H.
+ rewrite IHw.
+
+
+          assert (map_word f w = ys).
           - inversion H.
             reflexivity.
           - set (Hx := IHl nil ys H0).
@@ -224,12 +240,12 @@ Proof.
         } 
 Qed.
 
-Lemma map_dec_3 : forall X Y : Type, forall f : X -> Y, forall l : list X,
-  forall xs ys zs : list Y,
-  map f l = xs ++ ys ++ zs ->
-  exists xs' : list X, exists ys' : list X, exists zs' : list X,
-  l = xs' ++ ys' ++ zs' /\
-  map f xs' = xs /\ map f ys' = ys /\ map f zs' = zs.
+Lemma map_dec_3 : forall X Y : Type, forall f : X -> Y, forall l : @Word X,
+  forall xs ys zs : @Word Y,
+  map_word f w = concat_word (concat_word xs ys) zs ->
+  exists xs' : @Word X, exists ys' : @Word X, exists zs' : @Word X,
+  w = concat_word (concat_word xs' ys') zs' /\
+  map_word f xs' = xs /\ map_word f ys' = ys /\ map_word f zs' = zs.
 Proof.
   intros X Y f l xs ys zs H.
   remember (ys ++ zs) as ls.

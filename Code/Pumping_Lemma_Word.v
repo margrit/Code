@@ -48,10 +48,10 @@ Fixpoint map_word {A B : Type} (f : A -> B) (w : @Word A) : @Word B :=
 
 Print map_word.
 
-Fixpoint inits {X : Type} (w : @Word X) : @Word (@Word X) :=
+Fixpoint tails {X : Type} (w : @Word X) : @Word (@Word X) :=
   match w with
   | eps       =>  snoc eps eps
-  | snoc xs x => snoc (map_word (inits xs)) x
+  | snoc xs x => snoc (map_word (fun w => snoc w x) (tails xs)) eps
   end.
 
 (*Fixpoint inits {X : Type} (l : list X) : list (list X) :=

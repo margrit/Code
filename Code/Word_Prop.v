@@ -42,6 +42,14 @@ Fixpoint word_reverse {A : Type} (w : @Word A) : @Word A  :=
     | snoc w' x  => concat_word (snoc eps x) (word_reverse w')
   end.
 
+(** Map-Funktion auf Wörtern (Word ist ein Funktor) *)
+Fixpoint map_word {A B : Type} (f : A -> B) (w : @Word A) : @Word B :=
+ match w with
+   | eps => eps
+   | snoc w' x => snoc (map_word f w') (f x)
+ end.
+
+
 (** * Definition von Listen *)
 
 (** In der Standardbibliothek befinden sich bereits Listenoperationen wie [concat] und [rev],
