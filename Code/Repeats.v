@@ -142,132 +142,108 @@ Proof.
 Qed.
 
 Lemma map_decomp_2_w : forall X Y :Type, forall f : X -> Y, forall w : @Word X,
-  forall xs ys : @Word Y,
-  map_word f w = concat_word xs ys -> exists xs' : @Word X, exists ys' : @Word X,
-  w = concat_word xs'  ys' /\ map_word f xs' = xs /\ map_word f ys' = ys.
+  forall v1 v2 : @Word Y,
+  map_word f w = concat_word v1 v2 -> exists w1 : @Word X, exists w2 : @Word X,
+  w = concat_word w1 w2 /\ map_word f w1 = v1 /\ map_word f w2 = v2.
 Proof.
   intros X Y f.
   induction w.
   (* w = eps *)
-  - intros xs ys H.
+  - intros v1 v2 H.
     exists eps.
     exists eps.
     simpl in H.
     split.
     + simpl.
       reflexivity.
-    + assert (ys = eps).
-      * { destruct ys.
+    + assert (v2 = eps).
+      * { destruct v2.
           - reflexivity.
           - inversion H.
         }
-      * { subst.
+      * { rewrite H0 in *.
           simpl in *.
           split.
           - exact H.
           - reflexivity.
         }
   (* w = snoc w' a *)
-  - intros xs ys H.
+   - intros v1 v2 H.
     simpl in H.
-    destruct xs as [|xs x].
-    (* xs = eps *)
+    destruct v2 as [|v2' y2].
+    (* v2' = eps *)
     + simpl in H.
-      destruct ys.
-      (* ys = eps *)
+      destruct v1 as [|v1' y1].
+      (* v1' = eps *)
       * { inversion H. }
-      (* ys = snoc ys' y *)
+      (* v1' = snoc v1' y1 *)
       * { simpl in H.
-          rewrite concat_word_eps in H.
+          
           inversion H.
-          exists eps.
           exists (snoc w a).
+          exists eps.
           simpl.
-          rewrite concat_word_eps.
           split.
           - reflexivity.
           - split ; reflexivity.
-        } (**)
-    + pose (IHw (snoc xs x) ys).
-       assert
-       rewrite e.
-simpl in H.
- rewrite IHw.
-
-
-          assert (map_word f w = ys).
-          - inversion H.
-            reflexivity.
-          - set (Hx := IHl nil ys H0).
-            destruct Hx as [xs'].
-            destruct H1 as [ys'].
-            clear IHl.
-            destruct H1.
-            destruct H2.
-            exists nil.
-            simpl in *.
-            exists (a :: l).
-            split.
-            + reflexivity.
-            + split.
-              * { reflexivity. }
-              * { simpl.
-                  apply H.
-                } }
-    (* xs = x :: xs *)
+        } 
+    (* v2' = snoc v2' y2 *)
     + simpl in H.
-      assert (map f l = xs ++ ys).
+      assert (map_word f w = concat_word v1 v2').
       * { inversion H.
           reflexivity.
         }
-      * { set (Hx := IHl xs ys H0).
-          destruct Hx as [xs'].
-          destruct H1 as [ys'].
-          destruct H1.
-          destruct H2.
-          clear IHl.
-          exists (a :: xs').
-          exists ys'.
-          subst.
-          split.
-            - simpl.
-              reflexivity.
-            - split.
-              + simpl.
-                inversion H.
-                reflexivity.
-              + reflexivity.
-        } 
-Qed.
+      * pose (IHw v1 v2' H0) as ex_w1_w2.
+        destruct ex_w1_w2 as [w1' ex_w2].
+        destruct ex_w2 as [w2' IHw_eqs].
+        destruct IHw_eqs as [w_eq_w1'w2' [fw1'_eq_v1 fw2'_eq_v2']].
+        inversion H as [[fw_eq_v1v2' fa_eq_y2]].
+        exists w1'.
+        exists (snoc w2' a).
+        simpl.
+        rewrite w_eq_w1'w2'.
+        rewrite fw1'_eq_v1.
+        rewrite fw2'_eq_v2'.
+        rewrite fa_eq_y2.
+        repeat split; reflexivity.
+Defined.
 
-Lemma map_dec_3 : forall X Y : Type, forall f : X -> Y, forall l : @Word X,
-  forall xs ys zs : @Word Y,
-  map_word f w = concat_word (concat_word xs ys) zs ->
-  exists xs' : @Word X, exists ys' : @Word X, exists zs' : @Word X,
-  w = concat_word (concat_word xs' ys') zs' /\
-  map_word f xs' = xs /\ map_word f ys' = ys /\ map_word f zs' = zs.
+
+
+Lemma map_decomp_3 : forall X Y : Type, forall f : X -> Y, forall w : @Word X,
+  forall v1 v2 v3 : @Word Y,
+  map_word f w = concat_word (concat_word v1 v2) v3 ->
+  exists w1 : @Word X, exists w2 : @Word X, exists w3 : @Word X,
+  w = concat_word (concat_word w1 w2) w3 /\
+  map_word f w1 = v1 /\ map_word f w2 = v2 /\ map_word f w3 = v3.
 Proof.
-  intros X Y f l xs ys zs H.
-  remember (ys ++ zs) as ls.
-  remember H as H2.
-  clear HeqH2.
-  apply map_dec_2 in H2.
-  destruct H2.
-  destruct H0.
-  destruct H0.
-  destruct H1.
-  exists x.
-  rewrite Heqls in H2.
-  remember H2 as H3.
-  clear HeqH3.
-  apply map_dec_2 in H3.
-  destruct H3.
-  destruct H3.
-  destruct H3.
-  destruct H4.
-  exists x1.
-  exists x2.
-  subst.
+  intros X Y f w v1 v2 v3 H.
+
+  pose (concat_word v1 v2) as v12.
+  apply map_decomp_2_w in H as decomp_w12'w3'.
+
+  destruct decomp_w12'w3' as [w12' decomp_w3'].
+  destruct decomp_w3' as [w3' decomp_eqs].
+  destruct decomp_eqs as [w_eq_w12'w3' decomp_eqs].
+  destruct decomp_eqs as [fw12'_eq_v1v2 fw3'_eq_v3].
+
+  apply map_decomp_2_w in fw12'_eq_v1v2 as decomp_w1'w2'.
+
+  destruct decomp_w1'w2' as [w1' decomp_w2'].
+  destruct decomp_w2' as [w2' decomp_eqs'].
+  destruct decomp_eqs' as [w12'_eq_w1'w2' decomp_eqs'].
+  destruct decomp_eqs' as [fw1'_eq_v1 fw2'_eq_v2].
+
+  exists w1'.
+  exists w2'.
+  exists w3'.
+
+  rewrite w_eq_w12'w3'.
+  rewrite w12'_eq_w1'w2'.
+  rewrite fw1'_eq_v1. 
+  rewrite fw2'_eq_v2.
+  rewrite fw3'_eq_v3.
+
   split.
   - reflexivity.
   - split.
@@ -275,4 +251,4 @@ Proof.
     + split.
       * { reflexivity. }
       * { reflexivity. }
-Qed.
+Defined.
