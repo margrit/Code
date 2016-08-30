@@ -1,5 +1,6 @@
+Require Import Nat.
 Require Import Fin.
-(*Require Import Vector. *)
+Require Import Vector.
 Require Import Program.
 
 (* type isomorphisms a.s.o. *)
@@ -332,7 +333,8 @@ Defined.
 (* the sum of two finite types is finite *)
 
 Lemma sumIsFiniteLemma (n m : nat) : forall (X Y : Type),
-                          (X ≅ (Fin.t n)) -> (Y ≅ (t m)) -> ((X + Y) ≅ (t (n + m))).
+                          (X ≅ (Fin.t n)) -> (Y ≅ (Fin.t m)) ->
+                          ((X + Y) ≅ (Fin.t (n + m))).
 Proof.
   induction n.
   + intros X Y isoXt0 isoYtm.
@@ -528,4 +530,58 @@ Proof.
   destruct X as [X [cardX isoX]].
   destruct Y as [Y [cardY isoY]].
   exact (Vector.t (Fin.t cardY) cardX).
+Defined.
+
+SearchAbout "nth".
+Print VectorDef.nth.
+Print VectorDef.nil.
+Print VectorDef.cons.
+
+Print "::".
+SearchPattern (nat -> nat -> nat).
+
+Fixpoint vectProdTo (X : Type) (n : nat) (v : Vector.t X (S n)) : X * (Vector.t X n) :=
+  match v with
+  | (VectorDef.cons _ x _ xs) => (x , xs)
+  end.
+
+Fixpoint vectProdFrom (X : Type) (n : nat) (p : X * (Vector.t X n)) : Vector.t X (S n) :=
+  match p with
+  | (x , xs) => VectorDef.cons X x n xs
+  end.
+
+Lemma vectProdIso (X : Type) (n : nat) : (Vector.t X (S n)) ≅ (X * (Vector.t X n)).
+Proof.
+  apply (MkIso _ _ (vectProdTo X n) (vectProdFrom X n)).
+  + intro pair.
+    destruct pair as [x v].
+    dependent destruction v; simpl; reflexivity.  
+  + intro v.
+    dependent destruction v.
+    dependent destruction v; simpl; reflexivity.  
+Defined.    
+
+Fixpoint lemma1To (X : Type) (v : Vector.t X 0) : Fin.t 1 :=
+  match v with
+  | nil _ => F1
+  end.
+
+Lemma lemma1From (X : Type) (i : Fin.t 1) : Vector.t X 0.
+Proof.
+  exact (nil X).
+Defined.
+
+Lemma lemma (n m : nat) : (Vector.t (Fin.t n) m) ≅ (Fin.t (n ^ m)).
+Proof.
+  induction m.
+  + compute.
+    apply (MkIso _ _ (lemma1To (Fin.t n)) (lemma1From (Fin.t n))).
+    - intro f; dependent destruction f.
+      * simpl; reflexivity.
+      * dependent destruction f; simpl.
+    - intro v; compute; dependent destruction v; reflexivity.
+  + apply (transIso (prodIsFiniteLemma n (n ^ m)
+                        (Fin.t n) (Fin.t (n ^ m)) (idIso _) (idIso _))).
+    apply (transIso (prodIsoRight (Fin.t n) IHm)).
+    exact (vectProdIso (Fin.t n) m).
 Defined.
