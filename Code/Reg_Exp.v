@@ -55,12 +55,6 @@ match c with
 | (a,b) => p a && q b
 end.
 
-(** Map-Funktion auf Wörtern (Word ist ein Funktor) *)
-Fixpoint map_word {A B : Type} (f : A -> B) (w : @Word A) : @Word B :=
- match w with
-   | eps => eps
-   | snoc w' x => snoc (map_word f w') (f x)
- end.
 
 (** Ein einzelnes Zeichen an ein Wort anhängen.*)
 Definition concat_word_single {A : Type} (x : A) (w : @Word(@Word A)) : @Word(@Word A) :=
