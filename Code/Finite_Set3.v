@@ -6,8 +6,8 @@ Require Import Program.
 (* type isomorphisms *)
 Record Iso (A B : Type) : Type :=
   MkIso {
-      to : A -> B;
-      from : B -> A;
+      to :     A -> B;
+      from :   B -> A;
       toFrom : forall (b : B), (to (from b) = b);
       fromTo : forall (a : A), (from (to a) = a)
   }.
@@ -66,17 +66,6 @@ Lemma transIsoIso (A B C : Type) (isoBC : B ≅ C) : (A ≅ B) ≅ (A ≅ C).
   but not here... 
 *)
 
-(*
-(* to make proofs more readable: 
-   allows reducing goal Iso A' B' to Iso A B
-   by giving Iso A A' and Iso B B' *)
-Lemma shiftIso {A A' B B' : Type} : A ≅ A' -> B ≅ B' -> A ≅ B -> A' ≅ B'.
-Proof.
-  intros isoaa' isobb' isoab.
-  apply (isobb' ⇛) in isoab as isoab'.
-  exact (isoab' ∘≅ (symIso isoaa')).
-Defined.
-*)
 
 (* property of a type to be finite *)
 Record Finite (X : Type) : Type :=
@@ -85,7 +74,7 @@ Record Finite (X : Type) : Type :=
       isoFin : Iso X (Fin.t card)
   }.
 
-(* type of finite types *)
+(* the type of finite types *)
 Definition FiniteType : Type := sigT Finite.
 
 (* for any cardinality, we have the standard finite type
@@ -126,8 +115,9 @@ Definition mapOption {A B : Type} (f: A -> B) (oa : option A) : option B :=
   end.
 
 (* option is a functor: map respects isomorphisms *)
-Fixpoint optionIso {A B : Type} (isoAB : A ≅ B) : (option A) ≅ (option B).
+Lemma optionIso {A B : Type} : A ≅ B -> (option A) ≅ (option B).
 Proof.
+  intro isoAB.
   destruct isoAB as [ab ba abba baab].
   apply (MkIso (option A) (option B) (mapOption ab) (mapOption ba)).
   - intro ob; destruct ob as [ b | ]; simpl.
@@ -139,13 +129,14 @@ Proof.
 Defined.
 
 (* option induces map FiniteType -> FiniteType *)
-Fixpoint optionFinite (X : FiniteType) : FiniteType.
+Definition optionFinite : FiniteType -> FiniteType.
 Proof.
+  intro X.
   destruct X as [X [cardX isoX]].
-  apply optionIso in isoX as isoOXOtc.
-  apply (transIso (symIso (@optionFinIso cardX))) in isoOXOtc as isoOXtSc.
   exists (option X).
-  apply (MkFinite (option X) (S cardX) isoOXtSc).
+  exists (S cardX).
+  apply (optionFinIso ⇚).
+  exact (optionIso isoX).
 Defined.
 
 (* to be done: define Hom, id, comp,... to make FiniteType
@@ -168,7 +159,7 @@ Proof.
   + left; exact isoX.
   + right.
     exists cardX.
-    apply (@optionFinIso cardX ⇛).
+    apply (optionFinIso ⇛).
     exact isoX.
 Defined.
 
@@ -293,8 +284,8 @@ Defined.
 (* (Fin.t 0) is also neutral for + *)
 Lemma sumFin0Iso (X : Type) : ((Fin.t 0) + X) ≅ X.
 Proof.
-  apply (transIso (sumFalseIso X)).
-  exact (sumIsoLeft X (symIso isoFalseFin0)).
+  apply (sumFalseIso _ ⇛).
+  exact (sumIsoLeft _ (symIso isoFalseFin0)).
 Defined.
 
 (* adding (Fin.t 1) is option (up to iso) *)
@@ -325,8 +316,8 @@ Defined.
 
 Lemma sumFin1FinNIso (n : nat) : ((Fin.t 1) + (Fin.t n)) ≅ (Fin.t (S n)).
 Proof.
-  apply (transIso (symIso (@optionFinIso n))).
-  exact (sumFin1Iso (Fin.t n)).
+  apply (optionFinIso ⇚).
+  exact (sumFin1Iso _).
 Defined.
 
 (* the sum of two finite types is finite *)
@@ -368,15 +359,14 @@ Defined.
 (* towards prodFinite *)
 (* universal property of prod *)
 
-Definition univProd {X Y Z : Type} (f : X -> Y) (g : X -> Z) (x : X) : Y * Z :=
-   (f x , g x).
+Definition univProd {X Y Z : Type} (f : X -> Y) (g : X -> Z) (x : X) : Y * Z := (f x , g x).
 
 Notation " f ▵ g " := (univProd f g) (at level 10). 
 
 (* prod is a functor in both arguments *)
 
 Definition prodMap {X Y Z W : Type} (f : X -> Z) (g : Y -> W) : 
-                  (X * Y) -> (Z * W) := (f ∘ fst) ▵ (g ∘ snd).
+                              (X * Y) -> (Z * W) := (f ∘ fst) ▵ (g ∘ snd).
 
 Notation " f ⊠ g " := (prodMap f g) (at level 10). 
 
@@ -495,12 +485,12 @@ Defined.
    extensionality, there is no chance to do that.
 
    Instead, we define Hom for finite sets to be
-          Hom X Y  :=  Vect (t cardY) cardX
+          Hom X Y  :=  Vect Y cardX
 
    That looks strange since the right hand side does not depend
-   on X and Y themselves, but only on their cardinalities.
+   on X itself, but only on its cardinality.
 
-   However, since the finite sets come with their isomorphisms to (t card),
+   However, since the finite set X comes with an isomorphisms to (t cardX),
    we can define maps
 
        X -> Y   --- toHom --->   Hom X Y
@@ -516,17 +506,17 @@ Defined.
 
    And it shouldn't be hard to prove 
 
-            (Vect cardX (t cardY)) ≅ t (cardY ^ cardX)),
+            (Vect Y cardX ) ≅ t (cardY ^ cardX)),
 
    i.e. Hom X Y finite for finite X and Y.
  *)
 
-
-Definition FinHom (X Y : FiniteType) : Type.
+(* first, we define a type for Hom *)
+Definition HomFinT (X Y : FiniteType) : Type.
 Proof.
   destruct X as [X [cardX isoX]].
   destruct Y as [Y [cardY isoY]].
-  exact (Vector.t (Fin.t cardY) cardX).
+  exact (Vector.t Y cardX).
 Defined.
 
 SearchAbout "nth".
@@ -536,6 +526,8 @@ Print VectorDef.cons.
 
 Print "::".
 SearchPattern (nat -> nat -> nat).
+
+(* towards vectProdIso *)
 
 Fixpoint vectProdTo (X : Type) (n : nat) (v : Vector.t X (S n)) : X * (Vector.t X n) :=
   match v with
@@ -582,3 +574,8 @@ Proof.
     apply (transIso (prodIsoRight (Fin.t n) IHm)).
     exact (vectProdIso (Fin.t n) m).
 Defined.
+
+(* for any n, Vector.t _ n is a functor *)
+(*
+Definition mapVector ... tbc 
+*)
