@@ -21,6 +21,9 @@ Notation "[ x ; .. ; y ]" := (snoc ( .. (snoc eps x) .. ) y).
 
 (** ** Grundoperationen auf dem Typ [Word]: *)
 
+(**Einheit der Mondade:*)
+Definition unit_w {A : Type} (a : A) : @Word A := snoc eps a.
+
 (** Berechnung der Wortlänge: *)
 Fixpoint word_length {A : Type} (w : @Word A) : nat :=
   match w with
@@ -48,15 +51,6 @@ Fixpoint map_word {A B : Type} (f : A -> B) (w : @Word A) : @Word B :=
    | eps => eps
    | snoc w' x => snoc (map_word f w') (f x)
  end.
-
-Lemma map_length_w {A B : Type} : forall (f : A -> B) (w : @Word A),
-       word_length (map_word f w) = word_length w.
-Proof.
-intros f w.
-induction w as [ | w' IHw].
-- simpl. reflexivity.
-- simpl. rewrite IHw. reflexivity.
-Defined.
 
 
 (** * Definition von Listen *)
@@ -425,62 +419,3 @@ unfold word_to_list''.
 rewrite word_list_word_simple.
 apply word_reverse_idempotent.
 Defined.
-
-
-(** Hilfsfunktionen *)
-
-(** Das n-te Element eines Worts, falls n < word_length, sonst None *)
-Fixpoint nth_error_w {A : Type} (w : @Word A) (n : nat) : option A :=
- match n, w with
-  | _   , eps       => None
-  | 0   , snoc _ x  => Some x
-  | S n', snoc w' _ => nth_error_w w' n'
- end.
-
-Fixpoint sublist {A : Type} (l : list A) (i j : nat) : option (list A) := 
- match i, j, l with
-  | S i', S j', (x :: l') => match sublist l' i' j' with
-                              | None     => None
-                              | Some l'' => Some l''
-                             end 
-  | 0   , S j', (x :: l') => match sublist l' 0 j' with
-                              | None => None
-                              | Some l'' => Some (x :: l'')
-                             end
-  | 0   , 0, _            => Some nil
-  | _, _, _               => None
- end.
-
-
-(** Teilwort von Index i bis Index j, falls i < j < word_length, Index rueckwaerts! *)
-Definition subword {A : Type} (w : @Word A) (i j : nat) : option (@Word A) := 
- match sublist (word_to_list w) i j with
-  | None => None
-  | Some l => Some (list_to_word l)
- end.
-
-
-(* Lemmata *)
-
-
-Lemma S_plus_1' : forall n,  (S n = n + 1).
-Proof.
-  induction n.
-  - simpl. reflexivity.
-  - simpl.
-    rewrite IHn.
-    reflexivity.
-Defined.
-
-Lemma wl_pres_length {A : Type} (w : @Word A) : length (word_to_list w) = word_length w.
-Proof.
-induction w.
-- simpl. reflexivity.
-- simpl.
-  SearchAbout length.
-  rewrite app_length.
-  simpl. 
-  rewrite <- S_plus_1'. 
-  rewrite IHw. reflexivity.
-Defined.
- 

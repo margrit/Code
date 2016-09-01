@@ -40,7 +40,8 @@ Definition Sigma := @Fin.t S_size.
 Parameter delta : Q -> Sigma -> Q.
 
 (** Die Funktion, die entscheidet, ob ein Zustand ein akzeptierender Zustand ist. *)
-Parameter is_accepting : Q -> bool.
+(*Parameter is_accepting : Q -> bool.*)
+Parameter is_accepting : Q -> Type. (*Proofs as Programms Pädagogik*)
 
 (** Der Startzustand. *)
 Parameter q0 : Q.
@@ -88,11 +89,11 @@ Proof.
     reflexivity.
 Defined.
 
-Definition accepted_word (w : @Word Sigma) : bool :=
+Definition accepted_word (w : @Word Sigma) : Type :=
   is_accepting (delta_hat q0 w).
 
 (** Die von einem endlichen Automaten beschriebene Sprachen.*)
-Definition DFA_Lang (w : @Word Sigma) : bool :=
+Definition Lang_delta (w : @Word Sigma) : Type :=
   accepted_word w.
 
 (* Der Typ der Konfigurationen eines DFA, Conf_DFA = Q x @Word Sigma*.*)
@@ -105,9 +106,10 @@ Definition Conf_DFA := Q * (@Word Sigma) : Type.
 (* Ein einzelner Konfigurationsschritt. Ausgehend von einer Konfiguration, einem Zeichen
 aus Sigma und einem Wort, wird das Zeichen durch [delta] abgearbeitet und führt zur
 nachfolgenden Konfiguration.*)
+
 Inductive Conf_DFA_step : Conf_DFA -> Conf_DFA -> Type :=
  | one_step : forall (q : Q) (p : Q) (a : Sigma) (w : @Word Sigma) (eq : (delta q a) = p),
-                                    Conf_DFA_step (q, (snoc w a)) (p, w).
+                                    Conf_DFA_step (q, (concat_word [a] w)) (p, w).
 
 (* Die reflexiv-transitive Hülle von Conf_rel_DFA_step.
 K ext_conf M <=> K = M (revlexiv) oder 
@@ -115,9 +117,28 @@ ex L mit K ext_conf L und L conf_step M (reflexiv-transitive Hülle)*)
 Inductive Conf_rel_DFA : Conf_DFA -> Conf_DFA -> Type :=
   | refl    : forall (K : Conf_DFA), Conf_rel_DFA K K
   | step  : forall (K L M : Conf_DFA),
-                                     Conf_rel_DFA K L ->
-                                     Conf_DFA_step L M ->
+                                     Conf_DFA_step K L ->
+                                     Conf_rel_DFA L M ->
                                      Conf_rel_DFA K M.
+
+Definition Lang_Conf (w: @Word Sigma) : Type := 
+{p : Q & (is_accepting p * Conf_rel_DFA (q0, w) (p, eps))%type}.
+
+Lemma delta_Conf {w: @Word Sigma} : Lang_delta w -> Lang_Conf w.
+Proof.
+intro LDw.
+unfold Lang_Conf.
+unfold Lang_delta in LDw.
+unfold accepted_word in LDw.
+induction w.
+- exists (delta_hat q0 eps).
+  split.
+  + exact LDw.
+  + simpl.
+     apply refl.
+- 
+
+Lemma Conf_delta {w: @Word Sigma} : Lang_Conf w -> Lang_delta w.
 
 (** Für die Anwendung des Pumping Lemmas muss die Abarbeitung eines Wortes in einer Liste
 gespeichert werden, da diese Informationen enthält, ob ein Zustand mehrfach durchlaufen wird.
