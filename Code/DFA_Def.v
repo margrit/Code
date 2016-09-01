@@ -124,7 +124,7 @@ Inductive Conf_rel_DFA : Conf_DFA -> Conf_DFA -> Type :=
 Definition Lang_Conf (w: @Word Sigma) : Type := 
 {p : Q & (is_accepting p * Conf_rel_DFA (q0, w) (p, eps))%type}.
 
-Lemma delta_Conf {w: @Word Sigma} : Lang_delta w -> Lang_Conf w.
+(*Lemma delta_Conf {w: @Word Sigma} : Lang_delta w -> Lang_Conf w.
 Proof.
 intro LDw.
 unfold Lang_Conf.
@@ -139,6 +139,7 @@ induction w.
 - 
 
 Lemma Conf_delta {w: @Word Sigma} : Lang_Conf w -> Lang_delta w.
+*)
 
 (** Für die Anwendung des Pumping Lemmas muss die Abarbeitung eines Wortes in einer Liste
 gespeichert werden, da diese Informationen enthält, ob ein Zustand mehrfach durchlaufen wird.
