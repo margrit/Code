@@ -260,7 +260,7 @@ Defined.
 
 (* Map von FS auf einen Vektor *)
 
-Definition map_fs {n m : nat} (v : Vector.t (@Fin.t n) m) := map FS v.
+Definition map_fs {n m : nat} (v : Vector.t (@Fin.t n) m) := map Fin.FS v.
 
 (* Das Einfuegen eines Elements erhaelt im Vektor vorhandene Elemente *)
 
@@ -317,7 +317,7 @@ Proof.
   dependent induction v.
   dependent destruction ap.
   - exists v.
-    exists F1.
+    exists Fin.F1.
     cbn.  (*alternativ simpl?*)
     reflexivity.
   - dependent destruction n.
@@ -326,7 +326,7 @@ Proof.
       destruct s as [v' rest].
       destruct rest as [f ins].
       exists (cons A h n v'). 
-      exists (FS f).
+      exists (Fin.FS f).
       rewrite <- ins. 
       compute.
       apply eq_refl.
@@ -350,7 +350,7 @@ Defined.
    dann entsteht er als Mapping aus einem Fin n-Vektor *)
 
 Lemma fin_vec_from_below {n m : nat} (v : Vector.t (@Fin.t (S n)) m) : 
-            (Appears_in F1 v -> False) -> {v' | map FS v' = v}.
+            (Appears_in Fin.F1 v -> False) -> {v' | map Fin.FS v' = v}.
 Proof.
 intro not_ap.
 dependent induction v.
@@ -360,7 +360,7 @@ dependent induction v.
 - dependent destruction h. 
   + contradict not_ap.
     apply ai_here.
-  + pose (not_Appears_in_tl F1 (FS h) v not_ap) as not_ap_F1.
+  + pose (not_Appears_in_tl Fin.F1 (Fin.FS h) v not_ap) as not_ap_F1.
     pose (IHv not_ap_F1) as ex_v'.
     destruct ex_v' as [v' eq_map].
     exists (cons (Fin.t n) h n0 v').
@@ -397,18 +397,18 @@ dependent induction n; intros m n_lt_m v.
     * assumption.
 
     (* Die Liste enthaelt keine Wiederholung *)
-    * pose (dec_Appears_fin F1 v) as dec_ap_tl.
+    * pose (dec_Appears_fin Fin.F1 v) as dec_ap_tl.
       destruct dec_ap_tl as [ap_f1 | not_ap_f1].
 
       (* F1 kommt in der Liste vor *)
-      pose (remove_app F1 v ap_f1).
+      pose (remove_app Fin.F1 v ap_f1).
       dependent destruction s.
       dependent destruction s.
-      pose (dec_Appears_fin F1 x0) as dec_ap_tl'.
+      pose (dec_Appears_fin Fin.F1 x0) as dec_ap_tl'.
       destruct dec_ap_tl' as [ap_f1_x0 | not_ap_f1_x0].
 
       (* F1 kommt noch einmal in der Liste vor *)
-      { pose (ins_app_Repeats F1 x0 x ap_f1_x0).
+      { pose (ins_app_Repeats Fin.F1 x0 x ap_f1_x0).
         rewrite e in r.
         assumption. } 
 
@@ -417,9 +417,9 @@ dependent induction n; intros m n_lt_m v.
         dependent destruction x'_ex.
         pose (lt_S_n n m n_lt_m).
         pose (IHn m l x1).
-        pose (funct_Repeats FS x1 r).
+        pose (funct_Repeats Fin.FS x1 r).
         rewrite e0 in r0.
-        pose (ins_pres_rep F1 x0 x r0).
+        pose (ins_pres_rep Fin.F1 x0 x r0).
         rewrite e in r1.
         assumption.
       } 
@@ -430,7 +430,7 @@ dependent induction n; intros m n_lt_m v.
         dependent destruction x.
         pose (lt_S_n n m n_lt_m).
         pose (IHn m l x). 
-        pose (funct_Repeats FS x r).
+        pose (funct_Repeats Fin.FS x r).
         simpl.
         apply rp_ext.
         assumption.
@@ -449,11 +449,11 @@ Lemma pos_Appears {A : Type} {n : nat} : forall (a : A) (v : Vector.t A n),
 Proof.
 intros a v ap.
 dependent induction ap.
-- exists F1.
+- exists Fin.F1.
   simpl.
   reflexivity.
 - destruct IHap.
-  exists (FS x).
+  exists (Fin.FS x).
   simpl.
   assumption.
 Defined.
@@ -466,14 +466,14 @@ intros v rp.
 dependent induction rp.
 - destruct IHrp.
   destruct s.
-  exists (FS x0).
-  exists (FS x1).
+  exists (Fin.FS x0).
+  exists (Fin.FS x1).
   simpl.
   assumption.
-- exists F1.
+- exists Fin.F1.
   pose (pos_Appears x v a).
   destruct s.
-  exists (FS x0).
+  exists (Fin.FS x0).
   simpl.
   rewrite e.
   reflexivity.
