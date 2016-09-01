@@ -3,8 +3,7 @@ Require Import Fin.
 Require Import Vector.
 Require Import Program.
 
-(* type isomorphisms a.s.o. *)
-
+(* type isomorphisms *)
 Record Iso (A B : Type) : Type :=
   MkIso {
       to : A -> B;
@@ -67,6 +66,7 @@ Lemma transIsoIso (A B C : Type) (isoBC : B ≅ C) : (A ≅ B) ≅ (A ≅ C).
   but not here... 
 *)
 
+(*
 (* to make proofs more readable: 
    allows reducing goal Iso A' B' to Iso A B
    by giving Iso A A' and Iso B B' *)
@@ -76,20 +76,20 @@ Proof.
   apply (isobb' ⇛) in isoab as isoab'.
   exact (isoab' ∘≅ (symIso isoaa')).
 Defined.
+*)
 
-(* finite types *)
-
+(* property of a type to be finite *)
 Record Finite (X : Type) : Type :=
   MkFinite {
       card : nat;
       isoFin : Iso X (Fin.t card)
   }.
 
+(* type of finite types *)
 Definition FiniteType : Type := sigT Finite.
 
 (* for any cardinality, we have the standard finite type
    of that cardinality *)
-
 Definition FinFinite (card : nat) : FiniteType.
 Proof.
   unfold FiniteType.
@@ -100,16 +100,16 @@ Defined.
 (* towards optionFinIso *)
 
 Definition optionFinTo {n : nat} (f : Fin.t (S n)) : option (Fin.t n) :=
-match f with
-| F1 => None
-| FS f' => Some f'
-end.
+  match f with
+    | F1 => None
+    | FS f' => Some f'
+  end.
  
 Definition optionFinFrom {n : nat} (of : option (Fin.t n)) : Fin.t (S n) :=
-match of with
-| None => F1
-| Some f' => FS f'
-end.
+  match of with
+    | None => F1
+    | Some f' => FS f'
+  end.
 
 Definition optionFinIso {n : nat} : Iso (Fin.t (S n)) (option (Fin.t n)).
 Proof.
@@ -118,12 +118,12 @@ Proof.
   - induction n; intro a; dependent destruction a; simpl; reflexivity.
 Defined.
 
-(* option is a functor *)
+(* option is a functor: can define map *)
 Definition mapOption {A B : Type} (f: A -> B) (oa : option A) : option B :=
-match oa with
-| None   => None
-| Some a => Some (f a)
-end.
+  match oa with
+    | None   => None
+    | Some a => Some (f a)
+  end.
 
 (* option is a functor: map respects isomorphisms *)
 Fixpoint optionIso {A B : Type} (isoAB : A ≅ B) : (option A) ≅ (option B).
@@ -150,14 +150,15 @@ Defined.
 
 (* to be done: define Hom, id, comp,... to make FiniteType
    a category and prove that optionFinite canonically extends
-   to a functor, i.e. define map, prove id- and comp-preservation,
-   and in particular iso-preservation! ... *)
+   to a functor, i.e. define map, prove id-, comp- and iso-preservation!
+*)
 
 (* any finite type is either isomorphic to False or isomorphic to
    optionFinite of some (Fin.t ..) 
    need's a nicer formulation
    have to figure out how this can be used for 
-   "induction" analoguous to nat induction    *)
+   "induction" analoguous to nat induction
+ *)
 
 Fixpoint decideFin (X : Type) (Xfin : Finite X) : 
          (X ≅ (Fin.t 0)) + {n : nat & X ≅ (option (Fin.t n))}.
@@ -167,13 +168,11 @@ Proof.
   + left; exact isoX.
   + right.
     exists cardX.
-    apply (@transIso X (Fin.t (S cardX))).
-    - apply optionFinIso.    
-    - exact isoX.
+    apply (@optionFinIso cardX ⇛).
+    exact isoX.
 Defined.
 
 (* universal property of sum *)
-
 Definition univSum {X Y Z : Type} (f : X -> Z) (g : Y -> Z) (xy: X + Y) : Z :=
   match xy with
       | inl x => f x
@@ -183,7 +182,6 @@ Definition univSum {X Y Z : Type} (f : X -> Z) (g : Y -> Z) (xy: X + Y) : Z :=
 Notation " f ▿ g " := (univSum f g) (at level 10). 
 
 (* sum is a functor in both arguments *)
-
 Definition sumMap {X Y Z W : Type} (f : X -> Z) (g : Y -> W) : 
                   (X + Y) -> (Z + W) := (inl ∘ f) ▿ (inr ∘ g).
 
@@ -217,7 +215,6 @@ Proof.
 Defined.
 
 (* sum is commutative (up to iso) *)
-
 Lemma sumCommutative (X Y : Type) : (X + Y) ≅ (Y + X).
 Proof.
   apply (MkIso (X + Y) (Y + X) (inr ▿ inl) (inr ▿ inl));
@@ -225,7 +222,6 @@ Proof.
 Defined.
 
 (* sum is a functor: it respects isomorphisms *)
-
 Lemma sumIso {X Y Z W : Type} : X ≅ Y -> Z ≅ W -> (X + Z) ≅ (Y + W).
 Proof.
   intros isoXY isoZW.
@@ -240,18 +236,14 @@ Proof.
     - compute; rewrite (wzzw z); reflexivity.
 Defined.
 
-Lemma sumIsoLeft {X Y : Type} (Z : Type) (isoXY: X ≅ Y) : (X + Z) ≅ (Y + Z).
-Proof.
-  exact (sumIso isoXY (idIso Z)).
-Defined.  
+(* name cases where iso on one side is identity *)
+Definition sumIsoLeft {X Y : Type} (Z : Type) (isoXY: X ≅ Y) :
+    (X + Z) ≅ (Y + Z) := (sumIso isoXY (idIso Z)).
 
-Lemma sumIsoRight {X Y : Type} (Z : Type) (isoXY: X ≅ Y) : (Z + X) ≅ (Z + Y).
-Proof.
-  exact (sumIso (idIso Z) isoXY).
-Defined. 
+Definition sumIsoRight {X Y : Type} (Z : Type) (isoXY: X ≅ Y) :
+    (Z + X) ≅ (Z + Y) := (sumIso (idIso Z) isoXY).
 
-(* we'll often need that (Fin.t 0) is uninhabitad, i.e. isomorphic to False *)
-
+(* (Fin.t 0) is uninhabited, i.e. isomorphic to False *)
 Lemma falseFromFin0 (x : Fin.t 0) : False.
 Proof.
   dependent destruction x.
@@ -271,7 +263,7 @@ Proof.
    exact isoFalseFin0.
 Defined.
 
-(* t 1 is isomorphic to True *)
+(* (Fin.t 1) is isomorphic to True *)
 Lemma isoTrueFin1 : True ≅ (Fin.t 1).
 Proof.
   apply (MkIso _ _ (fun _ => F1) (fun _ => I)).
@@ -305,7 +297,8 @@ Proof.
   exact (sumIsoLeft X (symIso isoFalseFin0)).
 Defined.
 
-(* adding (Fin.t 1) is option *)
+(* adding (Fin.t 1) is option (up to iso) *)
+
 Fixpoint sumFin1IsoTo (X : Type) (t1X : (Fin.t 1) + X ) : (option X) :=
    match t1X with
    | inl _ => None
@@ -345,15 +338,14 @@ Proof.
   induction n.
   + intros X Y isoXt0 isoYtm.
     compute.
-    apply (transIso (sumFalseIso (Fin.t m))).
-    apply (transIso (sumIsoLeft (Fin.t m) (symIso isoFalseFin0))).
+    apply ((sumFalseIso _) ⇛).
+    apply ((sumIsoLeft _ isoFalseFin0) ⇚).
     exact (sumIso isoXt0 isoYtm).
   + intros X Y isoXtSn isoYtm.
-    apply (transIso (symIso (@optionFinIso (n + m)))).
-    apply (transIso (optionIso 
-             (IHn (Fin.t n) (Fin.t m) (idIso (Fin.t n)) (idIso (Fin.t m))))).
-    apply (transIso (optionSumIso (Fin.t n) (Fin.t m))).
-    apply (transIso (sumIsoLeft (Fin.t m) (@optionFinIso n))).
+    apply ((@optionFinIso (n + m)) ⇚).
+    apply ((optionIso (IHn _ _ (idIso (Fin.t n)) (idIso (Fin.t m)))) ⇛).
+    apply ((optionSumIso _ _) ⇛).
+    apply ((sumIsoLeft _ optionFinIso) ⇛).
     exact (sumIso isoXtSn isoYtm).
 Defined.
     
@@ -388,13 +380,12 @@ Definition prodMap {X Y Z W : Type} (f : X -> Z) (g : Y -> W) :
 
 Notation " f ⊠ g " := (prodMap f g) (at level 10). 
 
-
-(* prod is commutative *)
+(* prod is commutative (up to iso) *)
 Lemma prodCommutative (X Y : Type) : (X * Y) ≅ (Y * X).
 Proof.
   apply (MkIso (X * Y) (Y * X) (snd ▵ fst) (snd ▵ fst));
   intro pair; destruct pair; compute; reflexivity.
-Defined.    
+Defined.
 
 (* prod is a functor: it respects isomorphisms *)
 Lemma prodIso {X Y Z W : Type} : X ≅ Y -> Z ≅ W -> (X * Z) ≅ (Y * W).
@@ -409,12 +400,13 @@ Proof.
     compute; rewrite (yxxy x); rewrite (wzzw z); reflexivity.
 Defined.
 
-Fixpoint prodIsoLeft {X Y : Type} (Z : Type) (isoXY : X ≅ Y) : (X * Z) ≅ (Y * Z) :=
-                                  (prodIso isoXY (idIso Z)).
+Definition prodIsoLeft {X Y : Type} (Z : Type) (isoXY : X ≅ Y) :
+                  (X * Z) ≅ (Y * Z) := prodIso isoXY (idIso Z).
 
-Fixpoint prodIsoRight {X Y : Type} (Z : Type) (isoXY : X ≅ Y) : (Z * X) ≅ (Z * Y) :=
-                                  (prodIso (idIso Z) isoXY).
+Fixpoint prodIsoRight {X Y : Type} (Z : Type) (isoXY : X ≅ Y) :
+                  (Z * X) ≅ (Z * Y) := prodIso (idIso Z) isoXY.
 
+(* product with False is False *)
 Lemma prodFalseIso (X : Type) : (False * X) ≅ False.  
 Proof.
   apply (MkIso _ _ fst (id ▵ (False_rect X))).
@@ -422,6 +414,7 @@ Proof.
   + intro fx; destruct fx as [f x]. destruct f.
 Defined.
 
+(* True is neutral for prod *)
 Lemma prodTrueIso (X : Type) : (True * X) ≅ X.
 Proof.
   apply (MkIso _ _ snd ((fun _ => I) ▵ id)).
@@ -429,7 +422,9 @@ Proof.
   + intro tx; destruct tx as [t x]; destruct t; compute; reflexivity.
 Defined.
 
-Fixpoint prodDistSumIsoTo (X Y Z : Type) (xyz : X * (Y + Z)) : (X * Y) + (X * Z) :=
+(* product distributes over sum *)
+
+Definition prodDistSumIsoTo (X Y Z : Type) (xyz : X * (Y + Z)) : (X * Y) + (X * Z) :=
   match xyz with
   | (x , inl y) => inl (x , y)
   | (x , inr z) => inr (x , z)
