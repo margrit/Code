@@ -1,0 +1,49 @@
+DIGEST 2dc01118eb0afc3a521a5601c2c77e78
+FDecidableOrder
+R15:18 Coq.Unicode.Utf8 <> <> lib
+modtype 74:76 <> Sig
+ax 89:89 Sig A
+ax 109:110 Sig le
+R115:119 Coq.Unicode.Utf8_core <> :type_scope:x_'→'_x not
+R121:125 Coq.Unicode.Utf8_core <> :type_scope:x_'→'_x not
+R120:120 DecidableOrder Sig A defax
+R114:114 DecidableOrder Sig A defax
+R148:149 DecidableOrder Sig le defax
+not 139:139 Sig :order_scope:x_'≤'_x
+ax 197:203 Sig le_refl
+R207:210 Coq.Unicode.Utf8_core <> :type_scope:'∀'_x_'..'_x_','_x not
+R212:213 Coq.Unicode.Utf8_core <> :type_scope:'∀'_x_'..'_x_','_x not
+R215:219 DecidableOrder Sig :order_scope:x_'≤'_x not
+R214:214 DecidableOrder <> x var
+R220:220 DecidableOrder <> x var
+ax 229:238 Sig le_antisym
+R242:245 Coq.Unicode.Utf8_core <> :type_scope:'∀'_x_'..'_x_','_x not
+R249:250 Coq.Unicode.Utf8_core <> :type_scope:'∀'_x_'..'_x_','_x not
+R258:262 Coq.Unicode.Utf8_core <> :type_scope:x_'→'_x not
+R270:274 Coq.Unicode.Utf8_core <> :type_scope:x_'→'_x not
+R276:278 Coq.Init.Logic <> :type_scope:x_'='_x not
+R275:275 DecidableOrder <> x var
+R279:279 DecidableOrder <> y var
+R264:268 DecidableOrder Sig :order_scope:x_'≤'_x not
+R263:263 DecidableOrder <> y var
+R269:269 DecidableOrder <> x var
+R252:256 DecidableOrder Sig :order_scope:x_'≤'_x not
+R251:251 DecidableOrder <> x var
+R257:257 DecidableOrder <> y var
+ax 288:295 Sig le_trans
+R299:302 Coq.Unicode.Utf8_core <> :type_scope:'∀'_x_'..'_x_','_x not
+R308:309 Coq.Unicode.Utf8_core <> :type_scope:'∀'_x_'..'_x_','_x not
+R317:321 Coq.Unicode.Utf8_core <> :type_scope:x_'→'_x not
+R329:333 Coq.Unicode.Utf8_core <> :type_scope:x_'→'_x not
+R335:339 DecidableOrder Sig :order_scope:x_'≤'_x not
+R334:334 DecidableOrder <> x var
+R340:340 DecidableOrder <> z var
+R323:327 DecidableOrder Sig :order_scope:x_'≤'_x not
+R322:322 DecidableOrder <> y var
+R328:328 DecidableOrder <> z var
+R311:315 DecidableOrder Sig :order_scope:x_'≤'_x not
+R310:310 DecidableOrder <> x var
+R316:316 DecidableOrder <> y var
+ax 349:356 Sig le_total
+R360:363 Coq.Unicode.Utf8_core <> :type_scope:'∀'_x_'..'_x_','_x not
+R367:368 Coq.Unicode.Utf8_core <> :type_scope:'∀'_x_'..'_x_','_x not

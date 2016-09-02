@@ -3,7 +3,11 @@ Require Import Fin.
 Require Import Vector.
 Require Import Program.
 
-(* type isomorphisms *)
+(****************)
+(* Isomorphisms *)
+(****************)
+
+(* isomorphism of Types *)
 Record Iso (A B : Type) : Type :=
   MkIso {
       to :     A -> B;
@@ -66,6 +70,9 @@ Lemma transIsoIso (A B C : Type) (isoBC : B ≅ C) : (A ≅ B) ≅ (A ≅ C).
   but not here... 
 *)
 
+(****************)
+(* Finite Types *)
+(****************)
 
 (* property of a type to be finite *)
 Record Finite (X : Type) : Type :=
@@ -86,7 +93,24 @@ Proof.
   apply (MkFinite (Fin.t card) card (idIso (Fin.t card))).
 Defined.
 
-(* towards optionFinIso *)
+(***********************************************)
+(* operations on FiniteType                    *)
+
+(* Many constructions producing a type from 
+   some parameter types yield finite types if 
+   the parameter types are finite.
+
+   Examples considered below are 
+     option :    Type -> Type
+     sum, prod:  Type -> Type -> Type
+     Vect.t _ n: Type -> Type (for some n:nat)
+
+   The function type A -> B of finite types
+   A and B cannot be shown to be finite, although
+   of course any function f : A -> B is
+*)   
+
+(* option preserves finiteness *)
 
 Definition optionFinTo {n : nat} (f : Fin.t (S n)) : option (Fin.t n) :=
   match f with
@@ -119,7 +143,7 @@ Lemma optionIso {A B : Type} : A ≅ B -> (option A) ≅ (option B).
 Proof.
   intro isoAB.
   destruct isoAB as [ab ba abba baab].
-  apply (MkIso (option A) (option B) (mapOption ab) (mapOption ba)).
+  apply (MkIso _ _ (mapOption ab) (mapOption ba)).
   - intro ob; destruct ob as [ b | ]; simpl.
     + rewrite (abba b); reflexivity.
     + reflexivity.
@@ -128,7 +152,7 @@ Proof.
     + reflexivity.
 Defined.
 
-(* option induces map FiniteType -> FiniteType *)
+(* option induces endofunction on FiniteType *)
 Definition optionFinite : FiniteType -> FiniteType.
 Proof.
   intro X.
@@ -150,8 +174,7 @@ Defined.
    have to figure out how this can be used for 
    "induction" analoguous to nat induction
  *)
-
-Fixpoint decideFin (X : Type) (Xfin : Finite X) : 
+Lemma decideFin (X : Type) (Xfin : Finite X) : 
          (X ≅ (Fin.t 0)) + {n : nat & X ≅ (option (Fin.t n))}.
 Proof.
   destruct Xfin as [cardX isoX].
@@ -170,12 +193,14 @@ Definition univSum {X Y Z : Type} (f : X -> Z) (g : Y -> Z) (xy: X + Y) : Z :=
       | inr y => g y
   end.
 
+(* \triangledown *)
 Notation " f ▿ g " := (univSum f g) (at level 10). 
 
 (* sum is a functor in both arguments *)
 Definition sumMap {X Y Z W : Type} (f : X -> Z) (g : Y -> W) : 
                   (X + Y) -> (Z + W) := (inl ∘ f) ▿ (inr ∘ g).
 
+(* \boxplus *)
 Notation " f ⊞ g " := (sumMap f g) (at level 10). 
 
 (* towards optionSumIso *)
@@ -264,7 +289,7 @@ Proof.
     - dependent destruction i.
   + intro a; destruct a; reflexivity.      
 Defined.
-    
+
 Lemma trueIsFinite : Finite True.
 Proof.
   exists 1.
@@ -290,7 +315,7 @@ Defined.
 
 (* adding (Fin.t 1) is option (up to iso) *)
 
-Fixpoint sumFin1IsoTo (X : Type) (t1X : (Fin.t 1) + X ) : (option X) :=
+Fixpoint sumFin1IsoTo (X : Type) (t1X : (Fin.t 1) + X) : (option X) := 
    match t1X with
    | inl _ => None
    | inr x => Some x
@@ -361,6 +386,7 @@ Defined.
 
 Definition univProd {X Y Z : Type} (f : X -> Y) (g : X -> Z) (x : X) : Y * Z := (f x , g x).
 
+(* \triangle *)
 Notation " f ▵ g " := (univProd f g) (at level 10). 
 
 (* prod is a functor in both arguments *)
@@ -368,6 +394,7 @@ Notation " f ▵ g " := (univProd f g) (at level 10).
 Definition prodMap {X Y Z W : Type} (f : X -> Z) (g : Y -> W) : 
                               (X * Y) -> (Z * W) := (f ∘ fst) ▵ (g ∘ snd).
 
+(* \boxtimes *)
 Notation " f ⊠ g " := (prodMap f g) (at level 10). 
 
 (* prod is commutative (up to iso) *)
@@ -393,7 +420,7 @@ Defined.
 Definition prodIsoLeft {X Y : Type} (Z : Type) (isoXY : X ≅ Y) :
                   (X * Z) ≅ (Y * Z) := prodIso isoXY (idIso Z).
 
-Fixpoint prodIsoRight {X Y : Type} (Z : Type) (isoXY : X ≅ Y) :
+Definition prodIsoRight {X Y : Type} (Z : Type) (isoXY : X ≅ Y) :
                   (Z * X) ≅ (Z * Y) := prodIso (idIso Z) isoXY.
 
 (* product with False is False *)
@@ -484,8 +511,8 @@ Defined.
    False -> Y is equal to False_rect Y, and since we don't have function 
    extensionality, there is no chance to do that.
 
-   Instead, we define Hom for finite sets to be
-          Hom X Y  :=  Vect Y cardX
+   Instead, we define Hom for finite types X, Y to be
+          Hom X Y  :=  Vect.t Y cardX
 
    That looks strange since the right hand side does not depend
    on X itself, but only on its cardinality.
