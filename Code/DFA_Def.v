@@ -89,12 +89,14 @@ Proof.
     reflexivity.
 Defined.
 
+(* Lang_delta ist dasselbe 
 Definition accepted_word (w : @Word Sigma) : Type :=
   is_accepting (delta_hat q0 w).
+*)
 
 (** Die von einem endlichen Automaten beschriebene Sprachen.*)
 Definition Lang_delta (w : @Word Sigma) : Type :=
-  accepted_word w.
+  is_accepting (delta_hat q0 w).
 
 (* Der Typ der Konfigurationen eines DFA, Conf_DFA = Q x @Word Sigma*.*)
 (*Definition Conf_DFA := Q * (list Sigma) : Type.*)
@@ -108,14 +110,14 @@ aus Sigma und einem Wort, wird das Zeichen durch [delta] abgearbeitet und führt
 nachfolgenden Konfiguration.*)
 
 Inductive Conf_DFA_step : Conf_DFA -> Conf_DFA -> Type :=
- | one_step : forall (q : Q) (p : Q) (a : Sigma) (w : @Word Sigma) (eq : (delta q a) = p),
-                                    Conf_DFA_step (q, (concat_word [a] w)) (p, w).
+ | one_step : forall (q : Q) (a : Sigma) (w : @Word Sigma),
+                        Conf_DFA_step (q, (concat_word [a] w)) (delta q a, w).
 
 (* Die reflexiv-transitive Hülle von Conf_rel_DFA_step.
 K ext_conf M <=> K = M (revlexiv) oder 
 ex L mit K ext_conf L und L conf_step M (reflexiv-transitive Hülle)*)
 Inductive Conf_rel_DFA : Conf_DFA -> Conf_DFA -> Type :=
-  | refl    : forall (K : Conf_DFA), Conf_rel_DFA K K
+  | refl  : forall (K : Conf_DFA), Conf_rel_DFA K K
   | step  : forall (K L M : Conf_DFA),
                                      Conf_DFA_step K L ->
                                      Conf_rel_DFA L M ->
@@ -124,22 +126,93 @@ Inductive Conf_rel_DFA : Conf_DFA -> Conf_DFA -> Type :=
 Definition Lang_Conf (w: @Word Sigma) : Type := 
 {p : Q & (is_accepting p * Conf_rel_DFA (q0, w) (p, eps))%type}.
 
-(*Lemma delta_Conf {w: @Word Sigma} : Lang_delta w -> Lang_Conf w.
+Lemma delta_hat_Conf_reverse (w : @Word Sigma) : forall (q : Q),
+               Conf_rel_DFA (q, (word_reverse w)) (delta_hat q (word_reverse w), eps).
+Proof.
+induction w.
++ intro q.
+  simpl.  
+  apply refl.
++ intro q.
+  simpl.
+  rewrite (delta_hat_Lemma q a (word_reverse w)).
+  pose (IHw (delta q a)) as step2.
+  exact (step _ _ _ (one_step q a (word_reverse w)) step2).
+Qed.
+
+Lemma delta_hat_Conf (w : @Word Sigma) : forall (q : Q),
+               Conf_rel_DFA (q, w) (delta_hat q w, eps).
+Proof.
+  rewrite <- (word_reverse_idempotent w).
+  exact (delta_hat_Conf_reverse (word_reverse w)).  
+Qed.
+  
+Lemma Lang_delta_Lang_Conf {w: @Word Sigma} :
+             Lang_delta w -> Lang_Conf w.
 Proof.
 intro LDw.
 unfold Lang_Conf.
 unfold Lang_delta in LDw.
-unfold accepted_word in LDw.
-induction w.
-- exists (delta_hat q0 eps).
-  split.
+exists (delta_hat q0 w).
+split.
   + exact LDw.
-  + simpl.
-     apply refl.
-- 
+  + exact (delta_hat_Conf w q0).
+Qed.
 
-Lemma Conf_delta {w: @Word Sigma} : Lang_Conf w -> Lang_delta w.
-*)
+Lemma Conf_delta_hat_reverse (w : @Word Sigma) : forall (q p : Q),
+                Conf_rel_DFA (q, word_reverse w) (p, eps) ->
+                delta_hat q (word_reverse w)= p.
+Proof.
+induction w.
++ simpl.
+  intros q p rel.
+  dependent destruction rel.
+  - reflexivity.
+  - dependent destruction c.
+    induction w.
+    * dependent induction x.
+    * dependent induction x.
++ simpl.
+  intros q p rel.
+  rewrite delta_hat_Lemma.
+  dependent destruction rel.
+  - rewrite <- (word_reverse_snoc w a) in x.
+    apply (f_equal word_reverse) in x.
+    rewrite (word_reverse_idempotent (snoc w a)) in x. 
+    simpl in x.
+    dependent destruction x.
+  - dependent induction c.
+    rewrite <- (word_reverse_idempotent w0) in x.
+    rewrite <- (word_reverse_snoc (word_reverse w0) a0) in x.    
+    rewrite <- (word_reverse_snoc w a) in x.
+    apply (word_reverse_injective) in x.
+    injection x.
+    intros a0Eqa revw0Eqw.
+    rewrite a0Eqa in rel.
+    apply (f_equal word_reverse) in revw0Eqw.
+    rewrite (word_reverse_idempotent w0) in revw0Eqw.
+    rewrite revw0Eqw in rel.
+    exact (IHw (delta q a) p rel).
+Defined.
+    
+Lemma Conf_delta_hat (w : @Word Sigma) : forall (q p : Q),
+                Conf_rel_DFA (q, w) (p, eps) ->
+                delta_hat q w = p.
+Proof.
+  rewrite <- (word_reverse_idempotent w).
+  exact (Conf_delta_hat_reverse (word_reverse w)).  
+Qed.
+
+Lemma Lang_Conf_Lang_delta {w: @Word Sigma} :
+             Lang_Conf w -> Lang_delta w.
+Proof.
+intro LCw.
+unfold Lang_delta.
+unfold Lang_Conf in LCw.
+destruct LCw as [p [pacc rel]].
+rewrite (Conf_delta_hat w q0 p rel).
+exact pacc.
+Defined.
 
 (** Für die Anwendung des Pumping Lemmas muss die Abarbeitung eines Wortes in einer Liste
 gespeichert werden, da diese Informationen enthält, ob ein Zustand mehrfach durchlaufen wird.

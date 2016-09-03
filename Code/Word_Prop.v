@@ -21,7 +21,7 @@ Notation "[ x ; .. ; y ]" := (snoc ( .. (snoc eps x) .. ) y).
 
 (** ** Grundoperationen auf dem Typ [Word]: *)
 
-(**Einheit der Mondade:*)
+(** Einheit der Word-Monade: *)
 Definition unit_w {A : Type} (a : A) : @Word A := snoc eps a.
 
 (** Berechnung der Wortlänge: *)
@@ -161,6 +161,14 @@ induction w2.
     apply concat_word_associative.
 Defined.
 
+Lemma word_reverse_snoc {A : Type} (w : @Word A) (a : A) :
+            word_reverse (snoc w a) = concat_word [a] (word_reverse w). 
+Proof.
+  simpl.
+  reflexivity.
+Defined.
+
+
 (** Das Umdrehen von Wörtern ist idempotent.*)
 Lemma word_reverse_idempotent {A : Type} (w : @Word A) : word_reverse (word_reverse w) = w.
 Proof.
@@ -173,6 +181,16 @@ Proof.
     rewrite IHw.
     simpl.
     reflexivity.
+Defined.
+
+Lemma word_reverse_injective {A : Type} (w1 w2 : @Word A) :
+      word_reverse w1 = word_reverse w2 -> w1 = w2.
+Proof.
+intro revEq.
+apply (f_equal word_reverse) in revEq.
+rewrite <- (word_reverse_idempotent w1).
+rewrite <- (word_reverse_idempotent w2).
+exact revEq.
 Defined.
 
 (** Somit ist [Word] als Monoid mit [concat_word] als assoziativer Konkatenation 
