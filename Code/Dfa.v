@@ -34,7 +34,7 @@ Proof.
     rewrite ext_app.
     rewrite H.
     apply IHn'.
-    assumption.
+    exact H.
 Qed.
 
 Fixpoint inits {X : Type} (l : list X) : list (list X) :=
@@ -99,7 +99,7 @@ Proof.
       reflexivity.
     + simpl in H.
       inversion H.
-      apply map_dec_2 in H2.
+      apply map_dec_2_l in H2.
       destruct H2 as [xss].
       destruct H0 as [yss].
       destruct H0.
@@ -213,7 +213,7 @@ Proof.
           split.
           - simpl.
           reflexivity.
-          - apply map_dec_2 in H2.
+          - apply map_dec_2_l in H2.
             destruct H2 as [xss].
             destruct H0 as [yss].
             destruct H0.
@@ -235,8 +235,8 @@ Proof.
           clear H.
           assert (map (cons h) (inits l) = xs ++ (y :: ys) ++ (z :: zs)).
           - simpl.
-            assumption.
-          - apply map_dec_3 in H.
+            exact H2.
+          - apply map_decomp_3_l in H.
             destruct H as [xss].
             destruct H as [yss].
             destruct H as [zss].
@@ -261,7 +261,7 @@ Proof.
                   split.
                   - subst.
                     reflexivity.
-                  - assumption.
+                  - exact H4.
                 } }
 Qed.
 
@@ -287,7 +287,7 @@ Proof.
     + apply H0.
   - rewrite app_assoc in H2.
     apply inits_dec_1 in H2.
-    assumption.
+    exact H2.
 Qed.
 
 Definition prefixes (q : Q) (l : list Sigma) : list Q :=
@@ -305,7 +305,7 @@ Qed.
 
 (* Das Axiom des Pigeohole Principle. *)
 Axiom states_size: forall l: list Q, length l > Q_size ->
-  repeats l.
+  repeats_l l.
 
 (** Das Pumping Lemma: *)
 Theorem pumping_lemma : forall w : list Sigma,
@@ -329,17 +329,17 @@ Proof.
     unfold lt.
     apply le_n_S.
     apply len_w.
-  - assert (HRep : repeats pref).
+  - assert (HRep : repeats_l pref).
     + apply states_size.
       apply Hpref.
-    + set (Hx := repeats_decomp Q pref HRep).
+    + set (Hx := repeats_l_decomp Q pref HRep).
       destruct Hx.
       destruct H.
       destruct H.
       destruct H.
       unfold pref in H.
       unfold prefixes in H.
-      set (Hx := map_dec_3 (list Sigma) Q (ext q0)
+      set (Hx := map_decomp_3_l (list Sigma) Q (ext q0)
       (inits w) x0 (x :: x1) (x :: x2) H).
       destruct Hx.
       destruct H0.

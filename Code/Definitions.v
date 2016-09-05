@@ -4,7 +4,7 @@
  *)
 
 (* Require Import String. *)
-Load Repeats.
+Load Repeats_List.
 Load Finite_Set.
 Require Import Fin.
 Require Import Arith.
