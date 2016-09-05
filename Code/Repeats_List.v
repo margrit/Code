@@ -16,7 +16,7 @@ Proof.
   - simpl.
     intro H1.
     right.
-    assumption.
+    exact H1.
   - intro H.
     inversion H.
     + left.
@@ -26,10 +26,10 @@ Proof.
        destruct X0.
       * { left.
            apply ai_later_l.
-           assumption.
+           exact a0.
         }
       * { right.
-          assumption.
+           exact a0.
         }
 Qed.
 
@@ -59,14 +59,14 @@ Proof.
       * { simpl.
           apply ai_later_l.
           apply IHxs.
-          assumption.
+          exact X0.
         }
   - induction xs.
     + simpl.
-      assumption.
+      exact xInys.
     + simpl.
       apply ai_later_l.
-      assumption.
+      exact IHxs.
 Qed.
 
 (*Vorkommen von x in einer Teilliste. *)
@@ -221,7 +221,7 @@ Proof.
                 inversion H.
                 reflexivity.
               + reflexivity.
-        } 
+        }
 Qed.
 
 Lemma map_decomp_3_l : forall X Y : Type, forall f : X -> Y, forall l : list X,
@@ -277,7 +277,6 @@ induction ap_a as [l' | a' l' ap_a IHap_a].
   simpl.
   exact nth_i'_eq_a.
 Defined.
-
 
 Lemma pos_repeats_l {A : Type} : forall (l : list A), 
     repeats_l l -> {i : nat & { j : nat & nth_error l i = nth_error l j } }.

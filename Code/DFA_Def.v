@@ -194,7 +194,7 @@ induction w.
     rewrite revw0Eqw in rel.
     exact (IHw (delta q a) p rel).
 Defined.
-    
+
 Lemma Conf_delta_hat (w : @Word Sigma) : forall (q p : Q),
                 Conf_rel_DFA (q, w) (p, eps) ->
                 delta_hat q w = p.

@@ -8,7 +8,7 @@ Definition Q'_size := 2.
 Definition Sigma'_size := 1.
 
 (*Definition, welche Übergänge möglich sind.*)
-Fixpoint next_state (p : Q') (a : Sigma') : Q' :=
+Fixpoint delta' (p : Q') (a : Sigma') : Q' :=
 match p with
   | on  => off
   | off  => on
