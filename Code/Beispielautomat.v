@@ -1,4 +1,4 @@
-Load DFA_Def.
+Load DTS_Def.
 (*Inductive Sigma := h : Sigma | a : Sigma | l : Sigma | o : Sigma.*)
 
 Inductive Q' := on : Q' | off : Q'.
