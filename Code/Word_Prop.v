@@ -183,6 +183,7 @@ Proof.
     reflexivity.
 Defined.
 
+(** [word_reverse] ist injektiv.*)
 Lemma word_reverse_injective {A : Type} (w1 w2 : @Word A) :
       word_reverse w1 = word_reverse w2 -> w1 = w2.
 Proof.
