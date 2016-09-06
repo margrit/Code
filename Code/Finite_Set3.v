@@ -93,8 +93,9 @@ Proof.
   apply (MkFinite (Fin.t card) card (idIso (Fin.t card))).
 Defined.
 
-(***********************************************)
-(* operations on FiniteType                    *)
+(**************************************************)
+(* operations on FiniteType:                      *)
+(**************************************************)
 
 (* Many constructions producing a type from 
    some parameter types yield finite types if 
@@ -107,8 +108,23 @@ Defined.
 
    The function type A -> B of finite types
    A and B cannot be shown to be finite, although
-   of course any function f : A -> B is
+   of course any function f : A -> B is extensionally
+   determined by the list of values it takes on the
+   elements of A. That's why we take Vector.t B (card A)
+   as the type of functions between finite sets A and B,
+   see below. 
+
+   Remark: Only the finiteness of A is necessary for 
+   this indentification to be reasonable, so we will also
+   identify a type family on a finite type A - i.e. a 
+   function A -> Type - with a Vector of types although 
+   of course neither Type nor FiniteType are finite.
+
 *)   
+
+(* ---------------------------------------------*)
+(* operations on FiniteType: Option             *)
+(* ---------------------------------------------*)
 
 (* option preserves finiteness *)
 
@@ -117,7 +133,7 @@ Definition optionFinTo {n : nat} (f : Fin.t (S n)) : option (Fin.t n) :=
     | F1 => None
     | FS f' => Some f'
   end.
- 
+
 Definition optionFinFrom {n : nat} (of : option (Fin.t n)) : Fin.t (S n) :=
   match of with
     | None => F1
@@ -152,7 +168,7 @@ Proof.
     + reflexivity.
 Defined.
 
-(* option induces endofunction on FiniteType *)
+(* option induces an endofunction on FiniteType *)
 Definition optionFinite : FiniteType -> FiniteType.
 Proof.
   intro X.
