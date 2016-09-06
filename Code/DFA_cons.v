@@ -1,5 +1,7 @@
 (* Hier kommen die cons Sachen rein, woraus man Übungsaufgaben basteln kann*)
 
+Load DFA_Def.
+
 (** Erweiterte Überführungsfunktion [delta_hat_cons], wird hier nicht weiter verwendet,
  da die Verfahren in der Vorlesung über den [snoc] Konstruktor definiert wurden. Es wäre als eine
  Übungsaufgabe denkbar, dass kleine Beispiele mit dem [cons] Konstruktor zu lösen sind.*)
@@ -23,6 +25,7 @@ induction l.
     reflexivity.
 Defined.
 
+(** Die Abarbeitung einer, aus zwei Teillisten bestehenden Liste.*)
 Theorem delta_hat_cons_app : forall xs ys : list Sigma, forall q : Q,
   delta_hat_cons q (xs ++ ys) = delta_hat_cons (delta_hat_cons q xs) ys.
 Proof.
@@ -68,17 +71,16 @@ induction w.
     reflexivity.
 Defined.
 
-(** Definiert, wann ein Wort akzeptiert wird.*)
-Definition accepted_word_cons (w : list Sigma) :=
+(** Die von einem endlichen Automaten beschriebene Sprachen definiert durch [is_accepting].*)
+Definition Lang_delta_cons (w : list Sigma) :=
   is_accepting (delta_hat_cons q0 w).
 
-(** Die Funktionen [accepted_word] und [accepted_word_cons] beschreiben die gleichen
-akzeptierten Wörter.*)
-Lemma accepted_word_Lemma (w : @Word Sigma) :
-  accepted_word w = accepted_word_cons (word_to_list w).
+(** Die Funktionen [Lang_delta] und [Lang_delta_cons] beschreiben die gleichen Sprachen.*)
+Lemma Lang_delta_Lemma (w : @Word Sigma) :
+  Lang_delta w = Lang_delta_cons (word_to_list w).
 Proof.
-unfold accepted_word.
-unfold accepted_word_cons.
+unfold Lang_delta.
+unfold Lang_delta_cons.
 induction w.
   - simpl.
     reflexivity.
@@ -89,4 +91,3 @@ induction w.
     rewrite delta_hat_snoc_cons.
     reflexivity.
 Defined.
-
