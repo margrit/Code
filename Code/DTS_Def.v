@@ -1,3 +1,16 @@
+(* TODO Margrit: 
+      Bemerkungen anpassen: 
+         Was sind Deterministische Transitionssysteme ?
+           im Prinzip dasselbe wie DFAs, nur die Endlichkeit der 
+           Zustands- und Eingabealphabet-Typen ist weggelassen
+         DFAs sind also spezielle DTSs.
+         Warum trennen wir das?
+           Definitionen delta_hat, Conf, Lang_delta, Lang_Conf und auch
+           der Äquivalenzbeweis von Lang_delta und Lang_Conf (in DFA_prop 
+           (das sollte übrigens DTS_prop heissen)) hängen nicht von der
+           Endlichkeit ab.
+*)
+
 (* Grundsaetzliche Anpassungen: 
 
    - Benutzung des Fin.t aus der Standard Library 
@@ -34,12 +47,12 @@ Parameter delta : Q -> Sigma -> Q.
 
 (** Die Funktion, die entscheidet, ob ein Zustand ein akzeptierender Zustand ist. *)
 (*Parameter is_accepting : Q -> bool.*)
-Parameter is_accepting : Q -> Type. (*Proofs as Programms Pädagogik*)
+Parameter is_accepting : Q -> Type. (*Proofs as programs Pädagogik*)
 
 (** Der Startzustand. *)
 Parameter q0 : Q.
 
-(** Um zu definieren, wann ein Wort akzeptiert wird, mÜssen noch einige Vorüberlegungen
+(** Um zu definieren, wann ein Wort akzeptiert wird, müssen noch einige Vorüberlegungen
 getroffen werden. Hierzu wird die erweiterte Transitionsfunktion [delta_hat] bzw. 
 [delta_hat_cons] benötigt. Da im allgemeinen auf Wörtern gearbeitet werden soll, die [snoc] als
 Konstruktor haben, wird dies in den Funktionsnamen weggelassen, um diese kurz zu halten.
@@ -49,7 +62,7 @@ verwendet.*)
 (** Die erweiterte Überführungsfunktion [delta_hat], wie in der Vorlesung definiert.*)
 Fixpoint delta_hat (q : Q) (w : @Word Sigma) : Q :=
    match w with
-    | eps          => q
+    | eps       => q
     | snoc w' h => delta (delta_hat q w' ) h
   end.
 
@@ -69,7 +82,7 @@ induction w.
     reflexivity.
 Defined.
 
-(** Die Abarbeitung eines, aus zwei Teilwörtern bestehenden Wortes*)
+(** Die Abarbeitung eines aus zwei Teilwörtern bestehenden Wortes*)
 Theorem delta_hat_app : forall w v : @Word Sigma, forall q : Q,
   delta_hat q (concat_word w v) = delta_hat (delta_hat q w) v.
 Proof.
@@ -89,29 +102,26 @@ Definition Lang_delta (w : @Word Sigma) : Type :=
 
 (** Die Konfigurationsübergangsrelation*)
 
-(** Der Typ der Konfigurationen eines DFA, Conf_DFA = Q x @Word Sigma*.*)
-Definition Conf_DFA := Q * (@Word Sigma) : Type.
+(** Der Typ der Konfigurationen eines DTS, Conf = Q x @Word Sigma*.*)
+Definition Conf := Q * (@Word Sigma) : Type.
 
 (** Ein einzelner Konfigurationsschritt. Ausgehend von einer Konfiguration, einem Zeichen a
 aus Sigma und einem Wort w, wird das Zeichen durch [delta] abgearbeitet und führt zur
 nachfolgenden Konfiguration.*)
 
-Inductive Conf_DFA_step : Conf_DFA -> Conf_DFA -> Type :=
+Inductive Conf_step : Conf -> Conf -> Type :=
  | one_step : forall (q : Q) (a : Sigma) (w : @Word Sigma),
-                        Conf_DFA_step (q, (concat_word [a] w)) (delta q a, w).
+                        Conf_step (q, (concat_word [a] w)) (delta q a, w).
 
 (** Die reflexiv-transitive Hülle von Conf_rel_DFA_step um die eigentliche Konfigurations-
 übergangsrelation zu beschreiben.*)
-Inductive Conf_rel_DFA : Conf_DFA -> Conf_DFA -> Type :=
-  | refl  : forall (K : Conf_DFA), Conf_rel_DFA K K
-  | step  : forall (K L M : Conf_DFA),
-                                     Conf_DFA_step K L ->
-                                     Conf_rel_DFA L M ->
-                                     Conf_rel_DFA K M.
+Inductive Conf_rel : Conf -> Conf -> Type :=
+  | refl  : forall (K : Conf), Conf_rel K K
+  | step  : forall (K L M : Conf), Conf_step K L -> Conf_rel L M -> Conf_rel K M.
 
-(** Die von einem endlichen Automaten beschriebene Sprachen definiert durch [Conf_rel_DFA].*)
+(** Die von einem endlichen Automaten beschriebene Sprachen definiert durch [Conf_rel].*)
 Definition Lang_Conf (w: @Word Sigma) : Type :=
-{p : Q & (is_accepting p * Conf_rel_DFA (q0, w) (p, eps))%type}.
+{p : Q & (is_accepting p * Conf_rel (q0, w) (p, eps))%type}.
 
 (** Für die Anwendung des Pumping Lemmas muss die Abarbeitung eines Wortes in einer Liste
 gespeichert werden, da diese Informationen enthält, ob ein Zustand mehrfach durchlaufen wird.
@@ -119,23 +129,23 @@ Dies ist der Fall, wenn die Anzahl der Konfigurationen innerhalb der Liste läng
 der Zustände des Automaten.*)
 
 (* Ableiten der nächsten Konfiguration [next_Conf].*)
-Fixpoint next_Conf  (conf : Conf_DFA) : option Conf_DFA :=
+Fixpoint next_Conf  (conf : Conf) : option Conf :=
   match conf with
-    | (q, eps)         => None
+    | (q, eps)      => None
     | (q, snoc w a) => Some (delta q a, w)
   end.
 
 (*Konfigurationssequenz in einer Liste speichern.*)
-Fixpoint conf_seq' (w : @Word Sigma) : Q -> list Conf_DFA :=
+Fixpoint conf_seq' (w : @Word Sigma) : Q -> list Conf :=
   match w with
-    | eps           => fun q : Q => cons (q, eps) nil
+    | eps        => fun q : Q => cons (q, eps) nil
     | snoc w' a  => fun q : Q => cons (q, w) (conf_seq' w' (delta q a))
   end.
 
 Print conf_seq'.
 (* aber im 2. Fall muss (q, w) zur Liste hinzugefuegt werden, oder? *)
 
-Fixpoint conf_seq (conf : Conf_DFA) : list Conf_DFA :=
+Fixpoint conf_seq (conf : Conf) : list Conf :=
   match conf with
     | (q, w) => conf_seq' w q
   end.
@@ -147,22 +157,15 @@ Fixpoint conf_seq (conf : Conf_DFA) : list Conf_DFA :=
    ich sehe auch sonst keinen Vorteil.
    Die "Wrapper" Funktion muss dann natuerlich kein Fixpunkt sein. *)
 
-Fixpoint conf_list (w : @Word Sigma) (q : Q) : list Conf_DFA :=
+Fixpoint conf_list (w : @Word Sigma) (q : Q) : list Conf :=
  let conf := (q, w) in
   match w with
-    | eps             => cons conf nil
+    | eps       => cons conf nil
     | snoc w' a => cons conf (conf_list w' (delta q a))
   end.
 
-Definition conf_to_conf_list (conf : Conf_DFA) : list Conf_DFA :=
+Definition conf_to_conf_list (conf : Conf) : list Conf :=
   let (q, w) := conf in conf_list w q.
-
-Print list.
-
-(*Definition der akzeptierten Sprache
-Definition L_DFA (w : list Sigma) : Conf_DFA:=
-exists p : Q, Conf_rel_DFA (q0 , w) (p, nil).
-*)
 
 End DTS.
 
