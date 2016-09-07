@@ -1,4 +1,4 @@
-(* TODO Margrit: 
+(* TODO Margrit:  -> done
       Bemerkungen anpassen: 
          Was sind Deterministische Transitionssysteme ?
            im Prinzip dasselbe wie DFAs, nur die Endlichkeit der 
@@ -11,32 +11,26 @@
            Endlichkeit ab.
 *)
 
-(* Grundsaetzliche Anpassungen: 
-
-   - Benutzung des Fin.t aus der Standard Library 
-   - Nicht mit Prop arbeiten sondern mit Type
-
-*)
-
 (** Wie in der Vorlesung Theoretische Informatik I werden die einzelne Komponenten eines
- deterministischen endlichen Automats (DEA, nachfolgend DFA genannt) als 5-Tupel beschrieben.
+ deterministischen Transitionssystem (DTS) als 5-Tupel beschrieben.
 
-DFA = (Q, Sigma, delta, q0, F) mit
+DTS = (Q, Sigma, delta, q0, F) mit
 
-* Q, als nichtleere endliche Zustandsmenge
-* Sigma, als (endliches) Eingabealphabet
+* Q, als Zustandsmenge
+* Sigma, als Eingabealphabet
 * delta: Q x Sigma -> Q, als Zustandsüberführungsfunktion
 * q0, als Startzustand
 * F Teilmenge von Q, als Menge der akzeptierenden Zustände.
 
 Diese Komponenten werden nachfolgend definiert.*)
 
-Load Pigeonhole_vector.
-Load Word_Prop.
+(*Load Pigeonhole_vector.
+Load Word_Prop. *)
 
-Module Type DTS.
+Module Type DTS_Par.
+Require Word_Prop.
 
-(** Die Anzahl der möglichen Zustände.*)
+(** Der Typ der Zustände.*)
 Parameter Q : Type.
 
 (** Der Typ des Eingabealphabets.*)
@@ -46,18 +40,25 @@ Parameter Sigma : Type.
 Parameter delta : Q -> Sigma -> Q.
 
 (** Die Funktion, die entscheidet, ob ein Zustand ein akzeptierender Zustand ist. *)
-(*Parameter is_accepting : Q -> bool.*)
 Parameter is_accepting : Q -> Type. (*Proofs as programs Pädagogik*)
 
 (** Der Startzustand. *)
 Parameter q0 : Q.
 
+End DTS_Par.
+
+Module DTS_Fun (Par : DTS_Par) <: DTS_Par.
+Import Par.
+Import Word_Prop.
+
+Definition Q := Q.
+Definition Sigma := Sigma.
+Definition delta := delta.
+Definition is_accepting := is_accepting.
+Definition q0 := q0.
+
 (** Um zu definieren, wann ein Wort akzeptiert wird, müssen noch einige Vorüberlegungen
-getroffen werden. Hierzu wird die erweiterte Transitionsfunktion [delta_hat] bzw. 
-[delta_hat_cons] benötigt. Da im allgemeinen auf Wörtern gearbeitet werden soll, die [snoc] als
-Konstruktor haben, wird dies in den Funktionsnamen weggelassen, um diese kurz zu halten.
-Nur wenn explizit auf Listen gearbeitet werden soll, wird der [cons] Konstruktor im Namen
-verwendet.*)
+getroffen werden. Hierzu wird die erweiterte Transitionsfunktion [delta_hat] bzw. benötigt. *)
 
 (** Die erweiterte Überführungsfunktion [delta_hat], wie in der Vorlesung definiert.*)
 Fixpoint delta_hat (q : Q) (w : @Word Sigma) : Q :=
@@ -96,7 +97,8 @@ Proof.
     reflexivity.
 Defined.
 
-(** Die von einem endlichen Automaten beschriebene Sprachen definiert durch [is_accepting].*)
+(** Die von einem deterministischen Transitionssystems beschriebene Sprachen definiert 
+durch [is_accepting].*)
 Definition Lang_delta (w : @Word Sigma) : Type :=
   is_accepting (delta_hat q0 w).
 
@@ -119,7 +121,8 @@ Inductive Conf_rel : Conf -> Conf -> Type :=
   | refl  : forall (K : Conf), Conf_rel K K
   | step  : forall (K L M : Conf), Conf_step K L -> Conf_rel L M -> Conf_rel K M.
 
-(** Die von einem endlichen Automaten beschriebene Sprachen definiert durch [Conf_rel].*)
+(** Die von einem deterministischen Transitionssystems beschriebene Sprachen definiert 
+durch [Conf_rel].*)
 Definition Lang_Conf (w: @Word Sigma) : Type :=
 {p : Q & (is_accepting p * Conf_rel (q0, w) (p, eps))%type}.
 
@@ -142,7 +145,7 @@ Fixpoint conf_seq' (w : @Word Sigma) : Q -> list Conf :=
     | snoc w' a  => fun q : Q => cons (q, w) (conf_seq' w' (delta q a))
   end.
 
-Print conf_seq'.
+(*Print conf_seq'.*)
 (* aber im 2. Fall muss (q, w) zur Liste hinzugefuegt werden, oder? *)
 
 Fixpoint conf_seq (conf : Conf) : list Conf :=
@@ -167,5 +170,5 @@ Fixpoint conf_list (w : @Word Sigma) (q : Q) : list Conf :=
 Definition conf_to_conf_list (conf : Conf) : list Conf :=
   let (q, w) := conf in conf_list w q.
 
-End DTS.
+End DTS_Fun.
 

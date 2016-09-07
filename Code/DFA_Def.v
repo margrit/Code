@@ -40,18 +40,13 @@ Definition Sigma := @Fin.t S_size.
 Parameter delta : Q -> Sigma -> Q.
 
 (** Die Funktion, die entscheidet, ob ein Zustand ein akzeptierender Zustand ist. *)
-(*Parameter is_accepting : Q -> bool.*)
 Parameter is_accepting : Q -> Type. (*Proofs as Programms Pädagogik*)
 
 (** Der Startzustand. *)
 Parameter q0 : Q.
 
-(** Um zu definieren, wann ein Wort akzeptiert wird, mÜssen noch einige Vorüberlegungen
-getroffen werden. Hierzu wird die erweiterte Transitionsfunktion [delta_hat] bzw. 
-[delta_hat_cons] benötigt. Da im allgemeinen auf Wörtern gearbeitet werden soll, die [snoc] als
-Konstruktor haben, wird dies in den Funktionsnamen weggelassen, um diese kurz zu halten.
-Nur wenn explizit auf Listen gearbeitet werden soll, wird der [cons] Konstruktor im Namen
-verwendet.*)
+(** Um zu definieren, wann ein Wort akzeptiert wird, müssen noch einige Vorüberlegungen
+getroffen werden. Hierzu wird die erweiterte Transitionsfunktion [delta_hat] benötigt. *)
 
 (** Die erweiterte Überführungsfunktion [delta_hat], wie in der Vorlesung definiert.*)
 Fixpoint delta_hat (q : Q) (w : @Word Sigma) : Q :=
