@@ -16,8 +16,8 @@
  * Die Basis Komponenten eines Automaten. 
  *)
 
-Load Repeats_vector.
 Require Import Fin.
+Require Import Vector.
 Require Import Arith.
 
 Section Definitions.
@@ -38,7 +38,8 @@ Definition Sigma := @Fin.t S_size.
 Parameter delta : Q -> Sigma -> Q.
 
 (* Funktion die entscheidet, ob ein Zustand ein akzeptierender Zustand ist *)
-Parameter is_accepting : Q -> bool.
+(* Parameter is_accepting : Q -> bool. *)
+Parameter is_accepting : Q -> Type.
 
 (* Startzustand *)
 Parameter q0 : Q.
@@ -50,13 +51,16 @@ erweiterte Transitionsfunktion delta_dach. *)
 (* Erweiterte Uebergangsfunktion - delta_dach *)
 Fixpoint delta_dach {n : nat} (q : Q) (v : Vector.t Sigma n) : Q :=
   match v with
-    | nil _               => q
+    | nil _          => q
     | cons _ h _ v'  => delta_dach (delta q h) v'
   end.
 
 (* Vorschlag zur Anpassung an VL-Notation: *)
-Theorem delta_dach_append : forall {n m : nat}(xs : Vector.t Sigma n)(ys : Vector.t Sigma m)(q : Q),
-  delta_dach q (append xs ys) = delta_dach (delta_dach q xs) ys.
+Theorem delta_dach_append : forall {n m : nat}
+                                   (xs : Vector.t Sigma n)
+                                   (ys : Vector.t Sigma m)
+                                   (q : Q),
+                            delta_dach q (append xs ys) = delta_dach (delta_dach q xs) ys.
 Proof.
   induction xs.
   - simpl.
@@ -68,7 +72,7 @@ Proof.
 Qed.
 
 (* Definiert, wann ein Wort akzeptiert wird. *)
-Definition accepted_word {n : nat}(w : Vector.t Sigma n) :=
+Definition accepted_word {n : nat} (w : Vector.t Sigma n) :=
   is_accepting (delta_dach q0 w).
 
 End Definitions.

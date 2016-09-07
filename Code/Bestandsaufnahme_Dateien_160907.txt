@@ -1,0 +1,74 @@
+Bestandsaufnahme Dateien 7.9.16.  to be completed
+
+ Automat_vector.v
+   einzelne Record-Definition eines Automaten, aus Stackoverflow
+   --> weg
+
+ Beispielautomat.v
+   noch nicht viel...
+   TODO: Modul DTS tatsächlich als Modul benutzen  (mit "<:").
+
+ Definitions.v
+   Dfa.v lädt das
+   Basisdefinitionen, inzwischen (mit Word) alle in DFA_Def (und DTS_Def)
+   --> kann auch weg
+
+ Definitions_vector.v
+   Automat_vector lädt das
+   Alternative Definition von delta_dach mit Vector,
+   delta_dach_append und is_accepting definiert.
+
+   mit Require Vector typecheckt das jetzt.
+   habe aus "is_accepting" ein typwertiges Prädikat gemacht.
+
+   --> kann man lassen, sollte aber vielleicht die Parameter
+       aus Modul DTS holen und nur die drei obigen Sachen 
+       (delta_dach, delta_dach_append, is_accepting) hier behalten.
+
+ DFA_cons.v
+   lädt DFA_Def
+   Varianten mit _cons und Vergleichslemmata _snoc _cons.
+   Nett, typecheckt.
+   Man könnte gucken, inwieweit man alles auch schon aus DTS
+   kriegt.
+
+ DFA_Def_accept_Prop.v
+   Kopie (einer älteren Version von) DFA_Def, nur accepted_word
+   und DFA_Lang gehen nach Prop. Typecheckt.
+
+   --> wir wollen Prop nicht verwenden, also weg damit.
+
+ DFA_Def.v
+   grundlegende Definitionen für DFAs - wichtig
+   
+ DFA_Prop.v
+   Lemmata, Beweis Äquivalenz Lang_delta Lang_Conf 
+
+ Dfa.v
+ DTS_Def.v
+ Ensembles.v
+ Fin_ext.v
+ FiniteClass2.v
+ FiniteClass.v
+ Finite_Set2.v
+ Finite_Set3.v
+ Finite_Set_outtakes.v
+ Finite_Set.v
+ General.v
+ List_Prop.v
+ ModuleTest
+ NFA_Def.v
+ Notizen.v
+ Pigeonhole_vector.v
+ Pumping_Lemma_vector.v
+ Pumping_Lemma_Word2.v
+ Pumping_Lemma_Word.v
+ Reg_Exp.v
+ Repeats_List.v
+ Repeats.v
+ Table_Filling.v
+ todo
+ vector_bsp.v
+ Vectors_Fin.v
+ Word_Prop.v
+ wortspiel.v

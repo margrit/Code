@@ -1,8 +1,10 @@
 Require Import Bool.
 Load DFA_Def.
 
-Lemma eq_Q_eq_delta_hat : forall (w : @Word Sigma)(p q : Q)(d : forall q p : Q, (p = q) ),
-delta_hat q w = delta_hat p w.
+Lemma eq_Q_eq_delta_hat : forall (w : @Word Sigma)
+                                 (p q : Q)
+                                 (d : forall q p : Q, (p = q)),
+                            delta_hat q w = delta_hat p w.
 Proof.
 intros.
 induction w.
@@ -13,27 +15,29 @@ induction w.
   reflexivity.
 Qed.
 
-Lemma delta_hat_eps (q : Q) (w : @Word Sigma) :
-delta_hat q eps = q.
+Lemma delta_hat_eps (q : Q) (w : @Word Sigma) : delta_hat q eps = q.
 Proof.
 simpl.
 reflexivity.
 Defined.
 
-Lemma eq_Q_eq_delta_hat_left : forall (w : @Word Sigma)(p q : Q),
-q = p -> delta_hat q w = delta_hat p w.
+Lemma eq_Q_eq_delta_hat_left : forall (w : @Word Sigma)
+                                      (p q : Q),
+                                      q = p ->
+                                      delta_hat q w = delta_hat p w.
 Proof.
-intros.
+intros w p q qEqp.
 induction w.
 - simpl.
-  assumption.
+  exact qEqp.
 - simpl.
   rewrite IHw.
   reflexivity.
 Defined.
 
 Lemma eq_Q_eq_delta_hat_right : forall (p q : Q),
-(forall (w : @Word Sigma), delta_hat q w = delta_hat p w) -> q = p.
+                                  (forall (w : @Word Sigma), delta_hat q w = delta_hat p w) ->
+                                  q = p.
 Proof.
 intros.
 pose (H eps).
@@ -43,7 +47,7 @@ Defined.
 
 (**  *[Lang_delta] und [Lang_Conf] beschreiben die gleichen Sprachen.*)
 
-(** Um zu zeigen, dass [Lang_delta] und [Lang_Conf] die Äquivalent zueinander sind, muss sowohl
+(** Um zu zeigen, dass [Lang_delta] und [Lang_Conf] äquivalent zueinander sind, muss sowohl
 [Lang_delta] w -> [Lang_Conf] w als auch [Lang_Conf] w -> [Lang_delta] w gezeigt werden. Dazu
 sind eine Reihe von Hilfslemmata norwendig.*)
 
