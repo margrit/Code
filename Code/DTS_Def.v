@@ -1,4 +1,4 @@
-(* TODO Margrit: 
+(* TODO Margrit:  -> done
       Bemerkungen anpassen: 
          Was sind Deterministische Transitionssysteme ?
            im Prinzip dasselbe wie DFAs, nur die Endlichkeit der 
@@ -14,9 +14,9 @@
 (** Wie in der Vorlesung Theoretische Informatik I werden die einzelne Komponenten eines
  deterministischen Transitionssystem (DTS) als 5-Tupel beschrieben.
 
-DFA = (Q, Sigma, delta, q0, F) mit
+DTS = (Q, Sigma, delta, q0, F) mit
 
-* Q, als nichtleere Zustandsmenge
+* Q, als Zustandsmenge
 * Sigma, als Eingabealphabet
 * delta: Q x Sigma -> Q, als Zustandsüberführungsfunktion
 * q0, als Startzustand
@@ -24,10 +24,11 @@ DFA = (Q, Sigma, delta, q0, F) mit
 
 Diese Komponenten werden nachfolgend definiert.*)
 
-Load Pigeonhole_vector.
-Load Word_Prop.
+(*Load Pigeonhole_vector.
+Load Word_Prop. *)
 
 Module Type DTS_Par.
+Require Word_Prop.
 
 (** Der Typ der Zustände.*)
 Parameter Q : Type.
@@ -46,8 +47,15 @@ Parameter q0 : Q.
 
 End DTS_Par.
 
-Module DTS_Fkt (Par : DTS_Par).
+Module DTS_Fun (Par : DTS_Par) <: DTS_Par.
 Import Par.
+Import Word_Prop.
+
+Definition Q := Q.
+Definition Sigma := Sigma.
+Definition delta := delta.
+Definition is_accepting := is_accepting.
+Definition q0 := q0.
 
 (** Um zu definieren, wann ein Wort akzeptiert wird, müssen noch einige Vorüberlegungen
 getroffen werden. Hierzu wird die erweiterte Transitionsfunktion [delta_hat] bzw. benötigt. *)
@@ -162,5 +170,5 @@ Fixpoint conf_list (w : @Word Sigma) (q : Q) : list Conf :=
 Definition conf_to_conf_list (conf : Conf) : list Conf :=
   let (q, w) := conf in conf_list w q.
 
-End DTS_Fkt.
+End DTS_Fun.
 

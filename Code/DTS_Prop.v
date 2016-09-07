@@ -1,5 +1,8 @@
 Require Import Bool.
 Require DTS_Def.
+Require Import Program.
+
+(*Require Import Word_Prop. *)
 
 (* Sigma ist nicht in der Umgebung. Da wir sie als Parameter definiert haben. Es geht weder mit 
 Load noch Require Import oder Export :( Irgendwie scheint das mit den Modulen nicht ganz hin zu 
@@ -7,7 +10,23 @@ hauen.
 
 Module wirklich nur mit Parametern und Axiomen "füllen"? *)
 
-Module DTS_Prop <: DTS_Def.DTS_Par.
+Module DTS_Prop  (Par : DTS_Def.DTS_Par) <: DTS_Def.DTS_Par.
+Import Par.
+Print Q.
+Definition Q := Q.
+Definition Sigma := Sigma.
+Definition delta := delta.
+Definition is_accepting := is_accepting.
+Definition q0 := q0.
+Print Q.
+Module Fun_Par := DTS_Def.DTS_Fun Par.
+Import Fun_Par.
+Import Word_Prop.
+
+Print Q.
+(*Module DTS_Prop ist abhängig von DTS_Fun wie DTS_Fun von DTS_Par*)
+
+
 Lemma eq_Q_eq_delta_hat : forall (w : @Word Sigma)(p q : Q)(d : forall q p : Q, (p = q) ),
 delta_hat q w = delta_hat p w.
 Proof.
@@ -56,7 +75,7 @@ sind eine Reihe von Hilfslemmata norwendig.*)
 
 (** Hilfslemmata für [Lang_delta_Lang_Conf]*)
 Lemma delta_hat_Conf_reverse (w : @Word Sigma) : forall (q : Q),
-               Conf_rel_DFA (q, (word_reverse w)) (delta_hat q (word_reverse w), eps).
+               Conf_rel (q, (word_reverse w)) (delta_hat q (word_reverse w), eps).
 Proof.
 induction w.
 - intro q.
@@ -70,7 +89,7 @@ induction w.
 Qed.
 
 Lemma delta_hat_Conf (w : @Word Sigma) : forall (q : Q),
-               Conf_rel_DFA (q, w)  (delta_hat q w, eps).
+               Conf_rel (q, w)  (delta_hat q w, eps).
 Proof.
   rewrite <- (word_reverse_idempotent w).
   exact (delta_hat_Conf_reverse (word_reverse w)).
@@ -92,7 +111,7 @@ Qed.
 (** Hilfslemmata für [Lang_Conf_Lang_delta].*)
 (** Die vollständige Abarbeitung eines umgedrehten Wortes.*)
 Lemma Conf_delta_hat_reverse (w : @Word Sigma) : forall (q p : Q),
-                Conf_rel_DFA (q, word_reverse w) (p, eps) ->
+                Conf_rel (q, word_reverse w) (p, eps) ->
                 delta_hat q (word_reverse w)= p.
 Proof.
 induction w.
@@ -128,7 +147,7 @@ induction w.
 Defined.
 
 Lemma Conf_delta_hat (w : @Word Sigma) : forall (q p : Q),
-                Conf_rel_DFA (q, w) (p, eps) ->
+                Conf_rel (q, w) (p, eps) ->
                 delta_hat q w = p.
 Proof.
   rewrite <- (word_reverse_idempotent w).
@@ -146,4 +165,6 @@ destruct LCw as [p [pacc rel]].
 rewrite (Conf_delta_hat w q0 p rel).
 exact pacc.
 Defined.
+
+End DTS_Prop.
 
