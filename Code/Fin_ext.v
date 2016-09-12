@@ -95,8 +95,6 @@ Defined.
 
 (* Lemmata zur Typanpassung *)
 
-SearchAbout plus.
-
 Definition n_plus_0 (n : nat) : (n + 0 = n) := eq_sym (plus_n_O n).
 
 Lemma fin_pl0 {n : nat} (p : @Fin.t (n + 0)) : @Fin.t n.
