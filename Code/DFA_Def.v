@@ -19,7 +19,7 @@ DFA = (Q, Sigma, delta, q0, F) mit
 Diese Komponenten werden nachfolgend definiert.*)
 
 Require Import Fin.
-Load Word_Prop.
+Load Words.
 Load Pigeonhole_vector.
 
 Section Definitions.
