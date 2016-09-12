@@ -104,6 +104,8 @@ Proof.
 
   apply pigeonhole_w in S_len_w as pigeonhole_rp_tr_w.
 
+  clear len_w S_len_w tr_w_len.
+
   (** Durch das Pigeonhole-Prinzip haben wir nun als Hypothese zur Verfuegung,
       dass die Zustandliste [tr_w] eine Wiederholung enthaelt.
       Auf diese Hypothese koennen wir nun das Dekompositionslemma 
@@ -121,43 +123,34 @@ Proof.
 
   (** Der Trace [tr_w] ist durch Anwendung der Funktion [trace_w] 
       entstanden, die durch eine [map] auf die Liste der Praefixe
-      [inits] des Wortes [w] realsisert ist. Daher koennen wir nun mit 
+      [inits] des Wortes [w] realisert ist. Daher koennen wir nun mit 
       Hilfe des Dekompositionslemmas [map_decomp_3] aus der Dekomposition
       von [tr_w] eine korrespondierende Zerlegung von [inits w] 
       in drei Teilwoerter erzeugen. *)
 
   unfold trace_w in trw_eq_trw1trw2trw3.
-  apply map_decomp_3 in trw_eq_trw1trw2trw3 as ex_decomp_w. 
+  apply map_decomp_3_snoc in trw_eq_trw1trw2trw3 as ex_decomp_w. 
+
   destruct ex_decomp_w as [inits1 ex_decomp_w'].
   destruct ex_decomp_w' as [inits2 ex_decomp_w''].
-  destruct ex_decomp_w'' as [inits3 ex_decomp_w_eqs].
-  destruct ex_decomp_w_eqs as [iw_eq_i1i2i3 ex_decomp_w_eqs'].
-  destruct ex_decomp_w_eqs' as [mi1_eq_trw1qrp ex_decomp_w_eqs''].
-  destruct ex_decomp_w_eqs'' as [mi2_eq_trw2qrp mi2_eq_trw3].
+  destruct ex_decomp_w'' as [inits3 ex_decomp_w'''].
+  destruct ex_decomp_w''' as [p1 ex_decomp_w''''].
+  destruct ex_decomp_w'''' as [p2 ex_decomp_w_eqs1].
 
-  (* TODO: Das sollte noch zu den inits-Lemmata
-           ausgelagert werden. *) 
+  destruct ex_decomp_w_eqs1 as [ex_decomp_w_eqs1' dhq0p2_eq_qrp].
+  destruct ex_decomp_w_eqs1' as [ex_decomp_w_eqs1'' dhq0p1_eq_qrp].
+  destruct ex_decomp_w_eqs1'' as [ex_decomp_w_eqs1''' mi2_eq_trw2].
+  destruct ex_decomp_w_eqs1''' as [ex_decomp_w_eqs2 mi1_eq_trw1].
 
-  apply ex_snoc_map in mi1_eq_trw1qrp as ex_snoc_i1.
-  destruct ex_snoc_i1 as [inits1' ex_snoc_i1'].
-  destruct ex_snoc_i1' as [p1 ex_snoc_i1_props].
-  destruct ex_snoc_i1_props as [ex_snoc_i1_props' qrp_eq_dhq0p1].
-  destruct ex_snoc_i1_props' as [i1_eq_inits1'p1 mi1'_eq_trw1].
-
-  apply ex_snoc_map in mi2_eq_trw2qrp as ex_snoc_i2.
-  destruct ex_snoc_i2 as [inits2' ex_snoc_i2'].
-  destruct ex_snoc_i2' as [p2 ex_snoc_i2_props].
-  destruct ex_snoc_i2_props as [ex_snoc_i2_props' qrp_eq_dhq0p2].
-  destruct ex_snoc_i2_props' as [i2_eq_inits2'p2 mi2'_eq_trw2].
-
-  rewrite i1_eq_inits1'p1 in iw_eq_i1i2i3.
-  rewrite i2_eq_inits2'p2 in iw_eq_i1i2i3.
+  destruct ex_decomp_w_eqs2 as [ex_decomp_w_eqs2' mi3_eq_trw3].
+  destruct ex_decomp_w_eqs2' as [ex_decomp_w_eqs2'' mi2p2_eq_trw2qrp].
+  destruct ex_decomp_w_eqs2'' as [iw_eq_i1p1i2p2i3 mi1p1_eq_trw1qrp].
 
   (** Nun koennen wir das Dekompositionslemma [w_decomp_of_initsw_decomp]
       benutzen, um aus der Zerlegung der Praefixliste [inits w] eine 
       korrespondierende Zerlegung des Eingabeworts [w] zu erhalten. *)
 
-  apply w_decomp_of_initsw_decomp in iw_eq_i1i2i3 as ex_decomp_w.
+  apply w_decomp_of_initsw_decomp in iw_eq_i1p1i2p2i3 as ex_decomp_w.
   destruct ex_decomp_w as [ex_y ex_z].
 
   destruct ex_y as [y y_props].
@@ -206,26 +199,25 @@ Proof.
         wiederholende Zustand [q_rp] ergibt. *)
 
     repeat rewrite delta_hat_app.
-    rewrite <- qrp_eq_dhq0p1.
+    rewrite dhq0p1_eq_qrp.
 
     (** Nun koennen wir benutzen, dass bei Abarbeitung des Worts [xy] von
        [q0] aus ebenfalls q_rp erreicht wird und damit ebenso bei Abarbeitung 
        des Worts [y] von Zustand [q_rp] selbst aus. *)
 
-    pose qrp_eq_dhq0p2 as dhq0x_eq_dhq0p2.
-    rewrite qrp_eq_dhq0p1 in dhq0x_eq_dhq0p2.
-    rewrite p2_eq_p1y in dhq0x_eq_dhq0p2.
+    pose dhq0p2_eq_qrp as dhq0p2_eq_dhq0x.
+    rewrite <- dhq0p1_eq_qrp in dhq0p2_eq_dhq0x. (* Namen drehen! *)
+    rewrite p2_eq_p1y in dhq0p2_eq_dhq0x.
 
-    rewrite delta_hat_app in dhq0x_eq_dhq0p2.
-    rewrite <- qrp_eq_dhq0p1 in dhq0x_eq_dhq0p2.
+    rewrite delta_hat_app in dhq0p2_eq_dhq0x.
+    rewrite dhq0p1_eq_qrp in dhq0p2_eq_dhq0x.
 
     (** Jetzt koennen wir das Lemma [pump_loop] anwenden, und 
         erhalten damit die Hypothese, dass bei beliebigen
         Wiederholungen des Teilworts [y] von [q_rp] aus wiederum
         [q_rp] erreicht wird.  *)
 
-    apply eq_sym in dhq0x_eq_dhq0p2.
-    apply (pump_loop k) in dhq0x_eq_dhq0p2 as pump_y.
+    apply (pump_loop k) in dhq0p2_eq_dhq0x as pump_y.
     rewrite pump_y.
 
     (** Es bleibt lediglich zu zeigen, dass bei Eingabe des Teilworts [z] von
@@ -233,7 +225,7 @@ Proof.
         die Gleichheit von [q_rp] und [delta_hat q0 x y] sowie  
         [xyz] und [w] moeglich ist. *)
 
-    rewrite qrp_eq_dhq0p2.
+    rewrite <- dhq0p2_eq_qrp.
     rewrite <- delta_hat_app.
     rewrite <- w_eq_p2z.
 
