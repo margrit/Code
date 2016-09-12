@@ -67,12 +67,12 @@ Proof.
     + simpl.
       apply ai_later_l.
       exact IHxs.
-Qed.
+Defined.
 
 (*Vorkommen von x in einer Teilliste. *)
 Lemma appears_l_app_split : forall {X : Type} (x : X) (l : list X),
   appears_l x l ->
-  exists l1, exists l2, l = l1 ++ (x :: l2).
+  { l1 : list X & { l2 : list X & l = l1 ++ (x :: l2) } }.
 Proof.
   intros X x l A.
   induction A.
@@ -81,14 +81,14 @@ Proof.
     simpl.
     reflexivity.
   - destruct IHA as [x0].
-    destruct H as [x1].
+    destruct s as [x1].
     exists (b :: x0).
     exists (x1).
     simpl.
     intros.
-    rewrite H.
+    rewrite e.
     reflexivity.
-Qed.
+Defined.
 
 Inductive repeats_l {X : Type} : list X -> Type :=
   (* extend *)
@@ -97,37 +97,37 @@ Inductive repeats_l {X : Type} : list X -> Type :=
 
 Lemma repeats_l_decomp : forall X : Type, forall l : list X,
   repeats_l l ->
-  exists x : X,
-  exists xs : list X,
-  exists ys : list X,
-  exists zs : list X,
-  l = xs ++ (x :: ys) ++ (x :: zs).
+  { x : X &
+  { xs : list X &
+  { ys : list X &
+  { zs : list X &
+  l = xs ++ (x :: ys) ++ (x :: zs) } } } }.
 Proof.
   intros X l H.
   induction H.
   - inversion IHrepeats_l.
-    inversion H0.
-    inversion H1.
-    inversion H2.
-    clear IHrepeats_l H0 H1 H2.
+    inversion X0.
+    inversion X1.
+    inversion X2.
+    (* clear IHrepeats_l H0 H1 H2. *)
     exists x0.
     exists (x :: x1).
     exists x2.
     exists x3.
     simpl in *.
-    rewrite H3.
+    rewrite H0.
     reflexivity.
   - apply appears_l_app_split in a.
     destruct a as [l1].
-    destruct H as [l2].
-    rewrite H.
+    destruct s as [l2].
+    rewrite e.
     exists x.
     exists nil.
     simpl.
     exists l1.
     exists l2.
     reflexivity.
-Qed. 
+Defined. 
 
 (*Länge von konkatenierten Listen und einem Element ist gleich. *)
 Lemma length_app_2_l : forall X:Type, forall x:X, forall xs ys: list X,
@@ -141,12 +141,12 @@ Proof.
     rewrite IHxs.
     simpl.
     reflexivity.
-Qed.
+Defined.
 
 Lemma map_dec_2_l : forall X Y :Type, forall f : X -> Y, forall l : list X,
   forall xs ys : list Y,
-  map f l = xs ++ ys -> exists xs' : list X, exists ys' : list X,
-  l = xs' ++ ys' /\ map f xs' = xs /\ map f ys' = ys.
+  map f l = xs ++ ys -> { xs' : list X & { ys' : list X &
+  l = xs' ++ ys' /\ map f xs' = xs /\ map f ys' = ys } }.
 Proof.
   intros X Y f.
   induction l.
@@ -184,9 +184,9 @@ Proof.
             reflexivity.
           - set (Hx := IHl nil ys H0).
             destruct Hx as [xs'].
-            destruct H1 as [ys'].
+            destruct s as [ys'].
             clear IHl.
-            destruct H1.
+            destruct a0.
             destruct H2.
             exists nil.
             simpl in *.
@@ -206,8 +206,8 @@ Proof.
         }
       * { set (Hx := IHl xs ys H0).
           destruct Hx as [xs'].
-          destruct H1 as [ys'].
-          destruct H1.
+          destruct s as [ys'].
+          destruct a0.
           destruct H2.
           clear IHl.
           exists (a :: xs').
@@ -222,14 +222,14 @@ Proof.
                 reflexivity.
               + reflexivity.
         }
-Qed.
+Defined.
 
 Lemma map_decomp_3_l : forall X Y : Type, forall f : X -> Y, forall l : list X,
   forall xs ys zs : list Y,
   map f l = xs ++ ys ++ zs ->
-  exists xs' : list X, exists ys' : list X, exists zs' : list X,
+  { xs' : list X & { ys' : list X & { zs' : list X &
   l = xs' ++ ys' ++ zs' /\
-  map f xs' = xs /\ map f ys' = ys /\ map f zs' = zs.
+  map f xs' = xs /\ map f ys' = ys /\ map f zs' = zs } } }.
 Proof.
   intros X Y f l xs ys zs H.
   remember (ys ++ zs) as ls.
@@ -237,8 +237,8 @@ Proof.
   clear HeqH2.
   apply map_dec_2_l in H2.
   destruct H2.
-  destruct H0.
-  destruct H0.
+  destruct s.
+  destruct a.
   destruct H1.
   exists x.
   rewrite Heqls in H2.
@@ -246,8 +246,8 @@ Proof.
   clear HeqH3.
   apply map_dec_2_l in H3.
   destruct H3.
-  destruct H3.
-  destruct H3.
+  destruct s.
+  destruct a.
   destruct H4.
   exists x1.
   exists x2.
@@ -259,7 +259,7 @@ Proof.
     + split.
       * { reflexivity. }
       * { reflexivity. }
-Qed.
+Defined.
 
 Print nth_error.
 (* Es lassen sich auch die Indizes der Wiederholungen berechnen: *)

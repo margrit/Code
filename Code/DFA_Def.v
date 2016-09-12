@@ -19,8 +19,8 @@ DFA = (Q, Sigma, delta, q0, F) mit
 Diese Komponenten werden nachfolgend definiert.*)
 
 Require Import Fin.
-Load Pigeonhole_vector.
 Load Word_Prop.
+Load Pigeonhole_vector.
 
 Section Definitions.
 
@@ -86,6 +86,7 @@ Proof.
 Defined.
 
 (** Die von einem endlichen Automaten beschriebene Sprachen definiert durch [is_accepting].*)
+(* Waere "In_Lang_delta" nicht eigentlich passender (betrachte die Formulierung des Pumping Lemmas...) *)
 Definition Lang_delta (w : @Word Sigma) : Type :=
   is_accepting (delta_hat q0 w).
 
@@ -100,7 +101,7 @@ nachfolgenden Konfiguration.*)
 
 Inductive Conf_DFA_step : Conf_DFA -> Conf_DFA -> Type :=
  | one_step : forall (q : Q) (a : Sigma) (w : @Word Sigma),
-                        Conf_DFA_step (q, (concat_word [a] w)) (delta q a, w).
+                        Conf_DFA_step (q, (concat_word (snoc eps a) w)) (delta q a, w).
 
 (** Die reflexiv-transitive Hülle von Conf_rel_DFA_step um die eigentliche Konfigurations-
 übergangsrelation zu beschreiben.*)
@@ -126,6 +127,9 @@ Fixpoint next_Conf  (conf : Conf_DFA) : option Conf_DFA :=
     | (q, eps)         => None
     | (q, snoc w a) => Some (delta q a, w)
   end.
+
+
+(* Hier gibt es offenbar gerade ein Problem ?
 
 (*Konfigurationssequenz in einer Liste speichern.*)
 Fixpoint conf_seq' (w : @Word Sigma) : Q -> list Conf_DFA :=
@@ -159,7 +163,47 @@ Fixpoint conf_list (w : @Word Sigma) (q : Q) : list Conf_DFA :=
 Definition conf_to_conf_list (conf : Conf_DFA) : list Conf_DFA :=
   let (q, w) := conf in conf_list w q.
 
-Print list.
+*)
+
+(*-----------------------------------------------------------------------------*)
+
+(* Liste der Zustaende, die bei der Abarbeitung des Worts durchlaufen werden. 
+   Wird in PL-Beweis gebraucht. *)
+
+Definition trace_w (q : Q) (w : @Word Sigma) : @Word Q :=
+  map_word (delta_hat q) (inits_w w).
+
+Lemma trace_length_w : forall w : @Word Sigma, forall q : Q,
+  word_length (trace_w q w) = S (word_length w).
+Proof.
+  intros w q.
+  unfold trace_w.
+  rewrite map_length_w.
+  apply inits_len_w.
+Defined.
+
+Definition concat_trace_w : forall (q : Q) (w w' : @Word Sigma),
+              trace_w q (concat_word w' w)
+              = concat_word (removelast_w (trace_w q w')) (trace_w (delta_hat q w') w).
+Proof.
+intros q w w'.
+unfold trace_w.
+rewrite commute_inits_concat_w.
+rewrite commute_concat_map_w.
+rewrite commute_removelast_map_w.
+induction w.
+- simpl. reflexivity.
+- (* Laesst sich das snoc auf einfachere Weise nach aussen ziehen? *)
+  simpl (concat_word (removelast_w (map_word (delta_hat q) (inits_w w')))
+  (map_word (delta_hat q) (map_word (concat_word w') (inits_w (snoc w a))))).
+  simpl (concat_word (removelast_w (map_word (delta_hat q) (inits_w w')))
+  (map_word (delta_hat (delta_hat q w')) (inits_w (snoc w a)))).
+  rewrite IHw.
+  rewrite delta_hat_app.
+  reflexivity.
+Defined.
+
+(*-----------------------------------------------------------------------------*)
 
 (*Definition der akzeptierten Sprache
 Definition L_DFA (w : list Sigma) : Conf_DFA:=

@@ -1,413 +1,242 @@
-(*Quelle: https://github.com/wjzz/PumpingLemma/blob/master/Dfa.v*)
+(* Quelle: https://github.com/wjzz/PumpingLemma/blob/master/Dfa.v *)
 
-(* In this file we try to formalize some notions from the 
-   formal languages field, precisely 
-   Deterministic Finite-State Automata.
- *)
+(** Veraltet: 
 
-(** Die Datei wurde dahin verändert, dass nur noch einfache Taktiken verwerdet werden. 
+Die Datei wurde dahin verändert, dass nur noch einfache Taktiken verwerdet werden. 
 Die Beweise sind in die einzelnen Teilbeweise unterteilt und dies wird durch die Zeichen
 -, +, * Sichtbar gemacht. Um mehr als 3 Ebenen zu schachteln, werden die gleichen Zeichen
 wiederverwendet, nur dass sie mit einer geschweiften Klammer umrahmt sind. Statt Listen über 
 [Sigma] werden Wörter über [Sigma] verwendet.
-*)
-Load DFA_Def.
-Section Transitions.
 
-Fixpoint word_replicate (n : nat) (w : @Word Sigma) : @Word Sigma :=
+(Von der urspruenglichen Datei ist nicht mehr viel uebrig...)
+
+*)
+
+
+(* TODO-Frage: Wie waere anstatt ausschliesslich einer Zerlegung der Beweise 
+               in elementare Schritte eine "paedagogische" Illustration, wie Beweise 
+               in mehreren Etappen verkuerzt werden koennen? *)
+
+
+
+Require Import Arith.
+
+Load DFA_Def.
+Load Repeats.
+Load Repeats_List.
+Load Conv_Vec_List_Word.
+
+(*--------------------------------------------------------------------------------------------*)
+
+(** ** Vorbereitung *)
+
+(*--------------------------------------------------------------------------------------------*)
+
+Fixpoint pump_w (n : nat) (w : @Word Sigma) : @Word Sigma :=
   match n with
   | O    => eps
-  | S n' => concat_word w (word_replicate n' w)
+  | S n' => concat_word w (pump_w n' w)
   end.
 
 (* Wenn es eine Schleife im Automaten gibt, kann man diese nutzen,
 um das Wort aufzublähen an dieser Stelle und bleibt im gleichen Zustand. *)
-Theorem ext_loop: forall n : nat, forall q : Q, forall xs : @Word Sigma,
-  delta_hat q xs = q -> delta_hat q (word_replicate n xs) = q.
+Theorem pump_loop: forall n : nat, forall q : Q, forall xs : @Word Sigma,
+  delta_hat q xs = q -> delta_hat q (pump_w n xs) = q.
 Proof.
-  induction n as [|n'].
+  induction n as [ | n' IHn'].
+
   - intros q xs H.
     simpl.
     reflexivity.
-  (* n = S n; *)
+
   - intros q xs H.
     simpl.
     rewrite delta_hat_app.
     rewrite H.
     apply IHn'.
     assumption.
-Qed.
+Defined.
 
-(*Ist in der Reg_Exp Datei zu finden und muss noch woanders hin, damit die Strukturen 
- übersichtlicher werden*)
-Fixpoint map_word {A B : Type} (f : A -> B) (w : @Word A) : @Word B :=
- match w with
-   | eps => eps
-   | snoc w' x => snoc (map_word f w') (f x)
- end.
 
-Print map_word.
+(*--------------------------------------------------------------------------------------------*)
 
-Fixpoint tails {X : Type} (w : @Word X) : @Word (@Word X) :=
-  match w with
-  | eps       =>  snoc eps eps
-  | snoc xs x => snoc (map_word (fun w => snoc w x) (tails xs)) eps
-  end.
+(** ** Das Pumping-Lemma *)
 
-(*Fixpoint inits {X : Type} (l : list X) : list (list X) :=
-  match l with
-  | nil       => nil :: nil
-  | x :: xs => nil :: map (cons x) (inits xs)
-  end.
-*)
+(*--------------------------------------------------------------------------------------------*)
 
-Eval compute in (inits (1 :: 2 :: nil)).
-Eval compute in (inits nil : list (list nat)).
+Theorem pumping_lemma :
 
-Theorem inits_len : forall X : Type, forall l : list X,
-  length (inits l) = S (length l).
+  forall w : @Word Sigma, Lang_delta w -> Q_size <= word_length w ->
+
+  { x : @Word Sigma &
+  { y : @Word Sigma &
+  { z : @Word Sigma &
+
+   ((word_length y > 0) *
+    (w = concat_word (concat_word x y) z) *
+    (forall k : nat, Lang_delta (concat_word (concat_word x (pump_w k y)) z))
+
+    )%type } } }.
+
 Proof.
-  induction l.
-  - simpl.
+  intros w w_in_lang len_w.
+
+  (** Vorbereitung : 
+      [tr_w]: "Trace" von [w]: Die Liste der Zustaende, die bei der Abarbeitung 
+              des Wortes [w] von [q0] ausgehend durchlaufen werden.
+      [tr_w_len]: Die Laenge dieser Zustandliste (immer > 0) im Verhaeltnis
+                  zur Laenge des Eingabeworts.
+  *)
+
+  pose (trace_w q0 w) as tr_w.
+  pose (trace_length_w w q0) as tr_w_len.
+
+  (** Umschreiben des Verhaeltnisses zwischen Wortlaenge des Eingabeworts 
+      und [Q_size] anhand arithmetischer Lemmata, so dass es die Form bekommt, 
+      in der das Pigeonhole-Prinzip darauf angewendet werden kann *)
+
+  apply le_n_S in len_w as S_len_w.
+  rewrite <- tr_w_len in S_len_w.
+  apply le_lt_n_Sm in S_len_w.
+  apply lt_S_n in S_len_w.
+
+  (** Anwendung des Pigeonhole-Prinzips *)
+
+  apply pigeonhole_w in S_len_w as pigeonhole_rp_tr_w.
+
+  (** Durch das Pigeonhole-Prinzip haben wir nun als Hypothese zur Verfuegung,
+      dass die Zustandliste [tr_w] eine Wiederholung enthaelt.
+      Auf diese Hypothese koennen wir nun das Dekompositionslemma 
+      [Repeats_decomp_w] anwenden, das uns die Liste entlang des sich 
+      wiederholenden Zustands zerlegt als 
+      [trw1 q_rp trw2 q_rp trw3], wobei 
+      [q_rp] der sich wiederholende Zustand und die
+      [trwi] jeweils der i-te Teil des Traces [tr_w] sind. *) 
+
+  apply Repeats_decomp_w in pigeonhole_rp_tr_w as ex_decomp_tr_w.
+  destruct ex_decomp_tr_w as [q_rp ex_decomp_tr_w'].
+  destruct ex_decomp_tr_w' as [trw1 ex_decomp_tr_w''].
+  destruct ex_decomp_tr_w'' as [trw2 ex_decomp_tr_w'''].
+  destruct ex_decomp_tr_w''' as [trw3 trw_eq_trw1trw2trw3].
+
+  (** Der Trace [tr_w] ist durch Anwendung der Funktion [trace_w] 
+      entstanden, die durch eine [map] auf die Liste der Praefixe
+      [inits] des Wortes [w] realsisert ist. Daher koennen wir nun mit 
+      Hilfe des Dekompositionslemmas [map_decomp_3] aus der Dekomposition
+      von [tr_w] eine korrespondierende Zerlegung von [inits w] 
+      in drei Teilwoerter erzeugen. *)
+
+  unfold trace_w in trw_eq_trw1trw2trw3.
+  apply map_decomp_3 in trw_eq_trw1trw2trw3 as ex_decomp_w. 
+  destruct ex_decomp_w as [inits1 ex_decomp_w'].
+  destruct ex_decomp_w' as [inits2 ex_decomp_w''].
+  destruct ex_decomp_w'' as [inits3 ex_decomp_w_eqs].
+  destruct ex_decomp_w_eqs as [iw_eq_i1i2i3 ex_decomp_w_eqs'].
+  destruct ex_decomp_w_eqs' as [mi1_eq_trw1qrp ex_decomp_w_eqs''].
+  destruct ex_decomp_w_eqs'' as [mi2_eq_trw2qrp mi2_eq_trw3].
+
+  (* TODO: Das sollte noch zu den inits-Lemmata
+           ausgelagert werden. *) 
+
+  apply ex_snoc_map in mi1_eq_trw1qrp as ex_snoc_i1.
+  destruct ex_snoc_i1 as [inits1' ex_snoc_i1'].
+  destruct ex_snoc_i1' as [p1 ex_snoc_i1_props].
+  destruct ex_snoc_i1_props as [ex_snoc_i1_props' qrp_eq_dhq0p1].
+  destruct ex_snoc_i1_props' as [i1_eq_inits1'p1 mi1'_eq_trw1].
+
+  apply ex_snoc_map in mi2_eq_trw2qrp as ex_snoc_i2.
+  destruct ex_snoc_i2 as [inits2' ex_snoc_i2'].
+  destruct ex_snoc_i2' as [p2 ex_snoc_i2_props].
+  destruct ex_snoc_i2_props as [ex_snoc_i2_props' qrp_eq_dhq0p2].
+  destruct ex_snoc_i2_props' as [i2_eq_inits2'p2 mi2'_eq_trw2].
+
+  rewrite i1_eq_inits1'p1 in iw_eq_i1i2i3.
+  rewrite i2_eq_inits2'p2 in iw_eq_i1i2i3.
+
+  (** Nun koennen wir das Dekompositionslemma [w_decomp_of_initsw_decomp]
+      benutzen, um aus der Zerlegung der Praefixliste [inits w] eine 
+      korrespondierende Zerlegung des Eingabeworts [w] zu erhalten. *)
+
+  apply w_decomp_of_initsw_decomp in iw_eq_i1i2i3 as ex_decomp_w.
+  destruct ex_decomp_w as [ex_y ex_z].
+
+  destruct ex_y as [y y_props].
+  destruct y_props as [p2_eq_p1y y_len].
+
+  destruct ex_z as [z w_eq_p2z].
+
+  remember p1 as x.
+
+  (** Jetzt haben wir die benoetigten Zeugen [x],[y], und [z] 
+      mit den gewuenschten Eigenschaften als Hypothesen zur Verfuegung.
+      Demenentsprechend koennen wir die Existenzquantoren in der 
+      Konklusion instanziieren und muessen dann nur noch die 
+      geforderten drei Eigenschaften beweisen. *)
+
+  exists x.
+  exists y.
+  exists z.
+
+  repeat split.
+
+  - (** Die Bedingung an die Laenge von [y] ist bereits exakt als 
+        Hypothese vorhanden. *)
+
+    exact (y_len).
+
+  - (** Dass die Zusammensetung von [x],[y] und [z] das Eingabewort [w] 
+          ergibt sich aus Eigenschaften Zerlegung der Praefixliste. *)
+
+    rewrite <- p2_eq_p1y.
+    rewrite <- w_eq_p2z.
     reflexivity.
-  (* l = cons _ _ *)
-  - simpl.
-    rewrite map_length.
-    congruence.
-Qed.
 
-Theorem inits_dec_1 :
-  forall X : Type,
-  forall l : list X,
-  forall y : list X, 
-  forall xs ys : list (list X),
-   inits l = xs ++ (y :: ys) ->
-    exists zs : list X, l = y ++ zs.
-Proof.
-  intros X l.
-  induction l as [|h l'].
-  (* l ist nil *)
-  - intros y xs ys H.
-    (* y muss nil sein *)
-    simpl in H.
-    assert (xs = nil) as Hxs.
-    + destruct xs.
-      * { reflexivity. }
-      * { destruct xs.
-          - simpl in H.
-            inversion H.
-          - simpl in H.
-            inversion H.
-        }
-    + subst xs.
-      simpl in H.
-      inversion H.
-      exists nil.
-      simpl.
-      reflexivity.
-  (* l ist h :: l' *)
-  - intros y xs ys H.
-    simpl in H.
-    destruct xs.
-    + simpl in H.
-      inversion H.
-      exists (h :: l').
-      simpl.
-      reflexivity.
-    + simpl in H.
-      inversion H.
-      apply map_dec_2 in H2.
-      destruct H2 as [xss].
-      destruct H0 as [yss].
-      destruct H0.
-      destruct H2.
-      destruct yss as [|y0 yss].
-      * { inversion H3. }
-      * { simpl in H3.
-          apply IHl' in H0.
-          destruct H0 as [zs].
-          inversion H3.
-          simpl.
-          exists zs.
-          subst.
-          reflexivity.
-        }
-Qed.
+  - (** Es bleibt zu zeigen, dass die aufgepumpte Version des Wortes 
+        fuer beliebige [k] wiederum in der Sprache des Automaten liegt. *)
 
-Theorem inits_dec_2 :
-  forall X : Type,
-  forall l : list X,
-  forall y z : list X,
-  forall xs ys zs : list (list X),
-   inits l = xs ++ (y :: ys) ++ (z :: zs) ->
-    exists ds : list X, z = y ++ ds /\ length ds > 0.
-Proof.
-  intros X l.
-  induction l as [|h l'].
-  - intros y z xs ys zs H.
-  (* Impossible case, inits nil has 1 elem,
-     the list on RHO has >= 2 elems *)
-    destruct xs.
-    + simpl in H.
-      inversion H.
-      subst y.
-      simpl in *.
-      inversion H.
-      destruct ys.
-      * { simpl in *.
-          inversion H1.
-        }
-      * { simpl in *.
-          inversion H1.
-        }
-    + simpl in *.
-      inversion H.
-      subst l.
-      inversion H.
-      destruct xs.
-      * { simpl in *.
-          inversion H2.
-        }
-      * { simpl in *.
-          inversion H1.
-        }
-  (* l = h :: l' *)
-  (* we need more info *)
-  - destruct l' as [|h' ls].
-    + intros y z xs ys zs H.
-      simpl in *.
-      destruct xs.
-      * { simpl in *.
-          inversion H.
-          subst y.
-          inversion H.
-          destruct ys.
-          - simpl in *.
-            inversion H1.
-            exists (h :: nil).
-            split.
-            + reflexivity.
-            + simpl.
-               unfold gt.
-               unfold lt.
-               apply le_n.
-          - inversion H1.
-            simpl in *.
-            clear H2.
-            clear H.
-            destruct ys.
-            * { simpl in *.
-                inversion H4.
-              }
-            * { simpl in *.
-                inversion H4.
-              } }
-      * { inversion H.
-          destruct xs.
-          - simpl in *.
-            inversion H2.
-            destruct ys.
-            + simpl in *.
-              inversion H4.
-            + simpl in *.
-              inversion H4.
-          - inversion H2.
-            destruct xs.
-            + simpl in H4.
-              inversion H4.
-            + simpl in H4.
-              inversion H4.
-        }
-    (* l = h :: h' :: ls *)
-    (* finally we can use the ind. hyp. *)
-    + intros y z xs ys zs H.
-      remember (h' :: ls) as l.
-      simpl in *.
-      destruct xs.
-      * { simpl in *.
-          inversion H.
-          exists z.
-          split.
-          - simpl.
-          reflexivity.
-          - apply map_dec_2 in H2.
-            destruct H2 as [xss].
-            destruct H0 as [yss].
-            destruct H0.
-            destruct H2.
-            destruct yss.
-            + simpl in *.
-              inversion H3.
-            + simpl in *.
-              inversion H3.
-              simpl.
-              unfold gt.
-              unfold lt.
-              apply le_n_S.
-              apply le_0_n.
-        }
-      * { simpl in *.
-          inversion H.
-          subst l0. 
-          clear H.
-          assert (map (cons h) (inits l) = xs ++ (y :: ys) ++ (z :: zs)).
-          - simpl.
-            assumption.
-          - apply map_dec_3 in H.
-            destruct H as [xss].
-            destruct H as [yss].
-            destruct H as [zss].
-            destruct H.
-            destruct H0.
-            destruct H1.
-            destruct yss.
-            + simpl in *.
-              inversion H1.
-            + simpl in *.
-              inversion H1.
-              destruct zss.
-              * { simpl in *.
-                  inversion H3.
-                }
-              * { simpl in *.
-                  inversion H3.
-                  apply IHl' in H.
-                  destruct H as [ds].
-                  destruct H.
-                  exists ds.
-                  split.
-                  - subst.
-                    reflexivity.
-                  - assumption.
-                } }
-Qed.
+    unfold Lang_delta.
+    unfold Lang_delta in w_in_lang.
 
-Theorem inits_dec : 
-  forall X : Type, 
-  forall l : list X,
-  forall b c : list X, 
-  forall ass bs cs : list (list X),
-  inits l = ass ++ (b :: bs) ++ (c :: cs) ->
-  (exists ds : list X, c = b ++ ds /\ length ds > 0) /\
-  exists es : list X, l = c ++ es.
-Proof.
-  intros X l b c ass bs cs H.
-  remember H as H2.
-  clear HeqH2.
-  apply inits_dec_2 in H.
-  destruct H as [ds].
-  split.
-  - exists ds.
-    destruct H.
-    split.
-    + apply H.
-    + apply H0.
-  - rewrite app_assoc in H2.
-    apply inits_dec_1 in H2.
-    assumption.
-Qed.
+    intro k.
 
-Definition prefixes (q : Q) (l : list Sigma) : list Q :=
-  map (ext q) (inits l).
+    (** Zunaechst benutzen wir das Lemma [delta_hat_app], das 
+        Verhalten von delta_hat auf verketteten Woertern beschreibt,
+        und koennen dann die Hypothese verwenden, die besagt, dass nach
+        der Abarbeitung der Eingabe [x] von [q0] aus der sich 
+        wiederholende Zustand [q_rp] ergibt. *)
 
-Lemma prefixes_len : forall l : list Sigma, forall q : Q,
-  length (prefixes q l) = S (length l).
-Proof.
-  intros.
-  unfold prefixes.
-  rewrite map_length.
-  rewrite inits_len.
-  reflexivity.
-Qed.
+    repeat rewrite delta_hat_app.
+    rewrite <- qrp_eq_dhq0p1.
 
-(* Das Axiom des Pigeohole Principle. *)
-Axiom states_size: forall l: list Q, length l > Q_size ->
-  repeats l.
+    (** Nun koennen wir benutzen, dass bei Abarbeitung des Worts [xy] von
+       [q0] aus ebenfalls q_rp erreicht wird und damit ebenso bei Abarbeitung 
+       des Worts [y] von Zustand [q_rp] selbst aus. *)
 
-(** Das Pumping Lemma: *)
-Theorem pumping_lemma : forall w : list Sigma,
-  accepted_word w -> Q_size <= length w ->
-  exists xs : list Sigma,
-  exists ys : list Sigma,
-  exists zs : list Sigma,
-  length ys > 0 /\
- (* length ys < Q_size -> *)
-  w = xs ++ ys ++ zs /\
-  forall n : nat,
-  accepted_word (xs ++ (word_replicate n ys) ++ zs).
-Proof.
-  intros w acc len_w.
-  (* Let's look at which state the DFA is after reading
-  epsilon, w0, w0w1, .. w. *)
-  set (pref := prefixes q0 w).
-  assert (Hpref : Q_size < length pref).
-  - unfold pref.
-    rewrite prefixes_len.
-    unfold lt.
-    apply le_n_S.
-    apply len_w.
-  - assert (HRep : repeats pref).
-    + apply states_size.
-      apply Hpref.
-    + set (Hx := repeats_decomp Q pref HRep).
-      destruct Hx.
-      destruct H.
-      destruct H.
-      destruct H.
-      unfold pref in H.
-      unfold prefixes in H.
-      set (Hx := map_dec_3 (list Sigma) Q (ext q0)
-      (inits w) x0 (x :: x1) (x :: x2) H).
-      destruct Hx.
-      destruct H0.
-      destruct H0.
-      destruct H0.
-      destruct H1.
-      destruct H2.
-      (* x4 und x5 können nicht nil sein *)
-      destruct x4 as [|y x4].
-      * { inversion H2. }
-      * { destruct x5 as [|y2 x5].
-          - inversion H3.
-          - set (Hx := inits_dec _ w y y2 x3 x4 x5 H0).
-            destruct Hx.
-            destruct H4.
-            destruct H5.
-            destruct  H4.
-            exists y.
-            exists x6.
-            exists x7.
-            split.
-            + apply H6.
-            + split.
-              * { subst y2.
-                  rewrite H5.
-                  rewrite app_assoc.
-                  reflexivity.
-                }
-              * { unfold accepted_word in *.
-                  intros n.
-                  assert (ext q0 (y ++ (word_replicate n x6) ++ x7) = ext q0 w).
-                  - rewrite ext_app.
-                    rewrite ext_app.
-                    simpl in H2.
-                    inversion H2.
-                    simpl in H3.
-                    inversion H3.
-                    assert (ext (ext q0 y) x6 = ext q0 y).
-                    + pattern (ext q0 y) at 2.
-                      rewrite H8.
-                      rewrite <- H10.
-                      rewrite H4.
-                      rewrite ext_app.
-                      reflexivity.
-                    + rewrite ext_loop.
-                       rewrite H5.
-                       rewrite ext_app.
-                       congruence.
-                       rewrite H7.
-                       reflexivity.
-                  - rewrite H7.
-                    apply acc.
-                } }
-Qed.
+    pose qrp_eq_dhq0p2 as dhq0x_eq_dhq0p2.
+    rewrite qrp_eq_dhq0p1 in dhq0x_eq_dhq0p2.
+    rewrite p2_eq_p1y in dhq0x_eq_dhq0p2.
+
+    rewrite delta_hat_app in dhq0x_eq_dhq0p2.
+    rewrite <- qrp_eq_dhq0p1 in dhq0x_eq_dhq0p2.
+
+    (** Jetzt koennen wir das Lemma [pump_loop] anwenden, und 
+        erhalten damit die Hypothese, dass bei beliebigen
+        Wiederholungen des Teilworts [y] von [q_rp] aus wiederum
+        [q_rp] erreicht wird.  *)
+
+    apply eq_sym in dhq0x_eq_dhq0p2.
+    apply (pump_loop k) in dhq0x_eq_dhq0p2 as pump_y.
+    rewrite pump_y.
+
+    (** Es bleibt lediglich zu zeigen, dass bei Eingabe des Teilworts [z] von
+        [q_rp] aus wiederum ein Endzustand erreicht wird, was sich durch 
+        die Gleichheit von [q_rp] und [delta_hat q0 x y] sowie  
+        [xyz] und [w] moeglich ist. *)
+
+    rewrite qrp_eq_dhq0p2.
+    rewrite <- delta_hat_app.
+    rewrite <- w_eq_p2z.
+
+    exact (w_in_lang).
+
+Defined.

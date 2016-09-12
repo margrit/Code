@@ -95,36 +95,27 @@ Defined.
 
 (* Lemmata zur Typanpassung *)
 
-Lemma n_plus_0 : forall n,  (n + 0 = n).
-Proof.
-  induction n.
-  - simpl. reflexivity.
-  - simpl.
-    rewrite IHn.
-    reflexivity.
-Defined.
+SearchAbout plus.
+
+Definition n_plus_0 (n : nat) : (n + 0 = n) := eq_sym (plus_n_O n).
 
 Lemma fin_pl0 {n : nat} (p : @Fin.t (n + 0)) : @Fin.t n.
 Proof.
-  pose (n_plus_0 n).
-  rewrite <- e.  
-  assumption.
+  rewrite <- (eq_sym (plus_n_O n)).
+  exact p.
 Defined.
 
-
-Lemma S_plus_1 : forall n,  (S n = n + 1).
+Lemma S_plus_1 (n : nat) : (S n = n + 1).
 Proof.
-  induction n.
-  - simpl. reflexivity.
-  - simpl.
-    rewrite IHn.
-    reflexivity.
+  rewrite <- plus_n_Sm. 
+  rewrite n_plus_0.
+  reflexivity.
 Defined.
 
 Lemma fin_S_pl1 {n : nat} (p : @Fin.t (n + 1)) : @Fin.t (S n).
 Proof.
-  pose (S_plus_1 n).
-  rewrite e.  
-  assumption.
+  rewrite <- plus_n_Sm in p. 
+  rewrite n_plus_0 in p.
+  exact p.
 Defined.
 
