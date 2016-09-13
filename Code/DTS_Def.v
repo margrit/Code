@@ -47,7 +47,64 @@ Parameter q0 : Q.
 
 End DTS_Par.
 
-Module DTS_Fun (Par : DTS_Par) <: DTS_Par.
+Module Type DTS_Prop.
+Import Word_Prop.
+Parameter Q : Type.
+Parameter Sigma : Type.
+Parameter delta : Q -> Sigma -> Q.
+Parameter is_accepting : Q -> Type.
+Parameter q0 : Q.
+Parameter delta_hat : Q -> @Word Sigma -> Q.
+Axiom delta_hat_Lemma : forall (q : Q) (a : Sigma) (w : @Word Sigma),
+  delta_hat q (concat_word (snoc eps a) w) = delta_hat (delta q a) w.
+Axiom delta_hat_app : forall (w v : @Word Sigma) (q : Q),
+  delta_hat q (concat_word w v) = delta_hat (delta_hat q w) v.
+Parameter Lang_delta : @Word Sigma -> Type.
+End DTS_Prop.
+
+Module DTS_Fun (Par : DTS_Par) <: DTS_Prop.
+Import Par.
+Import Word_Prop.
+Definition Q := Q.
+Definition Sigma := Sigma.
+Definition delta := delta.
+Definition is_accepting := is_accepting.
+Definition q0 := q0.
+Fixpoint delta_hat (q : Q) (w : @Word Sigma) := 
+  match w with
+    | eps       => q
+    | snoc w' h => delta (delta_hat q w' ) h
+  end.
+Lemma delta_hat_Lemma (q : Q) (a : Sigma) (w : @Word Sigma) :
+  delta_hat q (concat_word (snoc eps a) w) = delta_hat (delta q a) w.
+Proof.
+induction w.
+  - simpl.
+    reflexivity.
+  - simpl.
+    rewrite IHw.
+    reflexivity.
+Defined.
+
+Lemma delta_hat_app : forall w v : @Word Sigma, forall q : Q,
+  delta_hat q (concat_word w v) = delta_hat (delta_hat q w) v.
+Proof.
+  induction v.
+  - simpl.
+    intros q.
+    reflexivity.
+  - simpl.
+    intros.
+    rewrite <- IHv.
+    reflexivity.
+Defined.
+
+Definition Lang_delta (w : @Word Sigma) : Type :=
+  is_accepting (delta_hat q0 w).
+
+End DTS_Fun.
+
+Module DTS_Fun2 (Par : DTS_Par).
 Import Par.
 Import Word_Prop.
 
@@ -130,7 +187,7 @@ Definition Lang_Conf (w: @Word Sigma) : Type :=
 gespeichert werden, da diese Informationen enthält, ob ein Zustand mehrfach durchlaufen wird.
 Dies ist der Fall, wenn die Anzahl der Konfigurationen innerhalb der Liste länger ist, als die Anzahl
 der Zustände des Automaten.*)
-
+(*
 (* Ableiten der nächsten Konfiguration [next_Conf].*)
 Fixpoint next_Conf  (conf : Conf) : option Conf :=
   match conf with
@@ -169,6 +226,7 @@ Fixpoint conf_list (w : @Word Sigma) (q : Q) : list Conf :=
 
 Definition conf_to_conf_list (conf : Conf) : list Conf :=
   let (q, w) := conf in conf_list w q.
+*)
+End DTS_Fun2.
 
-End DTS_Fun.
-
+Print DTS_Fun.
