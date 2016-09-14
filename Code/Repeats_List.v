@@ -297,4 +297,3 @@ induction rp_l. (* as [l' | a' l' rp_a IHrp_a].*)
   rewrite e.
   reflexivity.
 Defined.
-

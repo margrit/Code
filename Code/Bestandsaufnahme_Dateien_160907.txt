@@ -3,6 +3,7 @@ Bestandsaufnahme Dateien 7.9.16.  to be completed
  Automat_vector.v
    einzelne Record-Definition eines Automaten, aus Stackoverflow
    --> weg
+--> done
 
  Beispielautomat.v
    noch nicht viel...
@@ -12,6 +13,7 @@ Bestandsaufnahme Dateien 7.9.16.  to be completed
    Dfa.v lädt das
    Basisdefinitionen, inzwischen (mit Word) alle in DFA_Def (und DTS_Def)
    --> kann auch weg
+--> done
 
  Definitions_vector.v
    Automat_vector lädt das
@@ -25,7 +27,7 @@ Bestandsaufnahme Dateien 7.9.16.  to be completed
        aus Modul DTS holen und nur die drei obigen Sachen 
        (delta_dach, delta_dach_append, is_accepting) hier behalten.
 
- DFA_cons.v
+ DFA_cons.v --> analog zu DTS_Prop als Modul und umbenennen
    lädt DFA_Def
    Varianten mit _cons und Vergleichslemmata _snoc _cons.
    Nett, typecheckt.
@@ -35,40 +37,23 @@ Bestandsaufnahme Dateien 7.9.16.  to be completed
  DFA_Def_accept_Prop.v
    Kopie (einer älteren Version von) DFA_Def, nur accepted_word
    und DFA_Lang gehen nach Prop. Typecheckt.
-
    --> wir wollen Prop nicht verwenden, also weg damit.
+--> done
 
  DFA_Def.v
    grundlegende Definitionen für DFAs - wichtig
-   
+
  DFA_Prop.v
    Lemmata, Beweis Äquivalenz Lang_delta Lang_Conf 
 
- Dfa.v
- DTS_Def.v
- Ensembles.v
- Fin_ext.v
- FiniteClass2.v
- FiniteClass.v
- Finite_Set2.v
- Finite_Set3.v
- Finite_Set_outtakes.v
- Finite_Set.v
- General.v
- List_Prop.v
- ModuleTest
- NFA_Def.v
- Notizen.v
- Pigeonhole_vector.v
- Pumping_Lemma_vector.v
- Pumping_Lemma_Word2.v
- Pumping_Lemma_Word.v
- Reg_Exp.v
- Repeats_List.v
- Repeats.v
- Table_Filling.v
- todo
- vector_bsp.v
- Vectors_Fin.v
- Word_Prop.v
- wortspiel.v
+Beispielautomat.v umbenennen in DTS_Toggle
+--> done
+
+Conv_Vec_List_Word.v
+- Conversion Listen - Wörter
+
+Dfa.v
+- urprüngliches Pumping Lemma
+--> weg --> done
+DTS_Def.globDTS_Def.vDTS_Def.voDTS_eq_Lang.vDTS_Prop.globDTS_Prop.voEnsembles.vEq.vFin_ext.vFinite_Set_outtakes.vFinite_Set.vFinite_Set2.vFinite_Set3.vFiniteClass.vFiniteClass2.vGeneral.vList_Prop.vModuleTestNFA_Def.vNotizen.v
+- wie iso fin in Idris aussehen könntePig.vPigeonhole_vector.vPumping_Lemma_vector.v -> kann wegPumping_Lemma_Word.v -> p2 in xy umbenennen und anpassenPumping_Lemma_Word2.v -> kann wegReg_Exp_Prop.vReg_Exp_v1.vReg_Exp.vRepeats_List.vRepeats.vrequested.txtrestore_ports.tclTable_Filling.vTest_Mudole.vtodovector_bsp.vVectors_Fin.vWord_Inits.vWord_Map.vWord_Prop.globWord_Prop.vWord_Prop.voWords.vworkonwortspiel.v

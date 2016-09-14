@@ -1,31 +1,16 @@
-Require Import Bool.
 Require DTS_Def.
 Require Import Program.
-
-(*Require Import Word_Prop. *)
-
-(* Sigma ist nicht in der Umgebung. Da wir sie als Parameter definiert haben. Es geht weder mit 
-Load noch Require Import oder Export :( Irgendwie scheint das mit den Modulen nicht ganz hin zu 
-hauen. 
-
-Module wirklich nur mit Parametern und Axiomen "füllen"? *)
-
-Module DTS_Prop  (Par : DTS_Def.DTS_Par) <: DTS_Def.DTS_Par.
-Import Par.
-Print Q.
-Definition Q := Q.
-Definition Sigma := Sigma.
-Definition delta := delta.
-Definition is_accepting := is_accepting.
-Definition q0 := q0.
-Print Q.
-Module Fun_Par := DTS_Def.DTS_Fun Par.
-Import Fun_Par.
 Import Word_Prop.
 
-Print Q.
-(*Module DTS_Prop ist abhängig von DTS_Fun wie DTS_Fun von DTS_Par*)
+(* BEMERKUNG, was in der Datei alles passiert !!! 
+- eventuell oben oder in der Bewertung??
+*)
 
+Module DTS_eq_Lang  (DTS : DTS_Def.DTS_Par).
+Import DTS.
+
+Module DTS_Prop := DTS_Def.DTS_Fun DTS.
+Import DTS_Prop.
 
 Lemma eq_Q_eq_delta_hat : forall (w : @Word Sigma)(p q : Q)(d : forall q p : Q, (p = q) ),
 delta_hat q w = delta_hat p w.
@@ -166,5 +151,5 @@ rewrite (Conf_delta_hat w q0 p rel).
 exact pacc.
 Defined.
 
-End DTS_Prop.
+End DTS_eq_Lang.
 

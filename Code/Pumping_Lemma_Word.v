@@ -206,7 +206,7 @@ Proof.
        des Worts [y] von Zustand [q_rp] selbst aus. *)
 
     pose dhq0p2_eq_qrp as dhq0p2_eq_dhq0x.
-    rewrite <- dhq0p1_eq_qrp in dhq0p2_eq_dhq0x. (* Namen drehen! *)
+    rewrite <- dhq0p1_eq_qrp in dhq0p2_eq_dhq0x.
     rewrite p2_eq_p1y in dhq0p2_eq_dhq0x.
 
     rewrite delta_hat_app in dhq0p2_eq_dhq0x.

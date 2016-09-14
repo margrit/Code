@@ -23,10 +23,10 @@ end.
 
 End DTS_Example.
 
-Module Ex_Fun := DTS_Def.DTS_Fun DTS_Example.
+Module Ex_Prop := DTS_Def.DTS_Fun DTS_Example.
 Import Word_Prop.
 Import DTS_Example.
-Import Ex_Fun.
+Import Ex_Prop.
 (* Was muss alles bewiesen werden?
 - zwei Sprachen definieren
 ** press gerade
@@ -40,9 +40,9 @@ Inductive even_press : @Word Sigma -> Type :=
 with odd_press : @Word Sigma -> Type :=
   | snoc_odd {w : @Word Sigma} {a : Sigma} : even_press w -> odd_press (snoc w a).
 
-(* Beweis, dass die Sprache des DTS = even_press 
-- forall w, even_press w -> Lang_delta w 
-  forall w, Lang_delta w -> even_press w *)
+(* Beweis, dass die Sprache des DTS = odd_press 
+- forall w, odd_press w -> Lang_delta w 
+  forall w, Lang_delta w -> odd_press w *)
 
 Lemma xyz : forall w,
 ((even_press w * (delta_hat q0 w = off)) +
@@ -70,14 +70,51 @@ induction w.
          reflexivity.
 Defined.
 
+Lemma even_odd_disjoint (w : @Word Sigma) : even_press w -> odd_press w -> False.
+Proof.
+intros even odd.
+induction w.
+- inversion odd.
+- inversion even.
+  inversion odd.
+  exact (IHw X0 X).
+Defined.
 
+(* z.z. forall w, Lang_delta w -> odd_press w *)
 
+Lemma lala : forall w, Lang_delta w -> odd_press w.
+Proof.
+unfold Lang_delta.
+intros w w_in_L.
+pose (xyz w) as decide_L.
+destruct decide_L as [[even off] |[odd on]].
+- rewrite off in w_in_L.
+  simpl in w_in_L.
+  destruct w_in_L.
+- exact odd.
+Defined.
 
+Lemma lala2 : forall w, odd_press w -> Lang_delta w.
+Proof.
+unfold Lang_delta.
+intros w odd.
+pose (xyz w) as decide_L.
+destruct decide_L as [[even off] |[odd' on]].
+- pose (even_odd_disjoint w even odd) as ff.
+  destruct ff.
+- rewrite on.
+  simpl.
+  exact I.
+Defined.
 
-
-
-
-
-
-
-
+(** Äquivalenz zwischen odd_press und Lang_delta. Die Sprache die von dem 
+Toggle Automaten akzeptiert wird besteht genau aus den Wörtern, deren Länge
+ungerade ist. *)
+Require Import Equivalences.
+Module Lang_Toggle : Logical_EQ_type_valued_pred.
+Definition  base := @Word Sigma.
+Definition P := odd_press.
+Definition Q := Lang_delta.
+Definition pq := lala2.
+Definition qp := lala.
+End Lang_Toggle.
