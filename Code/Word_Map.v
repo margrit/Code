@@ -122,7 +122,7 @@ Proof.
 Defined.
 
 
-Lemma map_decomp_3_snoc {X Y : Type} (f : X -> Y) (w : @Word X)
+Lemma map_decomp_3_snoc_full {X Y : Type} (f : X -> Y) (w : @Word X)
   (v1 v2 v3 : @Word Y) (y1 y2 : Y) :
   map_word f w = concat_word (concat_word (snoc v1 y1) (snoc v2 y2)) v3 ->
   { w1 : @Word X & { w2 : @Word X & { w3 : @Word X &
@@ -159,26 +159,67 @@ Proof.
  destruct ex_snoc_w2_props as [ex_snoc_w2_props' y2_eq_fx2].
  destruct ex_snoc_w2_props' as [w2'_eq_w2x2 fw2_eq_v2].
 
-exists w1.
-exists w2.
-exists w3.
-exists x1.
-exists x2.
+ exists w1.
+ exists w2.
+ exists w3.
+ exists x1.
+ exists x2.
 
-rewrite <- w1'_eq_w1x1.
-rewrite <- w2'_eq_w2x2.
+ rewrite <- w1'_eq_w1x1.
+ rewrite <- w2'_eq_w2x2.
 
-repeat split.
+ repeat split.
 
-- exact w_eq_w1'w2'w3.
-- exact mw1'_eq_v1y1.
-- exact mw2'_eq_v2y2.
-- exact mw3_eq_v3.
-- exact fw1_eq_v1.
-- exact fw2_eq_v2.
-- apply eq_sym in y1_eq_fx1. 
-  exact y1_eq_fx1.
-- apply eq_sym in y2_eq_fx2. 
-  exact y2_eq_fx2.
+ - exact w_eq_w1'w2'w3.
+ - exact mw1'_eq_v1y1.
+ - exact mw2'_eq_v2y2.
+ - exact mw3_eq_v3.
+ - exact fw1_eq_v1.
+ - exact fw2_eq_v2.
+ - apply eq_sym in y1_eq_fx1. 
+   exact y1_eq_fx1.
+ - apply eq_sym in y2_eq_fx2. 
+   exact y2_eq_fx2.
 
+Defined.
+
+
+Lemma map_decomp_3_snoc {X Y : Type} (f : X -> Y) (w : @Word X)
+  (v1 v2 v3 : @Word Y) (y1 y2 : Y) :
+  map_word f w = concat_word (concat_word (snoc v1 y1) (snoc v2 y2)) v3 ->
+  { w1 : @Word X & { w2 : @Word X & { w3 : @Word X &
+  { x1 : X & { x2 : X & 
+  ((w = concat_word (concat_word (snoc w1 x1) (snoc w2 x2)) w3) *
+   (f x1 = y1) *
+   (f x2 = y2)
+  )%type } } } } }.
+Proof.
+ intro mfw_eq_v1y1v2y2v3.
+
+ apply map_decomp_3_snoc_full in mfw_eq_v1y1v2y2v3 as ex_decomp_w.
+ destruct ex_decomp_w as [w1' ex_decomp_w'].
+ destruct ex_decomp_w' as [w2' ex_decomp_w''].
+ destruct ex_decomp_w'' as [w3 ex_decomp_w'''].
+ destruct ex_decomp_w''' as [x1' ex_decomp_w''''].
+ destruct ex_decomp_w'''' as [x2' ex_decomp_w_eqs].
+
+ destruct ex_decomp_w_eqs as [ex_decomp_w_eqs' fx2'_eq_y2].
+ destruct ex_decomp_w_eqs' as [ex_decomp_w_eqs'' fx1'_eq_y1].
+ destruct ex_decomp_w_eqs'' as [ex_decomp_w_eqs2 mfw2'_eq_v2].
+ destruct ex_decomp_w_eqs2 as [ex_decomp_w_eqs2' mfw1'_eq_v1].
+ destruct ex_decomp_w_eqs2' as [ex_decomp_w_eqs2'' mfw3_eq_v3].
+ destruct ex_decomp_w_eqs2'' as [ex_decomp_w_eqs2''' mfw2'x2'_eq_v2y2].
+ destruct ex_decomp_w_eqs2''' as [w_eq_w1'x1'w2'x2'w3 mfw1'x1'_eq_v1y1].
+
+ exists w1'.
+ exists w2'.
+ exists w3.
+ exists x1'.
+ exists x2'.
+
+ repeat split.
+
+- exact w_eq_w1'x1'w2'x2'w3.
+- exact fx1'_eq_y1.
+- exact fx2'_eq_y2.
 Defined.

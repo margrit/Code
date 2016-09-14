@@ -61,12 +61,11 @@ Proof.
     exists eps.
     simpl.
     reflexivity.
-  - destruct IHA as [w1'].
-    destruct s as [w2'].
+  - destruct IHA as [w1' [w2' w_eq_w1'xw2']].
     exists w1'.
     exists (snoc w2' b).
     simpl.
-    rewrite e.
+    rewrite w_eq_w1'xw2'.
     reflexivity.
 Defined.
 
@@ -77,8 +76,7 @@ Lemma Appears_app_split_rev_w {X : Type} (x : X) (w : @Word X) :
   -> Appears_Word x w.
 Proof.
 intro ex_decomp.
-destruct ex_decomp as [w1 ex_decomp'].
-destruct ex_decomp' as [w2 w_eq_w1xw2].
+destruct ex_decomp as [w1 [w2 w_eq_w1xw2]].
 destruct w2.
 - simpl in w_eq_w1xw2.
   rewrite w_eq_w1xw2.
@@ -119,24 +117,20 @@ Proof.
   intros X w H.
   induction H.
   - apply Appears_app_split_w in a.
-    destruct a as [w1'].
-    destruct s as [w2'].
+    destruct a as [w1' [w2' w_eq_w1'xw2']].
     exists x.
     exists w1'.
     exists w2'.
     exists eps.
-    rewrite e.
+    rewrite w_eq_w1'xw2'.
     simpl.
     reflexivity.
-  - destruct IHRepeats_Word as [x'  IH].
-    destruct IH as [xs'  IH].
-    destruct IH as [ys'  IH].
-    destruct IH as [zs'  IH].
+  - destruct IHRepeats_Word as [x'  [xs'  [ys' [zs' w_eq_xs'x'ys'x'zs']]]].
     exists x'.
     exists xs'.
     exists ys'.
     exists (snoc zs' x).
-    rewrite IH.
+    rewrite w_eq_xs'x'ys'x'zs'.
     simpl.
     reflexivity.
 Defined.
@@ -152,10 +146,7 @@ Lemma Repeats_decomp_rev_w {X : Type} : forall w : @Word X,
 Proof.
 intros w decomp_w.
 
-destruct decomp_w as [a decomp_w'].
-destruct decomp_w' as [w1 decomp_w''].
-destruct decomp_w'' as [w2 decomp_w'''].
-destruct decomp_w''' as [w3 w_eq_w1aw2aw3].
+destruct decomp_w as [a [w1 [w2 [w3 w_eq_w1aw2aw3]]]].
 
 simpl (concat_word (snoc w1 a) (snoc w2 a)) in w_eq_w1aw2aw3.
 rewrite w_eq_w1aw2aw3. 

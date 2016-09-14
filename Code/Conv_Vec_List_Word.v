@@ -114,9 +114,8 @@ intro rp_l.
 
 apply repeats_l_decomp in rp_l as split_l.
 destruct split_l as [a split_l'].
-destruct split_l' as [l1 split_l''].
-destruct split_l'' as [l2 split_l'''].
-destruct split_l''' as [l3 l_eq_l1al2al3].
+destruct split_l' as [l1 [l2 [l3 l_eq_l1al2al3]]].
+
 rewrite <- list_word_list in l_eq_l1al2al3.
 repeat rewrite list_to_word_hom in l_eq_l1al2al3.
 
@@ -125,16 +124,14 @@ rewrite word_list_word.
 rewrite <- concat_word_associative.
 
 pose (lw_concat l1 l2 a) as ex_l1al2.
-destruct ex_l1al2 as [w1 ex_l1al2']. 
-destruct ex_l1al2' as [w2 l1al2_eq_w1aw2].
+destruct ex_l1al2 as [w1 [w2 l1al2_eq_w1aw2]].
 
 rewrite l1al2_eq_w1aw2.
 rewrite concat_word_associative.
 rewrite <- (word_list_word w2).
 
 pose (lw_concat (word_to_list w2) l3 a) as ex_w2al3.
-destruct ex_w2al3 as [w2' ex_w2al3']. 
-destruct ex_w2al3' as [w3 w2al3_eq_w2'aw3].
+destruct ex_w2al3 as [w2' [w3 w2al3_eq_w2'aw3]].
 
 rewrite w2al3_eq_w2'aw3.
 rewrite <- concat_word_associative.
