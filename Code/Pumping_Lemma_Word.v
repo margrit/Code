@@ -92,13 +92,18 @@ Proof.
   pose (trace_length_w w q0) as tr_w_len.
 
   (** Umschreiben des Verhaeltnisses zwischen Wortlaenge des Eingabeworts 
-      und [Q_size] anhand arithmetischer Lemmata, so dass es die Form bekommt, 
+      und [Q_size] anhand 
+      - der arithmetischen Lemmata [le_n_S], [le_lt_n_Sm] und [lt_S_n] sowie
+      - des Lemmas [tr_w_len] ueber das Verhaeltnis der Laenge von [w] und 
+        des Traces von w, 
+      so dass die Hypothese [S_len_w] die Form bekommt,
       in der das Pigeonhole-Prinzip darauf angewendet werden kann *)
 
   apply le_n_S in len_w as S_len_w.
-  rewrite <- tr_w_len in S_len_w.
   apply le_lt_n_Sm in S_len_w.
   apply lt_S_n in S_len_w.
+  
+  rewrite <- tr_w_len in S_len_w.
 
   (** Anwendung des Pigeonhole-Prinzips *)
 
@@ -116,10 +121,9 @@ Proof.
       [trwi] jeweils der i-te Teil des Traces [tr_w] sind. *) 
 
   apply Repeats_decomp_w in pigeonhole_rp_tr_w as ex_decomp_tr_w.
+
   destruct ex_decomp_tr_w as [q_rp ex_decomp_tr_w'].
-  destruct ex_decomp_tr_w' as [trw1 ex_decomp_tr_w''].
-  destruct ex_decomp_tr_w'' as [trw2 ex_decomp_tr_w'''].
-  destruct ex_decomp_tr_w''' as [trw3 trw_eq_trw1trw2trw3].
+  destruct ex_decomp_tr_w' as [trw1 [trw2 [trw3 trw_eq_trw1trw2trw3]]].
 
   (** Der Trace [tr_w] ist durch Anwendung der Funktion [trace_w] 
       entstanden, die durch eine [map] auf die Liste der Praefixe
@@ -131,17 +135,11 @@ Proof.
       vorkam, finden sich jetzt die Praefixe [x] und [xy] von [w]. *)
 
   unfold trace_w in trw_eq_trw1trw2trw3.
-  apply map_decomp_3_snoc in trw_eq_trw1trw2trw3 as ex_decomp_w. 
+  apply map_decomp_3_snoc in trw_eq_trw1trw2trw3 as ex_decomp_iw. 
 
-  destruct ex_decomp_w as [inits1 ex_decomp_w'].
-  destruct ex_decomp_w' as [inits2 ex_decomp_w''].
-  destruct ex_decomp_w'' as [inits3 ex_decomp_w'''].
-
-  destruct ex_decomp_w''' as [x ex_decomp_w''''].
-  destruct ex_decomp_w'''' as [xy ex_decomp_w_eqs1].
-
-  destruct ex_decomp_w_eqs1 as [ex_decomp_w_eqs1' dhq0xy_eq_qrp].
-  destruct ex_decomp_w_eqs1' as [iw_eq_i1xi2xyi3 dhq0x_eq_qrp].
+  destruct ex_decomp_iw as [inits1 [inits2 [inits3 ex_decomp_iw']]].
+  destruct ex_decomp_iw' as [x [xy ex_decomp_iw_eqs]].
+  destruct ex_decomp_iw_eqs as [[iw_eq_i1xi2xyi3 dhq0x_eq_qrp] dhq0xy_eq_qrp].
 
   (** Nun koennen wir das Dekompositionslemma [w_decomp_of_initsw_decomp]
       benutzen, um aus der Zerlegung der Praefixliste [inits w] eine 
@@ -152,11 +150,9 @@ Proof.
       - dem Praefix [xy] und dem gesamten Eingabewort [w]. *)
 
   apply w_decomp_of_initsw_decomp in iw_eq_i1xi2xyi3 as ex_decomp_w.
+
   destruct ex_decomp_w as [ex_y ex_z].
-
-  destruct ex_y as [y y_props].
-  destruct y_props as [xy_eq_x_y y_len].
-
+  destruct ex_y as [y [xy_eq_x_y y_len]].
   destruct ex_z as [z w_eq_xyz].
 
   (** Aufraeumarbeiten: 
