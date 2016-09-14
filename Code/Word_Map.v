@@ -1,4 +1,4 @@
-(* Load Word_Prop. *)
+Load Word_Prop. 
 
 
 (* --------------------------------------------------------------------------*)
@@ -16,7 +16,10 @@ Lemma map_decomp_2_w : forall X Y :Type, forall f : X -> Y, forall w : @Word X,
   forall v1 v2 : @Word Y,
   map_word f w = concat_word v1 v2 -> 
      { w1 : @Word X & { w2 : @Word X &
-          w = concat_word w1 w2 /\ map_word f w1 = v1 /\ map_word f w2 = v2 } }.
+         ((w = concat_word w1 w2) *
+          (map_word f w1 = v1) *
+          (map_word f w2 = v2)
+         )%type  } }.
 Proof.
   intros X Y f.
   induction w.
@@ -25,20 +28,16 @@ Proof.
     exists eps.
     exists eps.
     simpl in H.
-    split.
-    + simpl.
-      reflexivity.
-    + assert (v2 = eps).
-      * { destruct v2.
-          - reflexivity.
-          - inversion H.
-        }
-      * { rewrite H0 in *.
-          simpl in *.
-          split.
-          - exact H.
-          - reflexivity.
-        }
+    assert (v2 = eps) as v2_eq_eps.
+    + destruct v2.
+      * reflexivity.
+      * inversion H.
+    + repeat split.
+      * rewrite v2_eq_eps in *.
+        simpl in *.
+        exact H.
+      * simpl. 
+        exact (eq_sym v2_eq_eps).
   (* w = snoc w' a *)
    - intros v1 v2 H.
     simpl in H.
@@ -55,10 +54,8 @@ Proof.
           exists (snoc w a).
           exists eps.
           simpl.
-          split.
-          - reflexivity.
-          - split ; reflexivity.
-        } 
+          repeat split; reflexivity.
+        }
     (* v2' = snoc v2' y2 *)
     + simpl in H.
       assert (map_word f w = concat_word v1 v2').
@@ -66,9 +63,8 @@ Proof.
           reflexivity.
         }
       * pose (IHw v1 v2' H0) as ex_w1_w2.
-        destruct ex_w1_w2 as [w1' ex_w2].
-        destruct ex_w2 as [w2' IHw_eqs].
-        destruct IHw_eqs as [w_eq_w1'w2' [fw1'_eq_v1 fw2'_eq_v2']].
+        destruct ex_w1_w2 as [w1' [w2' IHw_eqs]].
+        destruct IHw_eqs as [[w_eq_w1'w2' fw1'_eq_v1] fw2'_eq_v2'].
         inversion H as [[fw_eq_v1v2' fa_eq_y2]].
         exists w1'.
         exists (snoc w2' a).
@@ -97,17 +93,13 @@ Proof.
   pose (concat_word v1 v2) as v12.
   apply map_decomp_2_w in H as decomp_w12'w3'.
 
-  destruct decomp_w12'w3' as [w12' decomp_w3'].
-  destruct decomp_w3' as [w3' decomp_eqs].
-  destruct decomp_eqs as [w_eq_w12'w3' decomp_eqs].
-  destruct decomp_eqs as [fw12'_eq_v1v2 fw3'_eq_v3].
+  destruct decomp_w12'w3' as [w12' [w3' decomp_eqs]].
+  destruct decomp_eqs as [[w_eq_w12'w3' fw12'_eq_v1v2] fw3'_eq_v3].
 
   apply map_decomp_2_w in fw12'_eq_v1v2 as decomp_w1'w2'.
 
-  destruct decomp_w1'w2' as [w1' decomp_w2'].
-  destruct decomp_w2' as [w2' decomp_eqs'].
-  destruct decomp_eqs' as [w12'_eq_w1'w2' decomp_eqs'].
-  destruct decomp_eqs' as [fw1'_eq_v1 fw2'_eq_v2].
+  destruct decomp_w1'w2' as [w1' [w2' decomp_eqs]].
+  destruct decomp_eqs as [[w12'_eq_w1'w2' fw1'_eq_v1] fw2'_eq_v2].
 
   exists w1'.
   exists w2'.
@@ -141,24 +133,16 @@ Proof.
  intro mfw_eq_v1y1v2y2v3.
 
  apply map_decomp_3 in mfw_eq_v1y1v2y2v3 as ex_decomp_w.
- destruct ex_decomp_w as [w1' ex_decomp_w'].
- destruct ex_decomp_w' as [w2' ex_decomp_w''].
- destruct ex_decomp_w'' as [w3 ex_decomp_w_eqs].
- destruct ex_decomp_w_eqs as [ex_decomp_w_eqs' mw3_eq_v3 ].
- destruct ex_decomp_w_eqs' as [ex_decomp_w_eqs'' mw2'_eq_v2y2 e].
- destruct ex_decomp_w_eqs'' as [w_eq_w1'w2'w3 mw1'_eq_v1y1].
+ destruct ex_decomp_w as [w1' [w2' [w3 d_eqs]]].
+ destruct d_eqs as [[[w_eq_w1'w2'w3 mw1'_eq_v1y1] mw2'_eq_v2y2] mw3_eq_v3].
 
  apply ex_snoc_map in mw1'_eq_v1y1 as ex_snoc_w1.
- destruct ex_snoc_w1 as [w1 ex_snoc_w1'].
- destruct ex_snoc_w1' as [x1 ex_snoc_w1_props].
- destruct ex_snoc_w1_props as [ex_snoc_w1_props' y1_eq_fx1].
- destruct ex_snoc_w1_props' as [w1'_eq_w1x1 fw1_eq_v1].
+ destruct ex_snoc_w1 as [w1 [x1 ex_snoc_w1_props]].
+ destruct ex_snoc_w1_props as [[w1'_eq_w1x1 fw1_eq_v1] y1_eq_fx1].
 
  apply ex_snoc_map in mw2'_eq_v2y2 as ex_snoc_w2.
- destruct ex_snoc_w2 as [w2 ex_snoc_w2'].
- destruct ex_snoc_w2' as [x2 ex_snoc_w2_props].
- destruct ex_snoc_w2_props as [ex_snoc_w2_props' y2_eq_fx2].
- destruct ex_snoc_w2_props' as [w2'_eq_w2x2 fw2_eq_v2].
+ destruct ex_snoc_w2 as [w2 [x2 ex_snoc_w2_props]].
+ destruct ex_snoc_w2_props as [[w2'_eq_w2x2 fw2_eq_v2] y2_eq_fx2].
 
  exists w1.
  exists w2.
@@ -198,19 +182,11 @@ Proof.
  intro mfw_eq_v1y1v2y2v3.
 
  apply map_decomp_3_snoc_full in mfw_eq_v1y1v2y2v3 as ex_decomp_w.
- destruct ex_decomp_w as [w1' ex_decomp_w'].
- destruct ex_decomp_w' as [w2' ex_decomp_w''].
- destruct ex_decomp_w'' as [w3 ex_decomp_w'''].
- destruct ex_decomp_w''' as [x1' ex_decomp_w''''].
- destruct ex_decomp_w'''' as [x2' ex_decomp_w_eqs].
+ destruct ex_decomp_w as [w1' [w2' [w3 [x1' [x2' d_eqs]]]]].
 
- destruct ex_decomp_w_eqs as [ex_decomp_w_eqs' fx2'_eq_y2].
- destruct ex_decomp_w_eqs' as [ex_decomp_w_eqs'' fx1'_eq_y1].
- destruct ex_decomp_w_eqs'' as [ex_decomp_w_eqs2 mfw2'_eq_v2].
- destruct ex_decomp_w_eqs2 as [ex_decomp_w_eqs2' mfw1'_eq_v1].
- destruct ex_decomp_w_eqs2' as [ex_decomp_w_eqs2'' mfw3_eq_v3].
- destruct ex_decomp_w_eqs2'' as [ex_decomp_w_eqs2''' mfw2'x2'_eq_v2y2].
- destruct ex_decomp_w_eqs2''' as [w_eq_w1'x1'w2'x2'w3 mfw1'x1'_eq_v1y1].
+ destruct d_eqs as [[d_eqs' fx1'_eq_y1] fx2'_eq_y2].
+ destruct d_eqs' as [[[d_eqs'' mfw3_eq_v3] mfw1'_eq_v1] mfw2'_eq_v2].
+ destruct d_eqs'' as [[w_eq_w1'x1'w2'x2'w3 mfw1'x1'_eq_v1y1] mfw2'x2'_eq_v2y2].
 
  exists w1'.
  exists w2'.
