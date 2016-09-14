@@ -138,13 +138,18 @@ Proof.
   destruct ex_decomp_w'''' as [p2 ex_decomp_w_eqs1].
 
   destruct ex_decomp_w_eqs1 as [ex_decomp_w_eqs1' dhq0p2_eq_qrp].
-  destruct ex_decomp_w_eqs1' as [ex_decomp_w_eqs1'' dhq0p1_eq_qrp].
-  destruct ex_decomp_w_eqs1'' as [ex_decomp_w_eqs1''' mi2_eq_trw2].
-  destruct ex_decomp_w_eqs1''' as [ex_decomp_w_eqs2 mi1_eq_trw1].
+  destruct ex_decomp_w_eqs1' as [iw_eq_i1p1i2p2i3 dhq0p1_eq_qrp].
 
-  destruct ex_decomp_w_eqs2 as [ex_decomp_w_eqs2' mi3_eq_trw3].
-  destruct ex_decomp_w_eqs2' as [ex_decomp_w_eqs2'' mi2p2_eq_trw2qrp].
-  destruct ex_decomp_w_eqs2'' as [iw_eq_i1p1i2p2i3 mi1p1_eq_trw1qrp].
+  (* Variante: Gleich x und xy als Namen benutzen:
+
+  destruct ex_decomp_w''' as [x ex_decomp_w''''].
+  destruct ex_decomp_w'''' as [xy ex_decomp_w_eqs1].
+
+  destruct ex_decomp_w_eqs1 as [ex_decomp_w_eqs1' dhq0xy_eq_qrp].
+  destruct ex_decomp_w_eqs1' as [iw_eq_i1xi2xyi3 dhq0x_eq_qrp].
+
+   *)
+
 
   (** Nun koennen wir das Dekompositionslemma [w_decomp_of_initsw_decomp]
       benutzen, um aus der Zerlegung der Praefixliste [inits w] eine 
@@ -158,7 +163,27 @@ Proof.
 
   destruct ex_z as [z w_eq_p2z].
 
+  (** Aufraeumarbeiten: 
+
+      Wir benennen die Prafixe p1 und p2 entsprechend ihrer Rolle fuer
+      die Aussage des Pumping-Lemmas um und entfernen nicht mehr 
+      benoetigte Hypothesen. *)
+
   remember p1 as x.
+  remember p2 as xy.
+  remember dhq0p1_eq_qrp as dhq0x_eq_qrp.
+  remember dhq0p2_eq_qrp as dhq0xy_eq_qrp.
+  remember p2_eq_p1y as xy_eq_x_y.
+  remember w_eq_p2z as w_eq_xyz.
+
+  clear Heqx Heqxy Heqdhq0x_eq_qrp Heqdhq0xy_eq_qrp.
+  clear p1 p2 dhq0p1_eq_qrp dhq0p2_eq_qrp.
+  clear Heqxy_eq_x_y Heqw_eq_xyz.
+  clear p2_eq_p1y w_eq_p2z.
+
+  clear trw_eq_trw1trw2trw3 iw_eq_i1p1i2p2i3.
+  clear tr_w trw1 trw2 trw3.
+  clear inits1 inits2 inits3.
 
   (** Jetzt haben wir die benoetigten Zeugen [x],[y], und [z] 
       mit den gewuenschten Eigenschaften als Hypothesen zur Verfuegung.
@@ -180,8 +205,8 @@ Proof.
   - (** Dass die Zusammensetung von [x],[y] und [z] das Eingabewort [w] 
           ergibt sich aus Eigenschaften Zerlegung der Praefixliste. *)
 
-    rewrite <- p2_eq_p1y.
-    rewrite <- w_eq_p2z.
+    rewrite <- xy_eq_x_y.
+    rewrite <- w_eq_xyz.
     reflexivity.
 
   - (** Es bleibt zu zeigen, dass die aufgepumpte Version des Wortes 
@@ -199,25 +224,25 @@ Proof.
         wiederholende Zustand [q_rp] ergibt. *)
 
     repeat rewrite delta_hat_app.
-    rewrite dhq0p1_eq_qrp.
+    rewrite dhq0x_eq_qrp.
 
     (** Nun koennen wir benutzen, dass bei Abarbeitung des Worts [xy] von
        [q0] aus ebenfalls q_rp erreicht wird und damit ebenso bei Abarbeitung 
        des Worts [y] von Zustand [q_rp] selbst aus. *)
 
-    pose dhq0p2_eq_qrp as dhq0p2_eq_dhq0x.
-    rewrite <- dhq0p1_eq_qrp in dhq0p2_eq_dhq0x. (* Namen drehen! *)
-    rewrite p2_eq_p1y in dhq0p2_eq_dhq0x.
+    pose dhq0xy_eq_qrp as dhq0xy_eq_dhq0x.
+    rewrite <- dhq0x_eq_qrp in dhq0xy_eq_dhq0x. (* Namen drehen! *)
+    rewrite xy_eq_x_y in dhq0xy_eq_dhq0x.
 
-    rewrite delta_hat_app in dhq0p2_eq_dhq0x.
-    rewrite dhq0p1_eq_qrp in dhq0p2_eq_dhq0x.
+    rewrite delta_hat_app in dhq0xy_eq_dhq0x.
+    rewrite dhq0x_eq_qrp in dhq0xy_eq_dhq0x.
 
     (** Jetzt koennen wir das Lemma [pump_loop] anwenden, und 
         erhalten damit die Hypothese, dass bei beliebigen
         Wiederholungen des Teilworts [y] von [q_rp] aus wiederum
         [q_rp] erreicht wird.  *)
 
-    apply (pump_loop k) in dhq0p2_eq_dhq0x as pump_y.
+    apply (pump_loop k) in dhq0xy_eq_dhq0x as pump_y.
     rewrite pump_y.
 
     (** Es bleibt lediglich zu zeigen, dass bei Eingabe des Teilworts [z] von
@@ -225,9 +250,9 @@ Proof.
         die Gleichheit von [q_rp] und [delta_hat q0 x y] sowie  
         [xyz] und [w] moeglich ist. *)
 
-    rewrite <- dhq0p2_eq_qrp.
+    rewrite <- dhq0xy_eq_qrp.
     rewrite <- delta_hat_app.
-    rewrite <- w_eq_p2z.
+    rewrite <- w_eq_xyz.
 
     exact (w_in_lang).
 
