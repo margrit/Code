@@ -126,7 +126,9 @@ Proof.
       [inits] des Wortes [w] realisert ist. Daher koennen wir nun mit 
       Hilfe des Dekompositionslemmas [map_decomp_3] aus der Dekomposition
       von [tr_w] eine korrespondierende Zerlegung von [inits w] 
-      in drei Teilwoerter erzeugen. *)
+      in drei Teile erzeugen. 
+      Dort, wo in der Zerlegung der Zustandsliste [q_rp]
+      vorkam, finden sich jetzt die Praefixe [x] und [xy] von [w]. *)
 
   unfold trace_w in trw_eq_trw1trw2trw3.
   apply map_decomp_3_snoc in trw_eq_trw1trw2trw3 as ex_decomp_w. 
@@ -134,13 +136,6 @@ Proof.
   destruct ex_decomp_w as [inits1 ex_decomp_w'].
   destruct ex_decomp_w' as [inits2 ex_decomp_w''].
   destruct ex_decomp_w'' as [inits3 ex_decomp_w'''].
-  destruct ex_decomp_w''' as [p1 ex_decomp_w''''].
-  destruct ex_decomp_w'''' as [p2 ex_decomp_w_eqs1].
-
-  destruct ex_decomp_w_eqs1 as [ex_decomp_w_eqs1' dhq0p2_eq_qrp].
-  destruct ex_decomp_w_eqs1' as [iw_eq_i1p1i2p2i3 dhq0p1_eq_qrp].
-
-  (* Variante: Gleich x und xy als Namen benutzen:
 
   destruct ex_decomp_w''' as [x ex_decomp_w''''].
   destruct ex_decomp_w'''' as [xy ex_decomp_w_eqs1].
@@ -148,40 +143,26 @@ Proof.
   destruct ex_decomp_w_eqs1 as [ex_decomp_w_eqs1' dhq0xy_eq_qrp].
   destruct ex_decomp_w_eqs1' as [iw_eq_i1xi2xyi3 dhq0x_eq_qrp].
 
-   *)
-
-
   (** Nun koennen wir das Dekompositionslemma [w_decomp_of_initsw_decomp]
       benutzen, um aus der Zerlegung der Praefixliste [inits w] eine 
-      korrespondierende Zerlegung des Eingabeworts [w] zu erhalten. *)
+      korrespondierende Zerlegung des Eingabeworts [w] in 
+      die drei Teilwoerter [x], [y] und [z] zu erhalten.
+      Dabei ergeben sich [y] und [z] als Differenzen zwischen 
+      - den Praefixen [x] und [xy] sowie
+      - dem Praefix [xy] und dem gesamten Eingabewort [w]. *)
 
-  apply w_decomp_of_initsw_decomp in iw_eq_i1p1i2p2i3 as ex_decomp_w.
+  apply w_decomp_of_initsw_decomp in iw_eq_i1xi2xyi3 as ex_decomp_w.
   destruct ex_decomp_w as [ex_y ex_z].
 
   destruct ex_y as [y y_props].
-  destruct y_props as [p2_eq_p1y y_len].
+  destruct y_props as [xy_eq_x_y y_len].
 
-  destruct ex_z as [z w_eq_p2z].
+  destruct ex_z as [z w_eq_xyz].
 
   (** Aufraeumarbeiten: 
+      Wir entfernen nicht mehr benoetigte Hypothesen. *)
 
-      Wir benennen die Prafixe p1 und p2 entsprechend ihrer Rolle fuer
-      die Aussage des Pumping-Lemmas um und entfernen nicht mehr 
-      benoetigte Hypothesen. *)
-
-  remember p1 as x.
-  remember p2 as xy.
-  remember dhq0p1_eq_qrp as dhq0x_eq_qrp.
-  remember dhq0p2_eq_qrp as dhq0xy_eq_qrp.
-  remember p2_eq_p1y as xy_eq_x_y.
-  remember w_eq_p2z as w_eq_xyz.
-
-  clear Heqx Heqxy Heqdhq0x_eq_qrp Heqdhq0xy_eq_qrp.
-  clear p1 p2 dhq0p1_eq_qrp dhq0p2_eq_qrp.
-  clear Heqxy_eq_x_y Heqw_eq_xyz.
-  clear p2_eq_p1y w_eq_p2z.
-
-  clear trw_eq_trw1trw2trw3 iw_eq_i1p1i2p2i3.
+  clear trw_eq_trw1trw2trw3 iw_eq_i1xi2xyi3.
   clear tr_w trw1 trw2 trw3.
   clear inits1 inits2 inits3.
 
@@ -202,8 +183,10 @@ Proof.
 
     exact (y_len).
 
-  - (** Dass die Zusammensetung von [x],[y] und [z] das Eingabewort [w] 
-          ergibt sich aus Eigenschaften Zerlegung der Praefixliste. *)
+  - (** Dass die Zusammensetzung von [x],[y] und [z] dem Eingabewort [w] 
+        entspricht, ergibt sich aus den Eigenschaften der Zerlegung 
+        des Eingabeworts, die aus der Zerlegung der Praefixliste 
+        erzeugt wurde. *)
 
     rewrite <- xy_eq_x_y.
     rewrite <- w_eq_xyz.
@@ -231,7 +214,7 @@ Proof.
        des Worts [y] von Zustand [q_rp] selbst aus. *)
 
     pose dhq0xy_eq_qrp as dhq0xy_eq_dhq0x.
-    rewrite <- dhq0x_eq_qrp in dhq0xy_eq_dhq0x. (* Namen drehen! *)
+    rewrite <- dhq0x_eq_qrp in dhq0xy_eq_dhq0x. 
     rewrite xy_eq_x_y in dhq0xy_eq_dhq0x.
 
     rewrite delta_hat_app in dhq0xy_eq_dhq0x.
@@ -246,9 +229,9 @@ Proof.
     rewrite pump_y.
 
     (** Es bleibt lediglich zu zeigen, dass bei Eingabe des Teilworts [z] von
-        [q_rp] aus wiederum ein Endzustand erreicht wird, was sich durch 
-        die Gleichheit von [q_rp] und [delta_hat q0 x y] sowie  
-        [xyz] und [w] moeglich ist. *)
+        [q_rp] aus wiederum ein Endzustand erreicht wird, was sich durch
+        die Gleichheit von [q_rp] und [delta_hat q0 x y] sowie
+        von [xyz] und [w] moeglich ist. *)
 
     rewrite <- dhq0xy_eq_qrp.
     rewrite <- delta_hat_app.
