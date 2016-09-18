@@ -34,7 +34,7 @@ Defined.
 Lemma symIsoIso {A B : Type} : (A ≅ B) ≅ (B ≅ A).
 Proof.
   apply (MkIso _ _ symIso symIso);
-  intro isoab; destruct isoab; compute; reflexivity.
+  intro isoab; destruct isoab; simpl; reflexivity.
 Defined.
   
 (* composition of isomorphisms *)
@@ -316,10 +316,10 @@ Defined.
 Lemma sumFalseIso (X : Type) : (False + X) ≅ X.
 Proof.
   apply (MkIso _ _ ((False_rect X) ▿ id) inr).
-  + intro x; compute; reflexivity.
+  + intro x; simpl; reflexivity.
   + intro fx; destruct fx as [f | x].
     - destruct f.  
-    - compute; reflexivity.
+    - simpl; reflexivity.
 Defined.
 
 (* (Fin.t 0) is also neutral for + *)
@@ -369,7 +369,7 @@ Lemma sumIsFiniteLemma (n m : nat) : forall (X Y : Type),
 Proof.
   induction n.
   + intros X Y isoXt0 isoYtm.
-    compute.
+    simpl.
     apply ((sumFalseIso _) ⇛).
     apply ((sumIsoLeft _ isoFalseFin0) ⇚).
     exact (sumIso isoXt0 isoYtm).
@@ -417,7 +417,7 @@ Notation " f ⊠ g " := (prodMap f g) (at level 10).
 Lemma prodCommutative (X Y : Type) : (X * Y) ≅ (Y * X).
 Proof.
   apply (MkIso (X * Y) (Y * X) (snd ▵ fst) (snd ▵ fst));
-  intro pair; destruct pair; compute; reflexivity.
+  intro pair; destruct pair; simpl; reflexivity.
 Defined.
 
 (* prod is a functor: it respects isomorphisms *)
@@ -451,8 +451,8 @@ Defined.
 Lemma prodTrueIso (X : Type) : (True * X) ≅ X.
 Proof.
   apply (MkIso _ _ snd ((fun _ => I) ▵ id)).
-  + intro x; compute; reflexivity.
-  + intro tx; destruct tx as [t x]; destruct t; compute; reflexivity.
+  + intro x; simpl; reflexivity.
+  + intro tx; destruct tx as [t x]; destruct t; simpl; reflexivity.
 Defined.
 
 (* product distributes over sum *)
@@ -467,9 +467,9 @@ Lemma prodDistSumIsoLeft (X Y Z : Type) : (X * (Y + Z)) ≅ ((X * Y) + (X * Z)).
 Proof.
   apply (MkIso _ _ (prodDistSumIsoTo X Y Z) ((id ⊠ inl) ▿ (id ⊠ inr))).
   + intro sumXYXZ; destruct sumXYXZ as [pair | pair];
-    destruct pair; compute; reflexivity.
+    destruct pair; simpl; reflexivity.
   + intro pairXSumYZ. 
-    destruct pairXSumYZ as [x [y | z]]; compute; reflexivity.
+    destruct pairXSumYZ as [x [y | z]]; simpl; reflexivity.
 Defined.
 
 Lemma prodDistSumIsoRight (X Y Z : Type) : ((Y + Z) * X) ≅ ((Y * X) + (Z * X)). 
@@ -484,7 +484,7 @@ Lemma prodIsFiniteLemma (n m : nat) : forall (X Y : Type),
 Proof.
   induction n.
   + intros X Y isoXt0 isoYtm.
-    compute.
+    simpl.
     apply (isoFalseFin0 ⇛).
     apply ((prodFalseIso (Fin.t m)) ⇛).
     apply ((prodIsoLeft _ isoFalseFin0) ⇚).
@@ -606,12 +606,12 @@ Defined.
 Lemma lemma (n m : nat) : (Vector.t (Fin.t n) m) ≅ (Fin.t (n ^ m)).
 Proof.
   induction m.
-  + compute.
+  + simpl.
     apply (MkIso _ _ (lemma1To (Fin.t n)) (lemma1From (Fin.t n))).
     - intro f; dependent destruction f.
       * simpl; reflexivity.
       * dependent destruction f; simpl.
-    - intro v; compute; dependent destruction v; reflexivity.
+    - intro v; simpl; dependent destruction v; reflexivity.
   + apply (transIso (prodIsFiniteLemma n (n ^ m)
                         (Fin.t n) (Fin.t (n ^ m)) (idIso _) (idIso _))).
     apply (transIso (prodIsoRight (Fin.t n) IHm)).
