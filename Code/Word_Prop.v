@@ -94,7 +94,7 @@ Defined.
 (** Die Konkatenation von Listen ist assoziativ.*)
 
 Lemma concat_associative {A : Type} (l1 l2 l3 : list A) :
-     (l1 ++ l2) ++ l3 = l1 ++ (l2 ++ l3). 
+     (l1 ++ l2) ++ l3 = l1 ++ (l2 ++ l3).
 Proof.
   induction l1.
   - simpl.
@@ -174,7 +174,7 @@ Defined.
 (** Die Konkatenation von Woertern ist assoziativ.*)
 
 Lemma concat_word_associative {A : Type} (w1 w2 w3 : @Word A) :
-      concat_word (concat_word w1 w2) w3 = 
+      concat_word (concat_word w1 w2) w3 =
       concat_word w1 (concat_word w2 w3).
 Proof.
   induction w3.
@@ -207,7 +207,7 @@ Proof.
 Defined.
 
 Lemma word_reverse_snoc {A : Type} (w : @Word A) (a : A) :
-      word_reverse (snoc w a) = concat_word [a] (word_reverse w). 
+      word_reverse (snoc w a) = concat_word [a] (word_reverse w).
 Proof.
   simpl.
   reflexivity.
@@ -215,14 +215,14 @@ Defined.
 
 (** Das Umdrehen von Woertern ist idempotent.*)
 
-Lemma word_reverse_idempotent {A : Type} (w : @Word A) : 
+Lemma word_reverse_idempotent {A : Type} (w : @Word A) :
       word_reverse (word_reverse w) = w.
 Proof.
   induction w.
   - simpl.
     reflexivity.
   - simpl.
-    pose (word_reverse_concat_word (snoc eps a) (word_reverse w) ).
+    pose (word_reverse_concat_word (snoc eps a) (word_reverse w)).
     rewrite e.
     rewrite IHw.
     simpl.
@@ -268,7 +268,7 @@ es sich um einen Antihomomorphismus: Das neutrale Element wird erhalten, das Bil
 ist die umgekehrte Konkatenation der Bilder der Einzellisten.*)
 
 Lemma list_to_word_simple_antihom {A: Type} (l1 l2 : list A) :
-      list_to_word_simple (l1 ++ l2) = 
+      list_to_word_simple (l1 ++ l2) =
       concat_word (list_to_word_simple l2) (list_to_word_simple l1).
 Proof.
   induction l1.
@@ -279,7 +279,7 @@ Proof.
     reflexivity.
 Defined.
 
-(** Um eine Liste mithilfe von [list_to_word_simple] in ein Wort unter Beachtung der Reihenfolge unzuwandeln,
+(** Um eine Liste mithilfe von [list_to_word_simple] in ein Wort unter Beachtung der Reihenfolge umzuwandeln,
  koennen zwei verschiedene Ansaetze verwendet werden. Die Liste wird zuerst in ein Wort umgewandelt
 und anschliessend wird die Reihenfolge mit [word_reverse] geaendert oder die Liste wird zuerst mit [rev]
 umgedreht und anschliessend in ein Wort umgewandelt. Da jeweils zwei Antihomomorphismen hintereinander
@@ -294,7 +294,7 @@ Definition list_to_word'' {A : Type} (l : list A) : @Word A :=
 (**  [list_to_word'] und [list_to_word''] basieren auf Funktionen, die durch Pattern Matching definiert sind.
 Durch Auffaltung der Definitionen koennen auch [list_to_word'] und [list_to_word''] ueber Pattern Matching
 definiert werden. Es stellt sich heraus, dass in beiden Faellen dieselbe Funktion [list_to_word] entsteht.
-Die Gleichheiten werden in  [list_to_word_Lemma] und [list_to_word_Lemma'] gezeigt.*)
+Die Gleichheiten werden in [list_to_word_Lemma] und [list_to_word_Lemma'] gezeigt.*)
 
 Fixpoint list_to_word {A : Type} (l : list A) : @Word A :=
   match l with
@@ -389,7 +389,7 @@ Proof.
 Defined.
 
 (** Wie schon bei [list_to_word] kann bei [word_to_list] die Reihenfolge durch das Umdrehen der Liste nach der
- Umwandlung mit [rev] oder das vorhrige Umdrehen gewaehrleistet werden. Dies wird durch die Funktionen
+ Umwandlung mit [rev] oder das vorherige Umdrehen gewaehrleistet werden. Dies wird durch die Funktionen
  [word_to_list'] und [word_to_list''] dargestellt.*)
 
 Definition word_to_list' {A : Type} (w : @Word A) : list A :=
@@ -489,7 +489,7 @@ Proof.
     reflexivity.
 Qed.
 
-(** [list_to_word] und [word_to_list*] sind zueinander inverse Isomorphismen.*)
+(** [list_to_word] und [word_to_list] sind zueinander inverse Isomorphismen.*)
 
 Lemma list_word_list {A : Type} (l : list A) :
       word_to_list (list_to_word l) = l.
@@ -553,8 +553,6 @@ Proof.
   reflexivity.
 Defined.
 
-
-
 (* --------------------------------------------------------------------------*)
 
 (** ** Inits und Tails *)
@@ -569,7 +567,7 @@ Defined.
 Fixpoint tails_w {X : Type} (w : @Word X) : @Word (@Word X) :=
   match w with
     | eps          => snoc eps eps
-    | snoc xs x => snoc (map_word (fun w => snoc w x) (tails_w xs)) eps 
+    | snoc xs x => snoc (map_word (fun w => snoc w x) (tails_w xs)) eps
   end.
 
 (** *** Verschiedene inits-Varianten *)
@@ -596,7 +594,7 @@ Fixpoint inits_w''{X : Type} (w : @Word X) : @Word (@Word X) :=
     | eps          => snoc eps eps
     | snoc w' x =>
         concat_word (snoc eps eps) 
-                    (map_word (fun w'' => concat_word w'' (snoc eps x)) 
+                    (map_word (fun w'' => concat_word w'' (snoc eps x))
                               (inits_w w'))
   end.
 
@@ -616,7 +614,6 @@ Fixpoint removelast_w {A} (w : @Word A) :=
     |eps          => eps
     |snoc w' _ => w'
   end.
-
 
 (* --------------------------------------------------------------------------*)
 
@@ -688,8 +685,7 @@ Proof.
     reflexivity.
 Defined.
 
-
-Lemma inits_last_w {A : Type} (w : @Word A) : 
+Lemma inits_last_w {A : Type} (w : @Word A) :
       inits_w w = snoc (removelast_w (inits_w w)) w.
 Proof.
   destruct w.
@@ -699,8 +695,7 @@ Proof.
     reflexivity.
 Defined.
 
-
-Lemma app_length_w {A : Type} : forall (w w' : @Word A), 
+Lemma app_length_w {A : Type} : forall (w w' : @Word A),
       word_length (concat_word w w') = word_length w + word_length w'.
 Proof.
   intros w w'.
@@ -714,8 +709,7 @@ Proof.
     reflexivity.
 Defined.
 
-
-Lemma absurd_eps_eq_concat_snoc {A : Type} (w w' : @Word A) (a : A) : 
+Lemma absurd_eps_eq_concat_snoc {A : Type} (w w' : @Word A) (a : A) :
       eps = concat_word (snoc w a) w' -> False.
 Proof.
   intro eps_eq_waw'.
@@ -724,8 +718,7 @@ Proof.
     inversion eps_eq_waw'.
   - simpl in eps_eq_waw'.
     inversion eps_eq_waw'.
-Defined. 
-
+Defined.
 
 Lemma ex_snoc_map {A B : Type} (w : @Word A) (v : @Word B) (b : B) (f : A -> B) :
       map_word f w = snoc v b ->
