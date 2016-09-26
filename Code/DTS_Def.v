@@ -1,16 +1,3 @@
-(* TODO Margrit:  -> done
-      Bemerkungen anpassen: 
-         Was sind Deterministische Transitionssysteme ?
-           im Prinzip dasselbe wie DFAs, nur die Endlichkeit der 
-           Zustands- und Eingabealphabet-Typen ist weggelassen
-         DFAs sind also spezielle DTSs.
-         Warum trennen wir das?
-           Definitionen delta_hat, Conf, Lang_delta, Lang_Conf und auch
-           der Äquivalenzbeweis von Lang_delta und Lang_Conf (in DFA_prop 
-           (das sollte übrigens DTS_prop heissen)) hängen nicht von der
-           Endlichkeit ab.
-*)
-
 (** Wie in der Vorlesung Theoretische Informatik I werden die einzelne Komponenten eines
  deterministischen Transitionssystem (DTS) als 5-Tupel beschrieben.
 
@@ -23,13 +10,9 @@ DTS = (Q, Sigma, delta, q0, F) mit
 * F Teilmenge von Q, als Menge der akzeptierenden Zustände.
 
 Diese Komponenten werden nachfolgend definiert.*)
-
-(*Load Pigeonhole_vector.
-Load Word_Prop. *)
 Require Import Word_Prop.
 
 Module Type DTS_Par.
-
 
 (** Der Typ der Zustände.*)
 Parameter Q : Type.
@@ -45,8 +28,8 @@ Parameter is_accepting : Q -> Type. (*Proofs as programs Pädagogik*)
 
 (** Der Startzustand. *)
 Parameter q0 : Q.
-
 End DTS_Par.
+
 (** Signatur der Eigenschaften von DTS.*)
 Module Type DTS_Prop.
 
