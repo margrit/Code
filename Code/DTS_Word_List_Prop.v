@@ -16,10 +16,10 @@ werden. Bei [delta_hat] muss die Liste durch [list_to_word] in ein Wort umgewand
 da der Eingabetyp [Word] erwartet wird. Die Abbildung in die andere Richtung kann man mit
 [word_to_list] analog definieren.*)
 Lemma delta_hat_cons_snoc (q : Q) (l : list Sigma) :
-  delta_hat_cons q l = delta_hat q (list_to_word l).
+      delta_hat_cons q l = delta_hat q (list_to_word l).
 Proof.
-generalize q.
-induction l.
+  generalize q.
+  induction l.
   - simpl.
     reflexivity.
   - simpl.
@@ -30,10 +30,10 @@ induction l.
 Defined.
 
 Lemma delta_hat_snoc_cons (q : Q) (w : @Word Sigma) :
-  delta_hat q w = delta_hat_cons q (word_to_list w).
+      delta_hat q w = delta_hat_cons q (word_to_list w).
 Proof.
-generalize q.
-induction w.
+  generalize q.
+  induction w.
   - simpl.
     reflexivity.
   - simpl.
@@ -45,11 +45,11 @@ Defined.
 
 (** Die Funktionen [Lang_delta] und [Lang_delta_cons] beschreiben die gleichen Sprachen.*)
 Lemma Lang_delta_Lemma (w : @Word Sigma) :
-  Lang_delta w = Lang_delta_cons (word_to_list w).
+      Lang_delta w = Lang_delta_cons (word_to_list w).
 Proof.
-unfold Lang_delta.
-unfold Lang_delta_cons.
-induction w.
+  unfold Lang_delta.
+  unfold Lang_delta_cons.
+  induction w.
   - simpl.
     reflexivity.
   - generalize q0.

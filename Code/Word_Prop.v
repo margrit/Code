@@ -73,7 +73,7 @@ Defined.
 (** * Definition von Listen *)
 
 (** In der Standardbibliothek befinden sich bereits Listenoperationen wie [concat] und [rev],
- die analog zu [concat_word] und [word_reverse] arbeiten. Zusaetzlich werden noch weitere 
+ die analog zu [concat_word] und [word_reverse] arbeiten. Zusaetzlich werden noch weitere
  Eigenschaften benoetigt, die nachfolgend gezeigt werden. *)
 
 (** ** Eigenschaften von [concat] und [rev] ueber Listen: *)

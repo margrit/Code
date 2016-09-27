@@ -5,7 +5,7 @@
    Deterministic Finite-State Automata.
  *)
 
-(** Die Datei wurde dahin verändert, dass nur noch einfache Taktiken verwerdet werden. 
+(** Die Datei wurde dahin veraendert, dass nur noch einfache Taktiken verwerdet werden.
 Die Beweise sind in die einzelnen Teilbeweise unterteilt und dies wird durch die Zeichen
 -, +, * Sichtbar gemacht. Um mehr als 3 Ebenen zu schachteln, werden die gleichen Zeichen
 wiederverwendet, nur dass sie mit einer geschweiften Klammer umrahmt sind.
@@ -16,14 +16,14 @@ Section Transitions.
 
 Fixpoint word_replicate (n : nat) (l : list Sigma) : list Sigma :=
   match n with
-  | O    => nil
-  | S n' => l ++ word_replicate n' l
+    | O    => nil
+    | S n' => l ++ word_replicate n' l
   end.
 
 (* Wenn es eine Schleife im Automaten gibt, kann man diese nutzen,
-um das Wort aufzublähen an dieser Stelle und bleibt im gleichen Zustand. *)
+um das Wort aufzublaehen an dieser Stelle und bleibt im gleichen Zustand. *)
 Theorem delta_hat_cons_loop: forall n : nat, forall q : Q, forall xs : list Sigma,
-  delta_hat_cons q xs = q -> delta_hat_cons q (word_replicate n xs) = q.
+       delta_hat_cons q xs = q -> delta_hat_cons q (word_replicate n xs) = q.
 Proof.
   induction n as [|n'].
   - intros q xs H.
@@ -40,8 +40,8 @@ Qed.
 
 Fixpoint inits {X : Type} (l : list X) : list (list X) :=
   match l with
-  | nil       => nil :: nil
-  | x :: xs => nil :: map (cons x) (inits xs)
+    | nil       => nil :: nil
+    | x :: xs => nil :: map (cons x) (inits xs)
   end.
 
 Eval compute in (inits (1 :: 2 :: nil)).
@@ -60,12 +60,12 @@ Proof.
 Qed.
 
 Theorem inits_dec_1 :
-  forall X : Type,
-  forall l : list X,
-  forall y : list X, 
-  forall xs ys : list (list X),
-   inits l = xs ++ (y :: ys) ->
-    exists zs : list X, l = y ++ zs.
+       forall X : Type,
+       forall l : list X,
+       forall y : list X, 
+       forall xs ys : list (list X),
+        inits l = xs ++ (y :: ys) ->
+        exists zs : list X, l = y ++ zs.
 Proof.
   intros X l.
   induction l as [|h l'].
@@ -118,12 +118,12 @@ Proof.
 Qed.
 
 Theorem inits_dec_2 :
-  forall X : Type,
-  forall l : list X,
-  forall y z : list X,
-  forall xs ys zs : list (list X),
-   inits l = xs ++ (y :: ys) ++ (z :: zs) ->
-    exists ds : list X, z = y ++ ds /\ length ds > 0.
+       forall X : Type,
+       forall l : list X,
+       forall y z : list X,
+       forall xs ys zs : list (list X),
+         inits l = xs ++ (y :: ys) ++ (z :: zs) ->
+         exists ds : list X, z = y ++ ds /\ length ds > 0.
 Proof.
   intros X l.
   induction l as [|h l'].
@@ -265,14 +265,14 @@ Proof.
                 } }
 Qed.
 
-Theorem inits_dec : 
-  forall X : Type, 
-  forall l : list X,
-  forall b c : list X, 
-  forall ass bs cs : list (list X),
-  inits l = ass ++ (b :: bs) ++ (c :: cs) ->
-  (exists ds : list X, c = b ++ ds /\ length ds > 0) /\
-  exists es : list X, l = c ++ es.
+Theorem inits_dec :
+       forall X : Type, 
+       forall l : list X,
+       forall b c : list X, 
+       forall ass bs cs : list (list X),
+         inits l = ass ++ (b :: bs) ++ (c :: cs) ->
+        (exists ds : list X, c = b ++ ds /\ length ds > 0) /\
+         exists es : list X, l = c ++ es.
 Proof.
   intros X l b c ass bs cs H.
   remember H as H2.
@@ -291,10 +291,10 @@ Proof.
 Qed.
 
 Definition prefixes (q : Q) (l : list Sigma) : list Q :=
-  map (delta_hat_cons q) (inits l).
+           map (delta_hat_cons q) (inits l).
 
 Lemma prefixes_len : forall l : list Sigma, forall q : Q,
-  length (prefixes q l) = S (length l).
+      length (prefixes q l) = S (length l).
 Proof.
   intros.
   unfold prefixes.
@@ -305,15 +305,15 @@ Qed.
 
 (** Das Pumping Lemma: *)
 Theorem pumping_lemma : forall w : list Sigma,
-  accepted_word_cons w -> Q_size <= length w ->
-  exists xs : list Sigma,
-  exists ys : list Sigma,
-  exists zs : list Sigma,
-  length ys > 0 /\
- (* length ys < Q_size -> *)
-  w = xs ++ ys ++ zs /\
-  forall n : nat,
-  accepted_word (xs ++ (word_replicate n ys) ++ zs).
+       accepted_word_cons w -> Q_size <= length w ->
+       exists xs : list Sigma,
+       exists ys : list Sigma,
+       exists zs : list Sigma,
+       length ys > 0 /\
+      (* length ys < Q_size -> *)
+       w = xs ++ ys ++ zs /\
+       forall n : nat,
+       accepted_word (xs ++ (word_replicate n ys) ++ zs).
 Proof.
   intros w acc len_w.
   (* Let's look at which state the DFA is after reading
@@ -343,7 +343,7 @@ Proof.
       destruct H0.
       destruct H1.
       destruct H2.
-      (* x4 und x5 können nicht nil sein *)
+      (* x4 und x5 koennen nicht nil sein *)
       destruct x4 as [|y x4].
       * { inversion H2. }
       * { destruct x5 as [|y2 x5].

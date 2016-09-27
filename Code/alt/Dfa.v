@@ -5,7 +5,7 @@
    Deterministic Finite-State Automata.
  *)
 
-(** Die Datei wurde dahin verändert, dass nur noch einfache Taktiken verwerdet werden. 
+(** Die Datei wurde dahin veraendert, dass nur noch einfache Taktiken verwerdet werden. 
 Die Beweise sind in die einzelnen Teilbeweise unterteilt und dies wird durch die Zeichen
 -, +, * Sichtbar gemacht. Um mehr als 3 Ebenen zu schachteln, werden die gleichen Zeichen
 wiederverwendet, nur dass sie mit einer geschweiften Klammer umrahmt sind.
@@ -15,12 +15,12 @@ Section Transitions.
 
 Fixpoint word_replicate (n : nat) (l : list Sigma) : list Sigma :=
   match n with
-  | O    => nil
-  | S n' => l ++ word_replicate n' l
+    | O    => nil
+    | S n' => l ++ word_replicate n' l
   end.
 
 (* Wenn es eine Schleife im Automaten gibt, kann man diese nutzen,
-um das Wort aufzublähen an dieser Stelle und bleibt im gleichen Zustand. *)
+um das Wort aufzublaehen an dieser Stelle und bleibt im gleichen Zustand. *)
 Theorem ext_loop: forall n : nat, forall q : Q, forall xs : list Sigma,
   ext q xs = q -> ext q (word_replicate n xs) = q.
 Proof.
@@ -39,8 +39,8 @@ Qed.
 
 Fixpoint inits {X : Type} (l : list X) : list (list X) :=
   match l with
-  | nil       => nil :: nil
-  | x :: xs => nil :: map (cons x) (inits xs)
+    | nil       => nil :: nil
+    | x :: xs => nil :: map (cons x) (inits xs)
   end.
 
 Eval compute in (inits (1 :: 2 :: nil)).
@@ -347,7 +347,7 @@ Proof.
       destruct H0.
       destruct H1.
       destruct H2.
-      (* x4 und x5 können nicht nil sein *)
+      (* x4 und x5 koennen nicht nil sein *)
       destruct x4 as [|y x4].
       * { inversion H2. }
       * { destruct x5 as [|y2 x5].

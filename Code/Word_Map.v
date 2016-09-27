@@ -13,13 +13,13 @@
 
 
 Lemma map_decomp_2_w : forall X Y :Type, forall f : X -> Y, forall w : @Word X,
-  forall v1 v2 : @Word Y,
-  map_word f w = concat_word v1 v2 -> 
-     { w1 : @Word X & { w2 : @Word X &
+      forall v1 v2 : @Word Y,
+      map_word f w = concat_word v1 v2 ->
+         { w1 : @Word X & { w2 : @Word X &
          ((w = concat_word w1 w2) *
           (map_word f w1 = v1) *
           (map_word f w2 = v2)
-         )%type  } }.
+           )%type  } }.
 Proof.
   intros X Y f.
   induction w.
@@ -49,7 +49,7 @@ Proof.
       * { inversion H. }
       (* v1' = snoc v1' y1 *)
       * { simpl in H.
-          
+
           inversion H.
           exists (snoc w a).
           exists eps.
@@ -79,14 +79,14 @@ Defined.
 
 
 Lemma map_decomp_3 : forall X Y : Type, forall f : X -> Y, forall w : @Word X,
-  forall v1 v2 v3 : @Word Y,
-  map_word f w = concat_word (concat_word v1 v2) v3 ->
-  { w1 : @Word X & { w2 : @Word X & { w3 : @Word X &
-  ((w = concat_word (concat_word w1 w2) w3) *
-   (map_word f w1 = v1) * 
-   (map_word f w2 = v2) * 
-   (map_word f w3 = v3)
-  )%type } } }.
+      forall v1 v2 v3 : @Word Y,
+      map_word f w = concat_word (concat_word v1 v2) v3 ->
+      { w1 : @Word X & { w2 : @Word X & { w3 : @Word X &
+      ((w = concat_word (concat_word w1 w2) w3) *
+      (map_word f w1 = v1) * 
+      (map_word f w2 = v2) * 
+      (map_word f w3 = v3)
+        )%type } } }.
 Proof.
   intros X Y f w v1 v2 v3 H.
 
@@ -116,87 +116,87 @@ Defined.
 
 
 Lemma map_decomp_3_snoc_full {X Y : Type} (f : X -> Y) (w : @Word X)
-  (v1 v2 v3 : @Word Y) (y1 y2 : Y) :
-  map_word f w = concat_word (concat_word (snoc v1 y1) (snoc v2 y2)) v3 ->
-  { w1 : @Word X & { w2 : @Word X & { w3 : @Word X &
-  { x1 : X & { x2 : X & 
-  ((w = concat_word (concat_word (snoc w1 x1) (snoc w2 x2)) w3) *
-   (map_word f (snoc w1 x1) = (snoc v1 y1)) * 
-   (map_word f (snoc w2 x2) = (snoc v2 y2)) * 
-   (map_word f w3 = v3) *
-   (map_word f w1 = v1) *
-   (map_word f w2 = v2) *
-   (f x1 = y1) *
-   (f x2 = y2)
-  )%type } } } } }.
+      (v1 v2 v3 : @Word Y) (y1 y2 : Y) :
+      map_word f w = concat_word (concat_word (snoc v1 y1) (snoc v2 y2)) v3 ->
+      { w1 : @Word X & { w2 : @Word X & { w3 : @Word X &
+      { x1 : X & { x2 : X & 
+      ((w = concat_word (concat_word (snoc w1 x1) (snoc w2 x2)) w3) *
+      (map_word f (snoc w1 x1) = (snoc v1 y1)) * 
+      (map_word f (snoc w2 x2) = (snoc v2 y2)) * 
+      (map_word f w3 = v3) *
+      (map_word f w1 = v1) *
+      (map_word f w2 = v2) *
+      (f x1 = y1) *
+      (f x2 = y2)
+        )%type } } } } }.
 Proof.
- intro mfw_eq_v1y1v2y2v3.
+  intro mfw_eq_v1y1v2y2v3.
 
- apply map_decomp_3 in mfw_eq_v1y1v2y2v3 as ex_decomp_w.
- destruct ex_decomp_w as [w1' [w2' [w3 d_eqs]]].
- destruct d_eqs as [[[w_eq_w1'w2'w3 mw1'_eq_v1y1] mw2'_eq_v2y2] mw3_eq_v3].
+  apply map_decomp_3 in mfw_eq_v1y1v2y2v3 as ex_decomp_w.
+  destruct ex_decomp_w as [w1' [w2' [w3 d_eqs]]].
+  destruct d_eqs as [[[w_eq_w1'w2'w3 mw1'_eq_v1y1] mw2'_eq_v2y2] mw3_eq_v3].
 
- apply ex_snoc_map in mw1'_eq_v1y1 as ex_snoc_w1.
- destruct ex_snoc_w1 as [w1 [x1 ex_snoc_w1_props]].
- destruct ex_snoc_w1_props as [[w1'_eq_w1x1 fw1_eq_v1] y1_eq_fx1].
+  apply ex_snoc_map in mw1'_eq_v1y1 as ex_snoc_w1.
+  destruct ex_snoc_w1 as [w1 [x1 ex_snoc_w1_props]].
+  destruct ex_snoc_w1_props as [[w1'_eq_w1x1 fw1_eq_v1] y1_eq_fx1].
 
- apply ex_snoc_map in mw2'_eq_v2y2 as ex_snoc_w2.
- destruct ex_snoc_w2 as [w2 [x2 ex_snoc_w2_props]].
- destruct ex_snoc_w2_props as [[w2'_eq_w2x2 fw2_eq_v2] y2_eq_fx2].
+  apply ex_snoc_map in mw2'_eq_v2y2 as ex_snoc_w2.
+  destruct ex_snoc_w2 as [w2 [x2 ex_snoc_w2_props]].
+  destruct ex_snoc_w2_props as [[w2'_eq_w2x2 fw2_eq_v2] y2_eq_fx2].
 
- exists w1.
- exists w2.
- exists w3.
- exists x1.
- exists x2.
+  exists w1.
+  exists w2.
+  exists w3.
+  exists x1.
+  exists x2.
 
- rewrite <- w1'_eq_w1x1.
- rewrite <- w2'_eq_w2x2.
+  rewrite <- w1'_eq_w1x1.
+  rewrite <- w2'_eq_w2x2.
 
- repeat split.
+  repeat split.
 
- - exact w_eq_w1'w2'w3.
- - exact mw1'_eq_v1y1.
- - exact mw2'_eq_v2y2.
- - exact mw3_eq_v3.
- - exact fw1_eq_v1.
- - exact fw2_eq_v2.
- - apply eq_sym in y1_eq_fx1. 
-   exact y1_eq_fx1.
- - apply eq_sym in y2_eq_fx2. 
-   exact y2_eq_fx2.
+  - exact w_eq_w1'w2'w3.
+  - exact mw1'_eq_v1y1.
+  - exact mw2'_eq_v2y2.
+  - exact mw3_eq_v3.
+  - exact fw1_eq_v1.
+  - exact fw2_eq_v2.
+  - apply eq_sym in y1_eq_fx1. 
+    exact y1_eq_fx1.
+  - apply eq_sym in y2_eq_fx2. 
+    exact y2_eq_fx2.
 
 Defined.
 
 
 Lemma map_decomp_3_snoc {X Y : Type} (f : X -> Y) (w : @Word X)
-  (v1 v2 v3 : @Word Y) (y1 y2 : Y) :
-  map_word f w = concat_word (concat_word (snoc v1 y1) (snoc v2 y2)) v3 ->
-  { w1 : @Word X & { w2 : @Word X & { w3 : @Word X &
-  { x1 : X & { x2 : X & 
-  ((w = concat_word (concat_word (snoc w1 x1) (snoc w2 x2)) w3) *
-   (f x1 = y1) *
-   (f x2 = y2)
-  )%type } } } } }.
+      (v1 v2 v3 : @Word Y) (y1 y2 : Y) :
+      map_word f w = concat_word (concat_word (snoc v1 y1) (snoc v2 y2)) v3 ->
+      { w1 : @Word X & { w2 : @Word X & { w3 : @Word X &
+      { x1 : X & { x2 : X & 
+      ((w = concat_word (concat_word (snoc w1 x1) (snoc w2 x2)) w3) *
+      (f x1 = y1) *
+      (f x2 = y2)
+       )%type } } } } }.
 Proof.
- intro mfw_eq_v1y1v2y2v3.
+  intro mfw_eq_v1y1v2y2v3.
 
- apply map_decomp_3_snoc_full in mfw_eq_v1y1v2y2v3 as ex_decomp_w.
- destruct ex_decomp_w as [w1' [w2' [w3 [x1' [x2' d_eqs]]]]].
+  apply map_decomp_3_snoc_full in mfw_eq_v1y1v2y2v3 as ex_decomp_w.
+  destruct ex_decomp_w as [w1' [w2' [w3 [x1' [x2' d_eqs]]]]].
 
- destruct d_eqs as [[d_eqs' fx1'_eq_y1] fx2'_eq_y2].
- destruct d_eqs' as [[[d_eqs'' mfw3_eq_v3] mfw1'_eq_v1] mfw2'_eq_v2].
- destruct d_eqs'' as [[w_eq_w1'x1'w2'x2'w3 mfw1'x1'_eq_v1y1] mfw2'x2'_eq_v2y2].
+  destruct d_eqs as [[d_eqs' fx1'_eq_y1] fx2'_eq_y2].
+  destruct d_eqs' as [[[d_eqs'' mfw3_eq_v3] mfw1'_eq_v1] mfw2'_eq_v2].
+  destruct d_eqs'' as [[w_eq_w1'x1'w2'x2'w3 mfw1'x1'_eq_v1y1] mfw2'x2'_eq_v2y2].
 
- exists w1'.
- exists w2'.
- exists w3.
- exists x1'.
- exists x2'.
+  exists w1'.
+  exists w2'.
+  exists w3.
+  exists x1'.
+  exists x2'.
 
- repeat split.
+  repeat split.
 
-- exact w_eq_w1'x1'w2'x2'w3.
-- exact fx1'_eq_y1.
-- exact fx2'_eq_y2.
+  - exact w_eq_w1'x1'w2'x2'w3.
+  - exact fx1'_eq_y1.
+  - exact fx2'_eq_y2.
 Defined.

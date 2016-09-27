@@ -1,18 +1,5 @@
 (* Quelle: https://github.com/wjzz/PumpingLemma/blob/master/Dfa.v *)
 
-(** Veraltet: 
-
-Die Datei wurde dahin verändert, dass nur noch einfache Taktiken verwerdet werden. 
-Die Beweise sind in die einzelnen Teilbeweise unterteilt und dies wird durch die Zeichen
--, +, * Sichtbar gemacht. Um mehr als 3 Ebenen zu schachteln, werden die gleichen Zeichen
-wiederverwendet, nur dass sie mit einer geschweiften Klammer umrahmt sind. Statt Listen über 
-[Sigma] werden Wörter über [Sigma] verwendet.
-
-(Von der urspruenglichen Datei ist nicht mehr viel uebrig...)
-
-*)
-
-
 (* TODO-Frage: Wie waere anstatt ausschliesslich einer Zerlegung der Beweise 
                in elementare Schritte eine "paedagogische" Illustration, wie Beweise 
                in mehreren Etappen verkuerzt werden koennen? *)
@@ -32,16 +19,18 @@ Load Conv_Vec_List_Word.
 
 (*--------------------------------------------------------------------------------------------*)
 
+(** Aufblaehen eines Wortes. *)
 Fixpoint pump_w (n : nat) (w : @Word Sigma) : @Word Sigma :=
   match n with
-  | O    => eps
-  | S n' => concat_word w (pump_w n' w)
+    | O    => eps
+    | S n' => concat_word w (pump_w n' w)
   end.
 
 (* Wenn es eine Schleife im Automaten gibt, kann man diese nutzen,
-um das Wort aufzublähen an dieser Stelle und bleibt im gleichen Zustand. *)
+um das Wort aufzublaehen an dieser Stelle und bleibt im gleichen Zustand. *)
+
 Theorem pump_loop: forall n : nat, forall q : Q, forall xs : @Word Sigma,
-  delta_hat q xs = q -> delta_hat q (pump_w n xs) = q.
+      delta_hat q xs = q -> delta_hat q (pump_w n xs) = q.
 Proof.
   induction n as [ | n' IHn'].
 
@@ -102,7 +91,7 @@ Proof.
   apply le_n_S in len_w as S_len_w.
   apply le_lt_n_Sm in S_len_w.
   apply lt_S_n in S_len_w.
-  
+
   rewrite <- tr_w_len in S_len_w.
 
   (** Anwendung des Pigeonhole-Prinzips *)

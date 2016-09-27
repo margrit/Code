@@ -7,16 +7,16 @@
 (* --------------------------------------------------------------------------*)
 
 (** Vorbereitung fuer das PL,
-    um von einer Zerlegung von [inits w] auf eine Zerlegung von [w] 
+    um von einer Zerlegung von [inits w] auf eine Zerlegung von [w]
     mit den benoetigten Eigenschaften schliessen zu koennen. *)
 
-Lemma inits_diff_w {A : Type} (w : @Word A) : 
-   forall (w1 : @Word A) (inits1 inits2 : @Word (@Word A)),
-            inits_w w = concat_word (snoc inits1 w1) inits2 
-            -> { w2 : @Word A & w = concat_word w1 w2 }.
+Lemma inits_diff_w {A : Type} (w : @Word A) :
+      forall (w1 : @Word A) (inits1 inits2 : @Word (@Word A)),
+      inits_w w = concat_word (snoc inits1 w1) inits2
+      -> { w2 : @Word A & w = concat_word w1 w2 }.
 Proof.
   induction w as [ | w' IHw a]; intros w1 inits1 inits2 iw_eq_i1w1i2.
- 
+
   - (* w = eps *)
     exists eps.
     simpl in iw_eq_i1w1i2.
@@ -59,20 +59,19 @@ Proof.
 Defined.
 
 
-Lemma inits_diff_pref_w {A : Type} (w : @Word A) : 
-  forall 
-    (p1 p2 : @Word A) 
-    (inits1 inits2 inits3 : @Word (@Word A)),
-      inits_w w = concat_word (concat_word 
-                     (snoc inits1 p1) (snoc inits2 p2)) inits3 
-       -> { diff_p1p2 : @Word A & 
-            ((p2 = concat_word p1 diff_p1p2) * 
-             (word_length diff_p1p2 > 0))%type }.
+Lemma inits_diff_pref_w {A : Type} (w : @Word A) :
+      forall (p1 p2 : @Word A)
+     (inits1 inits2 inits3 : @Word (@Word A)),
+      inits_w w = concat_word (concat_word
+     (snoc inits1 p1) (snoc inits2 p2)) inits3
+      -> { diff_p1p2 : @Word A &
+          ((p2 = concat_word p1 diff_p1p2) *
+           (word_length diff_p1p2 > 0))%type }.
 Proof.
 
   induction w as [ |w' IHw a]; 
   intros p1 p2 inits1 inits2 inits3 iw_eq_i1p1i2p2i3.
-  
+
   - (* w = eps *)
     (* ---> unmoeglich, da |inits_w eps| = 1 und 
             |i1p1i2p2i3| >= 2 durch die 2 snocs. *)
@@ -138,7 +137,7 @@ Proof.
 
            - simpl in eps_eq_i1p1i2.
              inversion eps_eq_i1p1i2.
- 
+
            - simpl in eps_eq_i1p1i2.
              inversion eps_eq_i1p1i2.
          }
@@ -174,10 +173,10 @@ Proof.
            simpl in *.
            inversion w''w''a'_eq_i1p1i2 as [[iw''_eq_i1 w''a'p1]].
            rewrite inits_last_w in iw''_eq_i1. 
-           
+
            inversion iw''_eq_i1 as [[riw_eq_inits1 w'_eq_p1]]. 
            rewrite <- w'_eq_p1.
-           
+
            exists (snoc eps a).
            split.
 
@@ -188,7 +187,7 @@ Proof.
          { (* inits2 = snoc init2' p2' 
               ---> inits w = concat_word (snoc inits1 p1) 
                              (snoc (snoc ints2' p2') p2) *)
- 
+
            pose (IHw p1 p2' inits1 inits2' eps) as IHw_inst.
            simpl in IHw_inst. simpl in w''w''a'_eq_i1p1i2.
            apply IHw_inst in w''w''a'_eq_i1p1i2 as ex_diff.
@@ -233,15 +232,15 @@ Defined.
 
 
 (* Hier werden nur die beiden vorhergehenden Lemmata zusammengefasst. *)
-Lemma w_decomp_of_initsw_decomp {A : Type} (w : @Word A): 
-  forall (p1 p2 : @Word A)
-         (inits1 inits2 inits3 : @Word (@Word A)),
-  inits_w w = concat_word (concat_word 
-                (snoc inits1 p1) (snoc inits2 p2)) inits3 
-  -> { diff_p1p2 : @Word A &
-       ((p2 = concat_word p1 diff_p1p2) * 
-        (word_length diff_p1p2 > 0))%type } *
-        { diff_p2w : @Word A & w = concat_word p2 diff_p2w }.
+Lemma w_decomp_of_initsw_decomp {A : Type} (w : @Word A):
+      forall (p1 p2 : @Word A)
+     (inits1 inits2 inits3 : @Word (@Word A)),
+      inits_w w = concat_word (concat_word
+     (snoc inits1 p1) (snoc inits2 p2)) inits3
+      -> { diff_p1p2 : @Word A &
+      ((p2 = concat_word p1 diff_p1p2) *
+       (word_length diff_p1p2 > 0))%type } *
+       { diff_p2w : @Word A & w = concat_word p2 diff_p2w }.
 
 Proof.
   intros p1 p2 inits1 inits2 inits3 iw_eq_i1p1i2p2i3p3.

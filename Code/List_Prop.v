@@ -3,7 +3,7 @@ Require Import List.
 Print list.
 Print andb.
 
-(*Prüfen, ob zwei Listen gleich sind.(Die gleichen Elemente haben.)*)
+(** Pruefen, ob zwei Listen gleich sind.(Die gleichen Elemente haben.)*)
 Fixpoint eqb_list {A : Type} (eqbA: A -> A -> bool) (l l': list A) : bool :=
   match l with
     | nil  =>

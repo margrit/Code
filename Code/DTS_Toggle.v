@@ -14,12 +14,12 @@ Definition is_accepting (q : Q) : Type :=
 
 Definition q0 := off.
 
-(*Definition, welche Übergänge möglich sind.*)
+(*Definition, welche Uebergaenge moeglich sind.*)
 Definition delta (p : Q) (a : Sigma) : Q :=
-match p with
-  | on  => off
-  | off  => on
-end.
+  match p with
+    | on  => off
+    | off  => on
+  end.
 
 End DTS_Example.
 
@@ -31,10 +31,10 @@ Import Ex_Prop.
 - zwei Sprachen definieren
 ** press gerade
 ** press ungerade
--> typwertiges Prädikat
+-> typwertiges Praedikat
 *)
 
-Inductive even_press : @Word Sigma -> Type := 
+Inductive even_press : @Word Sigma -> Type :=
   | eps_even : even_press eps
   | snoc_even {w : @Word Sigma} {a : Sigma} : odd_press w -> even_press (snoc w a)
 with odd_press : @Word Sigma -> Type :=
@@ -45,17 +45,17 @@ with odd_press : @Word Sigma -> Type :=
   forall w, Lang_delta w -> odd_press w *)
 
 Lemma xyz : forall w,
-((even_press w * (delta_hat q0 w = off)) +
-(odd_press w * (delta_hat q0 w = on)))%type.
+      ((even_press w * (delta_hat q0 w = off)) +
+      (odd_press w * (delta_hat q0 w = on)))%type.
 Proof.
-induction w.
-- simpl.
-  left.
-  split.
+  induction w.
+  - simpl.
+    left.
+    split.
     + exact eps_even.
     + reflexivity.
-- simpl.
-  destruct IHw as [[peven x] | [podd y]].
+  - simpl.
+    destruct IHw as [[peven x] | [podd y]].
     + right.
        split.
        * exact (snoc_odd peven).
@@ -70,45 +70,46 @@ induction w.
          reflexivity.
 Defined.
 
-Lemma even_odd_disjoint (w : @Word Sigma) : even_press w -> odd_press w -> False.
+Lemma even_odd_disjoint (w : @Word Sigma) :
+      even_press w -> odd_press w -> False.
 Proof.
-intros even odd.
-induction w.
-- inversion odd.
-- inversion even.
-  inversion odd.
-  exact (IHw X0 X).
+  intros even odd.
+  induction w.
+  - inversion odd.
+  - inversion even.
+    inversion odd.
+    exact (IHw X0 X).
 Defined.
 
 (* z.z. forall w, Lang_delta w -> odd_press w *)
 
 Lemma lala : forall w, Lang_delta w -> odd_press w.
 Proof.
-unfold Lang_delta.
-intros w w_in_L.
-pose (xyz w) as decide_L.
-destruct decide_L as [[even off] |[odd on]].
-- rewrite off in w_in_L.
-  simpl in w_in_L.
-  destruct w_in_L.
-- exact odd.
+  unfold Lang_delta.
+  intros w w_in_L.
+  pose (xyz w) as decide_L.
+  destruct decide_L as [[even off] |[odd on]].
+  - rewrite off in w_in_L.
+    simpl in w_in_L.
+    destruct w_in_L.
+  - exact odd.
 Defined.
 
 Lemma lala2 : forall w, odd_press w -> Lang_delta w.
 Proof.
-unfold Lang_delta.
-intros w odd.
-pose (xyz w) as decide_L.
-destruct decide_L as [[even off] |[odd' on]].
-- pose (even_odd_disjoint w even odd) as ff.
-  destruct ff.
-- rewrite on.
-  simpl.
-  exact I.
+  unfold Lang_delta.
+  intros w odd.
+  pose (xyz w) as decide_L.
+  destruct decide_L as [[even off] |[odd' on]].
+  - pose (even_odd_disjoint w even odd) as ff.
+    destruct ff.
+  - rewrite on.
+    simpl.
+    exact I.
 Defined.
 
-(** Äquivalenz zwischen odd_press und Lang_delta. Die Sprache die von dem 
-Toggle Automaten akzeptiert wird besteht genau aus den Wörtern, deren Länge
+(** Aequivalenz zwischen odd_press und Lang_delta. Die Sprache die von dem 
+Toggle Automaten akzeptiert wird besteht genau aus den Woertern, deren Laenge
 ungerade ist. *)
 Require Import Equivalences.
 Module Lang_Toggle : Logical_EQ_type_valued_pred.

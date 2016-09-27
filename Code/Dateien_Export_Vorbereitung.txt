@@ -1,0 +1,31 @@
+Folgende Änderungen worden bereits in den hier gelisteten Dateien durchgeführt:
+
+- Vorbereitung für LaTeX Export:
+
+** Umlaute und ß entfernt
+** Taktiken richtig eingerückt
+** Lemmata/Definitionen und co eingerückt mit folgendem Freiraum:
+      Lemma
+       Theorem
+           Definition
+
+Conv_Vec_List_Word
+DFA_Def
+DFA_Prop
+DTS_Def
+DTS_Toggle
+DTS_eq_Lang
+DTS_Word_List_Prop
+DTS_cons_Prop
+Equivalences
+Fin_ext
+General
+List_Prop
+Pumping_Lemma_vector
+Pumping_Lemma_Word
+Repeats
+Repeats_List
+Word_Map
+Word_Inits
+Word_Prop
+Words
