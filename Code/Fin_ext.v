@@ -5,6 +5,9 @@ Require Import Arith.
 (* We need some Extensions to the Vectors.Fin library, first of all *)
 (* versions of to_nat and of_nat with strong sums *) 
 
+(** Es werden zuerst noch ein paar Erweiterungen zur Vectors.Fin Bibliothek
+ benoetigt. Als erstes eine Version von [to_nat] und [of_nat] mit festen Summen*)
+
 Fixpoint of_nat' (p n : nat) : (t n) + { m : nat & p = n + m }.
   induction n.
   - right.
@@ -91,7 +94,7 @@ Proof.
         assumption.
 Defined.
 
-(* Lemmata zur Typanpassung *)
+(** Lemmata zur Typanpassung *)
 
 Definition n_plus_0 (n : nat) : (n + 0 = n) := eq_sym (plus_n_O n).
 
