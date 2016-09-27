@@ -24,6 +24,7 @@ List_Prop
 Pigeonhole_vector
 Pumping_Lemma_vector
 Pumping_Lemma_Word
+Reg_Exp
 Repeats
 Repeats_List
 Word_Map
