@@ -21,6 +21,7 @@ Equivalences
 Fin_ext
 General
 List_Prop
+Pigeonhole_vector
 Pumping_Lemma_vector
 Pumping_Lemma_Word
 Repeats
