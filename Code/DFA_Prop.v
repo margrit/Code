@@ -66,7 +66,7 @@ Qed.
 Lemma delta_hat_Conf (w : @Word Sigma) : forall (q : Q),
       Conf_rel_DFA (q, w)  (delta_hat q w, eps).
 Proof.
-  rewrite <- (word_reverse_idempotent w).
+  rewrite <- (word_reverse_involutiv w).
   exact (delta_hat_Conf_reverse (word_reverse w)).
 Qed.
 
@@ -104,11 +104,11 @@ Proof.
     dependent destruction rel.
     + rewrite <- (word_reverse_snoc w a) in x.
        apply (f_equal word_reverse) in x.
-       rewrite (word_reverse_idempotent (snoc w a)) in x.
+       rewrite (word_reverse_involutiv (snoc w a)) in x.
        simpl in x.
        dependent destruction x.
     + dependent induction c.
-       rewrite <- (word_reverse_idempotent w0) in x.
+       rewrite <- (word_reverse_involutiv w0) in x.
        rewrite <- (word_reverse_snoc (word_reverse w0) a0) in x.
        rewrite <- (word_reverse_snoc w a) in x.
        apply (word_reverse_injective) in x.
@@ -116,7 +116,7 @@ Proof.
        intros a0Eqa revw0Eqw.
        rewrite a0Eqa in rel.
        apply (f_equal word_reverse) in revw0Eqw.
-       rewrite (word_reverse_idempotent w0) in revw0Eqw.
+       rewrite (word_reverse_involutiv w0) in revw0Eqw.
        rewrite revw0Eqw in rel.
        exact (IHw (delta q a) p rel).
 Defined.
@@ -124,7 +124,7 @@ Defined.
 Lemma Conf_delta_hat (w : @Word Sigma) : forall (q p : Q),
       Conf_rel_DFA (q, w) (p, eps) -> delta_hat q w = p.
 Proof.
-  rewrite <- (word_reverse_idempotent w).
+  rewrite <- (word_reverse_involutiv w).
   exact (Conf_delta_hat_reverse (word_reverse w)).
 Qed.
 

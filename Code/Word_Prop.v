@@ -123,9 +123,9 @@ Proof.
     apply concat_associative.
 Defined.
 
-(** Das Umdrehen von Listen ist idempotent.*)
+(** Das Umdrehen von Listen ist selbstinvers.*)
 
-Lemma rev_idempotent {A : Type} (ls : list A) : rev (rev ls) = ls.
+Lemma rev_involutiv {A : Type} (ls : list A) : rev (rev ls) = ls.
 Proof.
   induction ls.
   - simpl.
@@ -213,9 +213,9 @@ Proof.
   reflexivity.
 Defined.
 
-(** Das Umdrehen von Woertern ist idempotent.*)
+(** Das Umdrehen von Woertern ist selbstinvers.*)
 
-Lemma word_reverse_idempotent {A : Type} (w : @Word A) :
+Lemma word_reverse_involutiv {A : Type} (w : @Word A) :
       word_reverse (word_reverse w) = w.
 Proof.
   induction w.
@@ -236,8 +236,8 @@ Lemma word_reverse_injective {A : Type} (w1 w2 : @Word A) :
 Proof.
   intro revEq.
   apply (f_equal word_reverse) in revEq.
-  rewrite <- (word_reverse_idempotent w1).
-  rewrite <- (word_reverse_idempotent w2).
+  rewrite <- (word_reverse_involutiv w1).
+  rewrite <- (word_reverse_involutiv w2).
   exact revEq.
 Defined.
 
@@ -498,7 +498,7 @@ Proof.
   rewrite word_to_list_Lemma'.
   unfold list_to_word'.
   unfold word_to_list''.
-  rewrite word_reverse_idempotent.
+  rewrite word_reverse_involutiv.
   apply list_word_list_simple.
 Defined.
 
@@ -510,7 +510,7 @@ Proof.
   unfold list_to_word'.
   unfold word_to_list''.
   rewrite word_list_word_simple.
-  apply word_reverse_idempotent.
+  apply word_reverse_involutiv.
 Defined.
 
 (** Weitere Lemmata zu Word-List und List-Word-Umwandlungen *)

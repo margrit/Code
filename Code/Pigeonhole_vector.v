@@ -22,8 +22,8 @@ Inductive Repeats {X : Type} : forall {n : nat}, Vector.t X n -> Type :=
 
 Theorem dec_Appears_in : forall {A : Type}
        (d : forall a a': A, (a = a') + ((a = a') -> False))
-       {n : nat} (a : A), forall v :
-       (Vector.t A n) , (Appears_in a v) + ((Appears_in a v) -> False).
+       {n : nat} (a : A), forall v : (Vector.t A n),
+       (Appears_in a v) + ((Appears_in a v) -> False).
 Proof.
   intros A d n a v.
   induction v.
