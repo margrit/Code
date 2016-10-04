@@ -1,24 +1,34 @@
 Require DTS_Prop.
 Module DTS_Example <: DTS_Def.DTS_Par.
-(*Inductive Sigma := h : Sigma | a : Sigma | l : Sigma | o : Sigma.*)
+
+(** Die Zustaende des Wechselschalters und die Instanziierung. *)
 
 Inductive Q' := on : Q' | off : Q'.
 Definition Q := Q'.
+
+(** Das Eingabealphabet des Wechselschalters und die Instanziierung. *)
+
 Inductive Sigma' := press : Sigma'.
 Definition Sigma := Sigma'.
-Definition is_accepting (q : Q) : Type :=
-  match q with
-    | on => True
-    | off => False
-  end.
 
-Definition q0 := off.
+(** Definition, welche Uebergaenge moeglich sind. *)
 
-(*Definition, welche Uebergaenge moeglich sind.*)
 Definition delta (p : Q) (a : Sigma) : Q :=
   match p with
     | on  => off
     | off  => on
+  end.
+
+(** Startzustand: *)
+
+Definition q0 := off.
+
+(** Akzeptierende Zustaende: *)
+
+Definition is_accepting (q : Q) : Type :=
+  match q with
+    | on => True
+    | off => False
   end.
 
 End DTS_Example.
@@ -27,12 +37,10 @@ Module Ex_Prop := DTS_Def.DTS_Fun DTS_Example.
 Import Word_Prop.
 Import DTS_Example.
 Import Ex_Prop.
-(* Was muss alles bewiesen werden?
-- zwei Sprachen definieren
-** press gerade
-** press ungerade
--> typwertiges Praedikat
-*)
+
+(** Durch der oben gegebenen Definition lassen sich zwei Sprachen definieren, die mit
+ einer geraden Anzahl an Eingaben [even_press] und die mit einer ungeraden Anzahl
+ an Eingaben [odd_press]. *)
 
 Inductive even_press : @Word Sigma -> Type :=
   | eps_even : even_press eps
@@ -40,9 +48,11 @@ Inductive even_press : @Word Sigma -> Type :=
 with odd_press : @Word Sigma -> Type :=
   | snoc_odd {w : @Word Sigma} {a : Sigma} : even_press w -> odd_press (snoc w a).
 
-(* Beweis, dass die Sprache des DTS = odd_press 
-- forall w, odd_press w -> Lang_delta w 
-  forall w, Lang_delta w -> odd_press w *)
+(* Beweis, dass die Sprache des [DTS_Example] = [odd_press] ist indem die folgenden
+ Implikationen gezeigt werden.
+ - forall w, odd_press w -> Lang_delta w
+ - forall w, Lang_delta w -> odd_press w
+ Dazu wird ein typwertiges Prädikat benoetigt, um zu wissen, welche*)
 
 Lemma xyz : forall w,
       ((even_press w * (delta_hat q0 w = off)) +
