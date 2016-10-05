@@ -151,8 +151,8 @@ Instance Q_Finite : Finite Q := {
     | on => FS (F1)
   end;
   from i := match i with
-    | F1         => off
-    | FS  (F1 )  => on
+    | F1             => off
+    | FS  (F1 )   => on
     | FS  (FS _) => off
   end
 }.
@@ -169,8 +169,8 @@ Instance Sigma_Finite : Finite Sigma := {
     | press => F1
   end;
   from i := match i with
-    | F1         => press
-    | FS  (F1 )  => press
+    | F1             => press
+    | FS  (F1 )   => press
     | FS  (FS _) => press
   end
 }.
