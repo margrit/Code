@@ -48,13 +48,14 @@ Inductive even_press : @Word Sigma -> Type :=
 with odd_press : @Word Sigma -> Type :=
   | snoc_odd {w : @Word Sigma} {a : Sigma} : even_press w -> odd_press (snoc w a).
 
-(* Beweis, dass die Sprache des [DTS_Example] = [odd_press] ist indem die folgenden
+(** Beweis, dass die Sprache des [DTS_Example] = [odd_press] ist indem die folgenden
  Implikationen gezeigt werden.
- - forall w, odd_press w -> Lang_delta w
  - forall w, Lang_delta w -> odd_press w
- Dazu wird ein typwertiges Prädikat benoetigt, um zu wissen, welche*)
+ - forall w, odd_press w -> Lang_delta w
+ Dazu wird ein typwertiges Prädikat benoetigt, um zu wissen, in welchem Zustand sich
+ der Automat nach der Eingabe befindet. *)
 
-Lemma xyz : forall w,
+Lemma finish_input : forall w,
       ((even_press w * (delta_hat q0 w = off)) +
       (odd_press w * (delta_hat q0 w = on)))%type.
 Proof.
@@ -80,6 +81,9 @@ Proof.
          reflexivity.
 Defined.
 
+(** Die Eingabe hat eine gerade oder ungerade Laenge. [even_press] und [odd_press]
+ sind disjunkt. *)
+
 Lemma even_odd_disjoint (w : @Word Sigma) :
       even_press w -> odd_press w -> False.
 Proof.
@@ -91,13 +95,15 @@ Proof.
     exact (IHw X0 X).
 Defined.
 
-(* z.z. forall w, Lang_delta w -> odd_press w *)
+(** Jetzt koennen beide Richtungen der Aequivalenz gezeitgt werden.
+ - forall w, Lang_delta w -> odd_press w
+ - forall w, odd_press w -> Lang_delta w *)
 
-Lemma lala : forall w, Lang_delta w -> odd_press w.
+Lemma Lang_odd : forall w, Lang_delta w -> odd_press w.
 Proof.
   unfold Lang_delta.
   intros w w_in_L.
-  pose (xyz w) as decide_L.
+  pose (finish_input w) as decide_L.
   destruct decide_L as [[even off] |[odd on]].
   - rewrite off in w_in_L.
     simpl in w_in_L.
@@ -105,11 +111,11 @@ Proof.
   - exact odd.
 Defined.
 
-Lemma lala2 : forall w, odd_press w -> Lang_delta w.
+Lemma odd_Lang : forall w, odd_press w -> Lang_delta w.
 Proof.
   unfold Lang_delta.
   intros w odd.
-  pose (xyz w) as decide_L.
+  pose (finish_input w) as decide_L.
   destruct decide_L as [[even off] |[odd' on]].
   - pose (even_odd_disjoint w even odd) as ff.
     destruct ff.
@@ -121,11 +127,56 @@ Defined.
 (** Aequivalenz zwischen odd_press und Lang_delta. Die Sprache die von dem 
 Toggle Automaten akzeptiert wird besteht genau aus den Woertern, deren Laenge
 ungerade ist. *)
+
 Require Import Equivalences.
 Module Lang_Toggle : Logical_EQ_type_valued_pred.
 Definition  base := @Word Sigma.
 Definition P := odd_press.
 Definition Q := Lang_delta.
-Definition pq := lala2.
-Definition qp := lala.
+Definition pq := odd_Lang.
+Definition qp := Lang_odd.
 End Lang_Toggle.
+
+(** Es muss noch gezeigt werden, dass das Eingabealphabet und die Zustandsmenge
+ endlich sind. *)
+
+Require Import FiniteClass.
+Require Import Fin.
+Require Import Program.
+
+Instance Q_Finite : Finite Q := {
+  card := 2;
+  to x := match x with
+    | off => F1
+    | on => FS (F1)
+  end;
+  from i := match i with
+    | F1         => off
+    | FS  (F1 )  => on
+    | FS  (FS _) => off
+  end
+}.
+Proof.
+  - intro i.
+    repeat dependent destruction i; reflexivity.
+  - intro x.
+    destruct x;reflexivity.
+Qed.
+
+Instance Sigma_Finite : Finite Sigma := {
+  card := 1;
+  to x := match x with
+    | press => F1
+  end;
+  from i := match i with
+    | F1         => press
+    | FS  (F1 )  => press
+    | FS  (FS _) => press
+  end
+}.
+Proof.
+  - intro i.
+    repeat dependent destruction i; reflexivity.
+  - intro x.
+    destruct x;reflexivity.
+Qed.

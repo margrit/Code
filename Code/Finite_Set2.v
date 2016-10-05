@@ -57,7 +57,7 @@ Defined.
 (* "flipped" version just for convenience *)
 Lemma transIso' (A B C : Type) : Iso A B -> Iso B C -> Iso A C.
 Proof.
-  intros isoab isobc.  
+  intros isoab isobc.
   exact (transIso _ _ _ isobc isoab).
 Defined.
   
