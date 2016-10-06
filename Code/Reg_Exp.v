@@ -98,13 +98,6 @@ Fixpoint split2 {A : Type} (w : @Word A) : @Word (@Word (@Word A)) :=
                                                 (concat_map_word (last_snoc x) (split2 w'))
   end.
 
-Eval compute in (split2 (snoc (snoc(snoc(snoc eps 1)2)3)4)).
-Eval compute in (split2 eps).
-Eval compute in (split2 [ 1 ]).
-Eval compute in (split2 [ 1 ; 2 ]).
-Eval compute in (split2 [ 1 ; 2 ; 3]).
-
-
 (*7. Definiere eine Funktion, die einem regulaeren Ausdruck ueber A die durch diesen
   Ausdruck definierte Sprache zuordnet.
 *)

@@ -10,7 +10,7 @@ DTS = (Q, Sigma, delta, q0, F) mit
 * F Teilmenge von Q, als Menge der akzeptierenden Zustaende.
 
 Diese Komponenten werden nachfolgend definiert.*)
-Require Import Word_Prop.
+Require Import Words.
 
 Module Type DTS_Par.
 

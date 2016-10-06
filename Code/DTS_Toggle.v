@@ -1,4 +1,4 @@
-Require DTS_Prop.
+Require DTS_Def.
 Module DTS_Example <: DTS_Def.DTS_Par.
 
 (** Die Zustaende des Wechselschalters und die Instanziierung. *)
@@ -34,7 +34,7 @@ Definition is_accepting (q : Q) : Type :=
 End DTS_Example.
 
 Module Ex_Prop := DTS_Def.DTS_Fun DTS_Example.
-Import Word_Prop.
+Require Import Words.
 Import DTS_Example.
 Import Ex_Prop.
 

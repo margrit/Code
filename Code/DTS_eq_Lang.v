@@ -1,6 +1,6 @@
 Require DTS_Def.
 Require Import Program.
-Import Word_Prop.
+Require Import Words.
 
 (* BEMERKUNG, was in der Datei alles passiert !!! 
 - eventuell oben oder in der Bewertung??
