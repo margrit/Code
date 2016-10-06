@@ -126,7 +126,7 @@ Inductive Conf_rel_DFA : Conf_DFA -> Conf_DFA -> Type :=
                                      Conf_rel_DFA L M ->
                                      Conf_rel_DFA K M.
 
-(** Die von einem endlichen Automaten beschriebene Sprachen definiert durch [Conf_rel_DFA]. *)
+(** Die von einem DFA beschriebene Sprachen definiert durch [Conf_rel_DFA]. *)
 
 Definition Lang_Conf (w: @Word Sigma) : Type :=
            {p : Q & (is_accepting p * Conf_rel_DFA (q0, w) (p, eps))%type}.

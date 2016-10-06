@@ -1,7 +1,7 @@
 (* Quelle: https://github.com/wjzz/PumpingLemma/blob/master/Dfa.v *)
 
-(* TODO-Frage: Wie waere anstatt ausschliesslich einer Zerlegung der Beweise 
-               in elementare Schritte eine "paedagogische" Illustration, wie Beweise 
+(* TODO-Frage: Wie waere anstatt ausschliesslich einer Zerlegung der Beweise
+               in elementare Schritte eine "paedagogische" Illustration, wie Beweise
                in mehreren Etappen verkuerzt werden koennen? *)
 
 
@@ -20,13 +20,14 @@ Load Conv_Vec_List_Word.
 (*--------------------------------------------------------------------------------------------*)
 
 (** Aufblaehen eines Wortes. *)
+
 Fixpoint pump_w (n : nat) (w : @Word Sigma) : @Word Sigma :=
   match n with
     | O    => eps
     | S n' => concat_word w (pump_w n' w)
   end.
 
-(* Wenn es eine Schleife im Automaten gibt, kann man diese nutzen,
+(* Wenn es eine Schleife im Automaten gibt, kann diese genutzt werden,
 um das Wort aufzublaehen an dieser Stelle und bleibt im gleichen Zustand. *)
 
 Theorem pump_loop: forall n : nat, forall q : Q, forall xs : @Word Sigma,
@@ -70,8 +71,8 @@ Theorem pumping_lemma :
 Proof.
   intros w w_in_lang len_w.
 
-  (** Vorbereitung : 
-      [tr_w]: "Trace" von [w]: Die Liste der Zustaende, die bei der Abarbeitung 
+  (** Vorbereitung :
+      [tr_w]: "Trace" von [w]: Die Liste der Zustaende, die bei der Abarbeitung
               des Wortes [w] von [q0] ausgehend durchlaufen werden.
       [tr_w_len]: Die Laenge dieser Zustandliste (immer > 0) im Verhaeltnis
                   zur Laenge des Eingabeworts.
@@ -80,13 +81,13 @@ Proof.
   pose (trace_w q0 w) as tr_w.
   pose (trace_length_w w q0) as tr_w_len.
 
-  (** Umschreiben des Verhaeltnisses zwischen Wortlaenge des Eingabeworts 
-      und [Q_size] anhand 
+  (** Umschreiben des Verhaeltnisses zwischen Wortlaenge des Eingabeworts
+      und [Q_size] anhand
       - der arithmetischen Lemmata [le_n_S], [le_lt_n_Sm] und [lt_S_n] sowie
-      - des Lemmas [tr_w_len] ueber das Verhaeltnis der Laenge von [w] und 
-        des Traces von w, 
+      - des Lemmas [tr_w_len] ueber das Verhaeltnis der Laenge von [w] und
+        des Traces von w,
       so dass die Hypothese [S_len_w] die Form bekommt,
-      in der das Pigeonhole-Prinzip darauf angewendet werden kann *)
+      in der das Pigeonhole-Prinzip darauf angewendet werden kann. *)
 
   apply le_n_S in len_w as S_len_w.
   apply le_lt_n_Sm in S_len_w.

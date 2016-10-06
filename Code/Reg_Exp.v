@@ -1,7 +1,6 @@
 Load DFA_Def.
 
 Section RegExp.
-(*Variable char : Sigma. allerdings nur ein einzelnes Zeichen*)
 
 (** Der Typ eines regulaeren Ausdrucks induktiv definiert.*)
 
@@ -98,28 +97,25 @@ Fixpoint split2 {A : Type} (w : @Word A) : @Word (@Word (@Word A)) :=
                                                 (concat_map_word (last_snoc x) (split2 w'))
   end.
 
-(*7. Definiere eine Funktion, die einem regulaeren Ausdruck ueber A die durch diesen
-  Ausdruck definierte Sprache zuordnet.
-*)
 (** Die Sprache, die von einem regulaeren Ausdruck beschrieben wird. *)
 
-Fixpoint reg_match {A : Type} (e : @Reg_Exp A) (eq: A -> A -> bool) (w : @Word A)  : bool :=
+Fixpoint Lang_Reg {A : Type} (e : @Reg_Exp A) (eq: A -> A -> bool) (w : @Word A)  : bool :=
   match e, w with
     | Void  ,_                     => false
     | Eps ,eps                   => true
     | Eps ,_                       => false
     | Single x, snoc eps y => eq x y
     | Single _, _                => false
-    | Conc e1 e2, w          => existsbw (pair_andb (reg_match e1 eq) (reg_match e2 eq))(splits w)
-    | Star e1, w'                => existsbw (forallbw (reg_match e1 eq)) (split2 w')
-    | Plus e1 e2, w'          => (reg_match e1 eq w') || (reg_match e2 eq w')
-    | Not e1, w'                 => negb (reg_match e1 eq w')
+    | Conc e1 e2, w          => existsbw (pair_andb (Lang_Reg e1 eq) (Lang_Reg e2 eq))(splits w)
+    | Star e1, w'                => existsbw (forallbw (Lang_Reg e1 eq)) (split2 w')
+    | Plus e1 e2, w'          => (Lang_Reg e1 eq w') || (Lang_Reg e2 eq w')
+    | Not e1, w'                 => negb (Lang_Reg e1 eq w')
   end.
 
 Definition testreg : @Reg_Exp nat := Star( Conc (Single 1)(Single 2) ).
 
-Eval compute in (reg_match testreg Nat.eqb eps).
-Eval compute in (reg_match testreg Nat.eqb (snoc eps 1)).
-Eval compute in (reg_match testreg Nat.eqb (snoc (snoc eps 1)2)).
+Eval compute in (Lang_Reg testreg Nat.eqb eps).
+Eval compute in (Lang_Reg testreg Nat.eqb (snoc eps 1)).
+Eval compute in (Lang_Reg testreg Nat.eqb (snoc (snoc eps 1)2)).
 
 End RegExp.
