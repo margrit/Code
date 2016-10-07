@@ -1,5 +1,3 @@
-(* Load Word_Prop. *)
-
 
 (* --------------------------------------------------------------------------*)
 
@@ -8,7 +6,7 @@
 (* --------------------------------------------------------------------------*)
 
 (** Vorbereitung fuer das PL,
-    um von einer Zerlegung von [trace w] auf eine Zerlegung von [inits w] 
+    um von einer Zerlegung von [trace w] auf eine Zerlegung von [inits w]
     schliessen zu koennen. *)
 
 
@@ -38,15 +36,19 @@ Proof.
         exact H.
       * simpl. 
         exact (eq_sym v2_eq_eps).
+
   (* w = snoc w' a *)
    - intros v1 v2 H.
     simpl in H.
     destruct v2 as [|v2' y2].
+
     (* v2' = eps *)
     + simpl in H.
       destruct v1 as [|v1' y1].
+
       (* v1' = eps *)
       * { inversion H. }
+
       (* v1' = snoc v1' y1 *)
       * { simpl in H.
 
@@ -56,6 +58,7 @@ Proof.
           simpl.
           repeat split; reflexivity.
         }
+
     (* v2' = snoc v2' y2 *)
     + simpl in H.
       assert (map_word f w = concat_word v1 v2').
@@ -173,7 +176,7 @@ Lemma map_decomp_3_snoc {X Y : Type} (f : X -> Y) (w : @Word X)
       (v1 v2 v3 : @Word Y) (y1 y2 : Y) :
       map_word f w = concat_word (concat_word (snoc v1 y1) (snoc v2 y2)) v3 ->
       { w1 : @Word X & { w2 : @Word X & { w3 : @Word X &
-      { x1 : X & { x2 : X & 
+      { x1 : X & { x2 : X &
       ((w = concat_word (concat_word (snoc w1 x1) (snoc w2 x2)) w3) *
       (f x1 = y1) *
       (f x2 = y2)

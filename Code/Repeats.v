@@ -20,7 +20,7 @@ Inductive Appears_Word {X : Type} (a : X) : @Word X -> Type :=
  Konkatenation der Woerter vor. *)
 
 Lemma app_Appears_w : forall {X : Type} (w1 w2 : @Word X) (x : X),
-      Appears_Word x w1 + Appears_Word x w2 
+      Appears_Word x w1 + Appears_Word x w2
       -> Appears_Word x (concat_word w1 w2).
 Proof.
   intros X w1 w2 x H.
@@ -44,8 +44,8 @@ Proof.
       assumption.
     + rewrite commute_snoc_concat_w.
       induction w2.
-      * inversion xInw2. 
-      * simpl. inversion xInw2. 
+      * inversion xInw2.
+      * simpl. inversion xInw2.
         { apply ai_here_w. }
         { apply ai_there_w.
           apply (IHw2 X0).
@@ -78,7 +78,7 @@ Defined.
 (** Wenn x das Suffix vom ersten Teilwort w1 und Praefix vom zweitem Teilwort
  w2 ist, dann kommt x in der Konkatenation w1 x w2 vor. *)
 
-Lemma Appears_app_split_rev_w {X : Type} (x : X) (w : @Word X) : 
+Lemma Appears_app_split_rev_w {X : Type} (x : X) (w : @Word X) :
       { w1 : @Word X & { w2 : @Word X & w = concat_word (snoc w1 x) w2 } }
       -> Appears_Word x w.
 Proof.

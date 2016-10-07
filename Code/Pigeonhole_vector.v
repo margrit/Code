@@ -128,7 +128,6 @@ Proof.
   apply fin_eq_dec.
 Defined. 
 
-
 (** "Funktorialitaets" Lemmata *)
 
 Fixpoint funct_Appears_in {A B : Type} {n : nat} (f : A -> B)
@@ -360,7 +359,7 @@ Proof.
        exists (cons (Fin.t n) h n0 v').
        simpl.
        rewrite eq_map.
-       reflexivity.  
+       reflexivity.
 Defined.
 
 
@@ -375,7 +374,7 @@ Theorem pigeon_hole_Repeats: forall (n m : nat) (n_lt_m: n < m)
       (v : Vector.t (@Fin.t n) m), Repeats v.
 Proof.
   dependent induction n; intros m n_lt_m v.
-  - inversion v. 
+  - inversion v.
     contradict n_lt_m.
     intro ff.
     rewrite <- H in ff.

@@ -398,7 +398,8 @@ Definition word_to_list' {A : Type} (w : @Word A) : list A :=
 Definition word_to_list'' {A : Type} (w : @Word A) : list A :=
            word_to_list_simple (word_reverse w).
 
-(** Es entsteht durch Auffaltung beider Definitionen dieselbe Funktion [word_to_list], siehe [list_to_word].*)
+(** Es entsteht durch Auffaltung beider Definitionen dieselbe Funktion [word_to_list],
+ siehe [list_to_word].*)
 
 Fixpoint word_to_list {A: Type} (w : @Word A) : list A :=
   match w with

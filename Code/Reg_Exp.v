@@ -2,7 +2,7 @@ Load DFA_Def.
 
 Section RegExp.
 
-(** Der Typ eines regulaeren Ausdrucks induktiv definiert.*)
+(** Der Typ eines regulaeren Ausdrucks induktiv definiert. *)
 
 Inductive Reg_Exp {A: Type} :=
   | Void : @Reg_Exp A
@@ -13,9 +13,7 @@ Inductive Reg_Exp {A: Type} :=
   | Conc : @Reg_Exp A -> @Reg_Exp A -> @Reg_Exp A
   | Not : @Reg_Exp A -> @Reg_Exp A.
 
-(** boolsche Funktion auf Woertern -> Sprache*)
-
-(** Anhaengen eines Zeichens an das zweite Teilwort eines aus zwei Teilwoertern bestehenden Wortes.*)
+(** Anhaengen eines Zeichens an das zweite Teilwort eines aus zwei Teilwoertern bestehenden Wortes. *)
 
 Fixpoint appsec {A : Type} (ps : @Word (@Word A * @Word A)) (x : A) :
       @Word (@Word A * @Word A) :=
@@ -27,7 +25,7 @@ Fixpoint appsec {A : Type} (ps : @Word (@Word A * @Word A)) (x : A) :
 Eval compute in (appsec (snoc eps (eps, eps)) 2).
 
 (** Aufsplitten eines Wortes in zwei Teilwoerter. Das erste Teilword wird dabei immer laenger und das
- zweite Teilwort dementsprechend kuerzer.*)
+ zweite Teilwort dementsprechend kuerzer. *)
 
 Fixpoint splits {A : Type} (w : @Word A) : @Word (@Word A * @Word A):=
   match w with
@@ -37,7 +35,7 @@ Fixpoint splits {A : Type} (w : @Word A) : @Word (@Word A * @Word A):=
 
 Eval compute in (splits (snoc (snoc (snoc eps 2) 3)4)).
 
-(** Formalisierung des Existenzquantors auf Woertern analog zu [existsb], das auf Listen arbeitet.*)
+(** Formalisierung des Existenzquantors auf Woertern analog zu [existsb], das auf Listen arbeitet. *)
 
 Fixpoint existsbw {A : Type} (p : A -> bool) (w : @Word A) : bool :=
   match w with
@@ -45,7 +43,7 @@ Fixpoint existsbw {A : Type} (p : A -> bool) (w : @Word A) : bool :=
     | snoc w' x => p x || existsbw p w'
   end.
 
-(** Formalisierung des Allquantors auf Woertern analog zu [forallb], das auf Listen arbeitet.*)
+(** Formalisierung des Allquantors auf Woertern analog zu [forallb], das auf Listen arbeitet. *)
 
 Fixpoint forallbw {A : Type} (p : A -> bool) (w : @Word A) : bool :=
   match w with
@@ -60,14 +58,14 @@ Fixpoint pair_andb {A B : Type} (p : A -> bool) (q : B -> bool) (c : A * B) : bo
     | (a,b) => p a && q b
   end.
 
-(** Ein einzelnes Zeichen an ein Wort anhaengen.*)
+(** Ein einzelnes Zeichen an ein Wort anhaengen. *)
 
 Definition concat_word_single {A : Type} (x : A) (w : @Word(@Word A)) : @Word(@Word A) :=
            snoc w (snoc eps x).
 
 Eval compute in (concat_word_single 2 (snoc eps (snoc eps 3))).
 
-(** Ein Wort ueber Woertern in ein Wort umwandeln (Monadenmultiplikation von Word).*)
+(** Ein Wort ueber Woertern in ein Wort umwandeln (Monadenmultiplikation von Word). *)
 
 Fixpoint flatten_word {A : Type} (w : @Word (@Word A)) : @Word A :=
   match w with
@@ -75,12 +73,12 @@ Fixpoint flatten_word {A : Type} (w : @Word (@Word A)) : @Word A :=
     | snoc w1 w2 => concat_word (flatten_word w1) w2
   end.
 
-(** bind-Operation der Monade Word*)
+(** bind-Operation der Monade Word *)
 
 Definition concat_map_word {A B : Type} (f : A -> @Word B) (w : @Word A) : @Word B :=
            flatten_word(map_word f w).
 
-(** Hilfsfunktion fuer [split2]*)
+(** Hilfsfunktion fuer [split2] *)
 
 Fixpoint last_snoc {A : Type} (x : A) (w : @Word(@Word A)) : @Word(@Word(@Word A)) :=
   match w with
@@ -112,10 +110,15 @@ Fixpoint Lang_Reg {A : Type} (e : @Reg_Exp A) (eq: A -> A -> bool) (w : @Word A)
     | Not e1, w'                 => negb (Lang_Reg e1 eq w')
   end.
 
+End RegExp.
+
+(** Ein Beispiel eines regulaeren Ausdrucks und die beschriebene Sprache. *)
+
 Definition testreg : @Reg_Exp nat := Star( Conc (Single 1)(Single 2) ).
 
 Eval compute in (Lang_Reg testreg Nat.eqb eps).
 Eval compute in (Lang_Reg testreg Nat.eqb (snoc eps 1)).
 Eval compute in (Lang_Reg testreg Nat.eqb (snoc (snoc eps 1)2)).
-
-End RegExp.
+Eval compute in (Lang_Reg testreg Nat.eqb (snoc (snoc (snoc eps 1)1)2)).
+Eval compute in (Lang_Reg testreg Nat.eqb (snoc (snoc (snoc(snoc eps 1)2)1)2)).
+Eval compute in (snoc (snoc (snoc(snoc eps 1)2)1)2).

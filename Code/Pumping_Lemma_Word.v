@@ -27,8 +27,8 @@ Fixpoint pump_w (n : nat) (w : @Word Sigma) : @Word Sigma :=
     | S n' => concat_word w (pump_w n' w)
   end.
 
-(* Wenn es eine Schleife im Automaten gibt, kann diese genutzt werden,
-um das Wort aufzublaehen an dieser Stelle und bleibt im gleichen Zustand. *)
+(** Das Aufblaehen des Wortes veraendert den Zustand, in dem sich der Automat
+ nach dar Abarbeitung befindet, nicht. *)
 
 Theorem pump_loop: forall n : nat, forall q : Q, forall xs : @Word Sigma,
       delta_hat q xs = q -> delta_hat q (pump_w n xs) = q.

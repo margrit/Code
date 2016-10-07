@@ -1,5 +1,4 @@
 
-
 (* --------------------------------------------------------------------------*)
 
 (** * Die groesseren "Zerlegungs"-Lemmata fuer inits *)
@@ -73,7 +72,7 @@ Proof.
   intros p1 p2 inits1 inits2 inits3 iw_eq_i1p1i2p2i3.
 
   - (* w = eps *)
-    (* ---> unmoeglich, da |inits_w eps| = 1 und 
+    (* ---> unmoeglich, da |inits_w eps| = 1 und
             |i1p1i2p2i3| >= 2 durch die 2 snocs. *)
 
     destruct inits3 as [ | inits3' p3].
@@ -98,7 +97,7 @@ Proof.
       destruct inits3 as [ | inits3' p3].
 
       * (* w = snoc eps a
-           ---> inits w = (snoc inits1 p1) (snoc inits2 p2) 
+           ---> inits w = (snoc inits1 p1) (snoc inits2 p2)
            ---> p1 = eps, p2 = (snoc eps a), diff = (snoc eps a) *)
         simpl in iw_eq_i1p1i2p2i3.
         inversion iw_eq_i1p1i2p2i3 as [[eps_eq_i1p1i2 a_eq_p2]].
@@ -124,8 +123,8 @@ Proof.
             inversion eps_eq_i1p1i2'.
          }
 
-       * (* w = snoc eps a 
-            inits w = (snoc inits1 p1) . (snoc inits2 p2) . (snoc inits3' p3) 
+       * (* w = snoc eps a
+            inits w = (snoc inits1 p1) . (snoc inits2 p2) . (snoc inits3' p3)
             ---> wegen 3. snoc zu lang, also unmoeglich.  *)
          simpl in iw_eq_i1p1i2p2i3.
          inversion iw_eq_i1p1i2p2i3 as [[eps_eq_i1p1i2p2i3 a_eq_p3]].
@@ -142,7 +141,7 @@ Proof.
              inversion eps_eq_i1p1i2.
          }
 
-         { simpl in eps_eq_i1p1i2p2i3. 
+         { simpl in eps_eq_i1p1i2p2i3.
            inversion eps_eq_i1p1i2p2i3 as [[eps_eq_i1p1i2p3i3'' eps_eq_p3']].
            destruct inits3'' as [ | inits3''' p3'''].
 
@@ -160,7 +159,7 @@ Proof.
 
       destruct inits3 as [ | inits3' p3].
 
-      * (* inits3 = eps 
+      * (* inits3 = eps
            ---> inits w = (snoc inits1 p1) (snoc inits2 p2) *)
         simpl in iw_eq_i1p1i2p2i3.
         inversion iw_eq_i1p1i2p2i3 as [[w''w''a'_eq_i1p1i2 w''a'a_eq_p2]].
@@ -168,13 +167,13 @@ Proof.
         destruct inits2 as [ | inits2' p2'].
 
          { (* inits2 = eps 
-              ---> inits w = snoc (snoc inits1 p1) p2 
+              ---> inits w = snoc (snoc inits1 p1) p2
               ---> p1 = w' , p2 = (snoc w' a) , diff = (snoc eps a) *)
            simpl in *.
            inversion w''w''a'_eq_i1p1i2 as [[iw''_eq_i1 w''a'p1]].
            rewrite inits_last_w in iw''_eq_i1. 
 
-           inversion iw''_eq_i1 as [[riw_eq_inits1 w'_eq_p1]]. 
+           inversion iw''_eq_i1 as [[riw_eq_inits1 w'_eq_p1]].
            rewrite <- w'_eq_p1.
 
            exists (snoc eps a).
@@ -184,8 +183,8 @@ Proof.
            - apply Gt.gt_Sn_O.
          }
 
-         { (* inits2 = snoc init2' p2' 
-              ---> inits w = concat_word (snoc inits1 p1) 
+         { (* inits2 = snoc init2' p2'
+              ---> inits w = concat_word (snoc inits1 p1)
                              (snoc (snoc ints2' p2') p2) *)
 
            pose (IHw p1 p2' inits1 inits2' eps) as IHw_inst.
@@ -198,7 +197,7 @@ Proof.
            inversion w''w''a'_eq_i1p1i2 as [[riw'_eq_i1p1i2' w'_eq_p2']].
 
            (* ---> p1 = p2-diff , p2 = (snoc p2' a) , diff = (snoc d_p1p2 a) *)
-           exists (snoc d_p1p2 a). 
+           exists (snoc d_p1p2 a).
            rewrite p2'_eq_p1dp12.
            simpl.
 
@@ -213,13 +212,13 @@ Proof.
          simpl in iw_eq_i1p1i2p2i3.
          inversion iw_eq_i1p1i2p2i3 as [[iw'_eq_i1p1i2p2i3' w'a_eq_p3]].
 
-         (* kurze Variante: 
+         (* kurze Variante:
 
             apply (IHw p1 p2 inits1 inits2 inits3' iw'_eq_i1p1i2p2i3').
 
          *)
 
-         (* Ausfuehrlichere Variante: *) 
+         (* Ausfuehrlichere Variante: *)
 
          apply IHw in iw'_eq_i1p1i2p2i3' as ex_diff.
          destruct ex_diff as [d_p1p2 diff_props].
@@ -231,7 +230,8 @@ Proof.
 Defined.
 
 
-(* Hier werden nur die beiden vorhergehenden Lemmata zusammengefasst. *)
+(** Zusammenfassen der beiden vorhergehenden Lemmata. *)
+
 Lemma w_decomp_of_initsw_decomp {A : Type} (w : @Word A):
       forall (p1 p2 : @Word A)
      (inits1 inits2 inits3 : @Word (@Word A)),
