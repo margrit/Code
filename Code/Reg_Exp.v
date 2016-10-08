@@ -60,14 +60,14 @@ Fixpoint pair_andb {A B : Type} (p : A -> bool) (q : B -> bool) (c : A * B) : bo
 
 (** Ein einzelnes Zeichen an ein Wort anhaengen. *)
 
-Definition concat_word_single {A : Type} (x : A) (w : @Word(@Word A)) : @Word(@Word A) :=
+Definition concat_word_single {A : Type} (x : A) (w : Word2) : Word2 :=
            snoc w (snoc eps x).
 
 Eval compute in (concat_word_single 2 (snoc eps (snoc eps 3))).
 
 (** Ein Wort ueber Woertern in ein Wort umwandeln (Monadenmultiplikation von Word). *)
 
-Fixpoint flatten_word {A : Type} (w : @Word (@Word A)) : @Word A :=
+Fixpoint flatten_word {A : Type} (w : Word2) : @Word A :=
   match w with
     | eps              => eps
     | snoc w1 w2 => concat_word (flatten_word w1) w2
@@ -80,7 +80,7 @@ Definition concat_map_word {A B : Type} (f : A -> @Word B) (w : @Word A) : @Word
 
 (** Hilfsfunktion fuer [split2] *)
 
-Fixpoint last_snoc {A : Type} (x : A) (w : @Word(@Word A)) : @Word(@Word(@Word A)) :=
+Fixpoint last_snoc {A : Type} (x : A) (w : Word2) : Word3 :=
   match w with
     | eps               => eps
     | snoc w1 w2  => snoc eps (snoc w1 (snoc w2 x))
@@ -88,12 +88,14 @@ Fixpoint last_snoc {A : Type} (x : A) (w : @Word(@Word A)) : @Word(@Word(@Word A
 
 (** Generierung aller Zerlegungen eines Wortes in alle nichtleeren Teilwoerter *)
 
-Fixpoint split2 {A : Type} (w : @Word A) : @Word (@Word (@Word A)) :=
+Fixpoint split2 {A : Type} (w : @Word A) : Word3 :=
   match w with
     | eps          => snoc eps eps
     | snoc w' x => concat_word (map_word (concat_word_single x) (split2 w')) 
                                                 (concat_map_word (last_snoc x) (split2 w'))
   end.
+
+Eval compute in (split2 (snoc (snoc (snoc eps 1)2)3)).
 
 (** Die Sprache, die von einem regulaeren Ausdruck beschrieben wird. *)
 

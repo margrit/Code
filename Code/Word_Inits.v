@@ -1,4 +1,4 @@
-
+(*Load Word_Prop.*)
 (* --------------------------------------------------------------------------*)
 
 (** * Die groesseren "Zerlegungs"-Lemmata fuer inits *)
@@ -10,7 +10,7 @@
     mit den benoetigten Eigenschaften schliessen zu koennen. *)
 
 Lemma inits_diff_w {A : Type} (w : @Word A) :
-      forall (w1 : @Word A) (inits1 inits2 : @Word (@Word A)),
+      forall (w1 : @Word A) (inits1 inits2 : Word2),
       inits_w w = concat_word (snoc inits1 w1) inits2
       -> { w2 : @Word A & w = concat_word w1 w2 }.
 Proof.
@@ -60,7 +60,7 @@ Defined.
 
 Lemma inits_diff_pref_w {A : Type} (w : @Word A) :
       forall (p1 p2 : @Word A)
-     (inits1 inits2 inits3 : @Word (@Word A)),
+     (inits1 inits2 inits3 : Word2),
       inits_w w = concat_word (concat_word
      (snoc inits1 p1) (snoc inits2 p2)) inits3
       -> { diff_p1p2 : @Word A &
@@ -229,12 +229,11 @@ Proof.
 
 Defined.
 
-
 (** Zusammenfassen der beiden vorhergehenden Lemmata. *)
 
 Lemma w_decomp_of_initsw_decomp {A : Type} (w : @Word A):
       forall (p1 p2 : @Word A)
-     (inits1 inits2 inits3 : @Word (@Word A)),
+     (inits1 inits2 inits3 : Word2),
       inits_w w = concat_word (concat_word
      (snoc inits1 p1) (snoc inits2 p2)) inits3
       -> { diff_p1p2 : @Word A &
@@ -255,4 +254,4 @@ Proof.
 
 Defined.
 
-
+(*Eval compute in ( w_decomp_of_initsw_decomp(snoc (snoc (snoc eps 1)2)3)).*)

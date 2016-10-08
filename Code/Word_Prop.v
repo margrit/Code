@@ -560,12 +560,14 @@ Defined.
 
 (* --------------------------------------------------------------------------*)
 
-(* TODO-Frage: Waere ein Typsynonym fuer @Word (@Word X) sinnvoll? *)
+(** Typsynonym fuer @Word (@Word X) und @Word (@Word (@Word X)). *)
 
+Definition Word2 {X : Type} := (@Word (@Word X)).
+Definition Word3 {X : Type} := (@Word (@Word (@Word X))).
 
 (* unbenutzt, aber ok als Standard ? *)
 
-Fixpoint tails_w {X : Type} (w : @Word X) : @Word (@Word X) :=
+Fixpoint tails_w {X : Type} (w : @Word X) : Word2 :=
   match w with
     | eps          => snoc eps eps
     | snoc xs x => snoc (map_word (fun w => snoc w x) (tails_w xs)) eps
@@ -581,7 +583,7 @@ Fixpoint inits_l {X : Type} (l : list X) : list (list X) :=
 
 (* die fuer PL_w benutzte benutzte Variante *)
 
-Fixpoint inits_w {X : Type} (w : @Word X) : @Word (@Word X) :=
+Fixpoint inits_w {X : Type} (w : @Word X) : Word2 :=
   match w with
     | eps          => snoc eps eps
     | snoc w' x => snoc (inits_w w') w
@@ -590,7 +592,7 @@ Fixpoint inits_w {X : Type} (w : @Word X) : @Word (@Word X) :=
 Definition inits_w'{X : Type} (w : @Word X) : @Word (@Word X) :=
            list_to_word (map (list_to_word) (inits_l (word_to_list w))).
 
-Fixpoint inits_w''{X : Type} (w : @Word X) : @Word (@Word X) :=
+Fixpoint inits_w''{X : Type} (w : @Word X) : Word2 :=
   match w with
     | eps          => snoc eps eps
     | snoc w' x =>

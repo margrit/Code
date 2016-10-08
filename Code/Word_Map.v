@@ -86,8 +86,8 @@ Lemma map_decomp_3 : forall X Y : Type, forall f : X -> Y, forall w : @Word X,
       map_word f w = concat_word (concat_word v1 v2) v3 ->
       { w1 : @Word X & { w2 : @Word X & { w3 : @Word X &
       ((w = concat_word (concat_word w1 w2) w3) *
-      (map_word f w1 = v1) * 
-      (map_word f w2 = v2) * 
+      (map_word f w1 = v1) *
+      (map_word f w2 = v2) *
       (map_word f w3 = v3)
         )%type } } }.
 Proof.

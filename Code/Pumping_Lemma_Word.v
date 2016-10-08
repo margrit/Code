@@ -44,7 +44,7 @@ Proof.
     rewrite delta_hat_app.
     rewrite H.
     apply IHn'.
-    assumption.
+    exact H.
 Defined.
 
 
@@ -103,29 +103,29 @@ Proof.
 
   (** Durch das Pigeonhole-Prinzip haben wir nun als Hypothese zur Verfuegung,
       dass die Zustandliste [tr_w] eine Wiederholung enthaelt.
-      Auf diese Hypothese koennen wir nun das Dekompositionslemma 
-      [Repeats_decomp_w] anwenden, das uns die Liste entlang des sich 
-      wiederholenden Zustands zerlegt als 
-      [trw1 q_rp trw2 q_rp trw3], wobei 
+      Auf diese Hypothese koennen wir nun das Dekompositionslemma
+      [Repeats_decomp_w] anwenden, das uns die Liste entlang des sich
+      wiederholenden Zustands zerlegt als
+      [trw1 q_rp trw2 q_rp trw3], wobei
       [q_rp] der sich wiederholende Zustand und die
-      [trwi] jeweils der i-te Teil des Traces [tr_w] sind. *) 
+      [trwi] jeweils der i-te Teil des Traces [tr_w] sind. *)
 
   apply Repeats_decomp_w in pigeonhole_rp_tr_w as ex_decomp_tr_w.
 
   destruct ex_decomp_tr_w as [q_rp ex_decomp_tr_w'].
   destruct ex_decomp_tr_w' as [trw1 [trw2 [trw3 trw_eq_trw1trw2trw3]]].
 
-  (** Der Trace [tr_w] ist durch Anwendung der Funktion [trace_w] 
+  (** Der Trace [tr_w] ist durch Anwendung der Funktion [trace_w]
       entstanden, die durch eine [map] auf die Liste der Praefixe
-      [inits] des Wortes [w] realisert ist. Daher koennen wir nun mit 
+      [inits] des Wortes [w] realisert ist. Daher koennen wir nun mit
       Hilfe des Dekompositionslemmas [map_decomp_3] aus der Dekomposition
-      von [tr_w] eine korrespondierende Zerlegung von [inits w] 
-      in drei Teile erzeugen. 
+      von [tr_w] eine korrespondierende Zerlegung von [inits w]
+      in drei Teile erzeugen.
       Dort, wo in der Zerlegung der Zustandsliste [q_rp]
       vorkam, finden sich jetzt die Praefixe [x] und [xy] von [w]. *)
 
   unfold trace_w in trw_eq_trw1trw2trw3.
-  apply map_decomp_3_snoc in trw_eq_trw1trw2trw3 as ex_decomp_iw. 
+  apply map_decomp_3_snoc in trw_eq_trw1trw2trw3 as ex_decomp_iw.
 
   destruct ex_decomp_iw as [inits1 [inits2 [inits3 ex_decomp_iw']]].
   destruct ex_decomp_iw' as [x [xy ex_decomp_iw_eqs]].

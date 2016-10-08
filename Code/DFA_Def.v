@@ -136,58 +136,13 @@ gespeichert werden, da diese Informationen enthaelt, ob ein Zustand mehrfach dur
 Dies ist der Fall, wenn die Anzahl der Konfigurationen innerhalb der Liste laenger ist, als die Anzahl
 der Zustaende des Automaten. *)
 
-(* Ableiten der naechsten Konfiguration [next_Conf]. *)
-
-Fixpoint next_Conf  (conf : Conf_DFA) : option Conf_DFA :=
-  match conf with
-    | (q, eps)         => None
-    | (q, snoc w a) => Some (delta q a, w)
-  end.
-
-
-(* Hier gibt es offenbar gerade ein Problem ?
-
-(*Konfigurationssequenz in einer Liste speichern.*)
-Fixpoint conf_seq' (w : @Word Sigma) : Q -> list Conf_DFA :=
-  match w with
-    | eps           => fun q : Q => cons (q, eps) nil
-    | snoc w' a  => fun q : Q => cons (q, w) (conf_seq' w' (delta q a))
-  end.
-
-Print conf_seq'.
-(* aber im 2. Fall muss (q, w) zur Liste hinzugefuegt werden, oder? *)
-
-Fixpoint conf_seq (conf : Conf_DFA) : list Conf_DFA :=
-  match conf with
-    | (q, w) => conf_seq' w q
-  end.
-
-(*################# Alternativ ###################*)
-
-(* Ich habe auch nichts wirklich Besseres zu bieten. Man koennte vermutlich einen
-   anonymen Fixpunkt benutzen, aber dadurch wird es nicht lesbarer und 
-   ich sehe auch sonst keinen Vorteil.
-   Die "Wrapper" Funktion muss dann natuerlich kein Fixpunkt sein. *)
-
-Fixpoint conf_list (w : @Word Sigma) (q : Q) : list Conf_DFA :=
- let conf := (q, w) in
-  match w with
-    | eps             => cons conf nil
-    | snoc w' a => cons conf (conf_list w' (delta q a))
-  end.
-
-Definition conf_to_conf_list (conf : Conf_DFA) : list Conf_DFA :=
-  let (q, w) := conf in conf_list w q.
-
-*)
-
-(*-----------------------------------------------------------------------------*)
-
-(* Liste der Zustaende, die bei der Abarbeitung des Worts durchlaufen werden. 
-   Wird in PL-Beweis gebraucht. *)
+(** Liste der Zustaende, die bei der Abarbeitung des Worts durchlaufen werden. *)
 
 Definition trace_w (q : Q) (w : @Word Sigma) : @Word Q :=
            map_word (delta_hat q) (inits_w w).
+
+(**Laenge der Liste ist eins laeger als die Laenge des Wortes, da der Startzustand noch
+ zusaetzlich gezaehlt wird. *)
 
 Lemma trace_length_w : forall w : @Word Sigma, forall q : Q,
       word_length (trace_w q w) = S (word_length w).
@@ -198,9 +153,11 @@ Proof.
   apply inits_len_w.
 Defined.
 
+(** *)
+
 Definition concat_trace_w : forall (q : Q) (w w' : @Word Sigma),
            trace_w q (concat_word w' w) = 
-           concat_word (removelast_w (trace_w q w')) 
+           concat_word (removelast_w (trace_w q w'))
            (trace_w (delta_hat q w') w).
 Proof.
   intros q w w'.
@@ -209,7 +166,8 @@ Proof.
   rewrite commute_concat_map_w.
   rewrite commute_removelast_map_w.
   induction w.
-  - simpl. reflexivity.
+  - simpl.
+    reflexivity.
   - (* Laesst sich das snoc auf einfachere Weise nach aussen ziehen? *)
     simpl (concat_word (removelast_w (map_word (delta_hat q) (inits_w w')))
     (map_word (delta_hat q) (map_word (concat_word w') (inits_w (snoc w a))))).
@@ -219,13 +177,6 @@ Proof.
     rewrite delta_hat_app.
     reflexivity.
 Defined.
-
-(*-----------------------------------------------------------------------------*)
-
-(*Definition der akzeptierten Sprache
-Definition L_DFA (w : list Sigma) : Conf_DFA:=
-exists p : Q, Conf_rel_DFA (q0 , w) (p, nil).
-*)
 
 End Definitions.
 
