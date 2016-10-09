@@ -59,7 +59,7 @@ Proof.
     intros ys q.
     reflexivity.
   - simpl.
-    intros.
+    intros ys q.
     apply IHxs.
 Defined.
 

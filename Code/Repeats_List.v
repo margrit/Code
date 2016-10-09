@@ -93,7 +93,6 @@ Proof.
     exists (b :: x0).
     exists (x1).
     simpl.
-    intros.
     rewrite e.
     reflexivity.
 Defined.

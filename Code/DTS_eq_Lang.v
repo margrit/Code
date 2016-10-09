@@ -15,7 +15,7 @@ Import DTS_Prop.
 Lemma eq_Q_eq_delta_hat : forall (w : @Word Sigma)(p q : Q)
       (d : forall q p : Q, (p = q) ), delta_hat q w = delta_hat p w.
 Proof.
-  intros.
+  intros w q p d.
   induction w.
   - simpl.
     apply d.
@@ -34,7 +34,7 @@ Defined.
 Lemma eq_Q_eq_delta_hat_left : forall (w : @Word Sigma)(p q : Q),
       q = p -> delta_hat q w = delta_hat p w.
 Proof.
-  intros.
+  intros w p q H.
   induction w.
   - simpl.
     assumption.
@@ -47,7 +47,7 @@ Lemma eq_Q_eq_delta_hat_right : forall (p q : Q),
       (forall (w : @Word Sigma),
       delta_hat q w = delta_hat p w) -> q = p.
 Proof.
-  intros.
+  intros p q H.
   pose (H eps).
   simpl in e.
   exact e.

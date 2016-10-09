@@ -90,7 +90,7 @@ Proof.
     intros q.
     reflexivity.
   - simpl.
-    intros.
+    intro q.
     rewrite <- IHv.
     reflexivity.
 Defined.

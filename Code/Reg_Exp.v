@@ -96,7 +96,7 @@ Fixpoint split2 {A : Type} (w : @Word A) : Word3 :=
   end.
 
 Eval compute in (split2 (snoc (snoc (snoc eps 1)2)3)).
-
+Eval compute in (split2 (snoc (snoc (snoc (snoc (snoc eps 1)2)3)4)5)).
 (** Die Sprache, die von einem regulaeren Ausdruck beschrieben wird. *)
 
 Fixpoint Lang_Reg {A : Type} (e : @Reg_Exp A) (eq: A -> A -> bool) (w : @Word A)  : bool :=

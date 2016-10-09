@@ -87,10 +87,10 @@ Theorem delta_hat_app : forall w v : @Word Sigma, forall q : Q,
 Proof.
   induction v.
   - simpl.
-    intros q.
+    intro q.
     reflexivity.
   - simpl.
-    intros.
+    intro q.
     rewrite <- IHv.
     reflexivity.
 Defined.

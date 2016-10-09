@@ -87,14 +87,14 @@ Defined.
 
 Lemma eq_app : forall (A B : Type) (f : A -> B) (x y  : A), x = y -> (f x = f y).
 Proof.
-  intros.
+  intros A B f x y H.
   rewrite H.
   reflexivity.
 Qed.
 
 Lemma subst : forall {A : Type} {x y : A} (B : A -> Type) (p : x = y), B x -> B y.
 Proof.
-  intros.
+  intros A x y B p X.
   destruct p.
   assumption.
 Defined.
@@ -102,7 +102,7 @@ Defined.
 Lemma eq_app_dep : forall {A : Type} {x y : A} {B : A -> Type} (f : forall (x : A ),
       (B x)) (p : x = y), (subst B p (f x) = f y).
 Proof.
-  intros.
+  intros A x y B f p.
   destruct p.
   simpl.
   reflexivity.
@@ -115,7 +115,7 @@ Defined.
 Theorem dec_Appears_fin : forall {n m : nat} (f : @Fin.t n) (v : Vector.t (@Fin.t n) m),
        (Appears_in f v) + ((Appears_in f v) -> False).
 Proof.
-  intros.
+  intros n m f v.
   apply dec_Appears_in.
   apply fin_eq_dec.
 Defined. 
@@ -123,7 +123,7 @@ Defined.
 Theorem dec_Repeats_fin : forall {n m : nat} (v : Vector.t (@Fin.t n) m),
        (Repeats v) + ((Repeats v) -> False).
 Proof.
-  intros.
+  intros n m v.
   apply dec_Repeats.
   apply fin_eq_dec.
 Defined. 
@@ -133,7 +133,7 @@ Defined.
 Fixpoint funct_Appears_in {A B : Type} {n : nat} (f : A -> B)
        (x : A) (v : Vector.t A n) :
        Appears_in x v -> Appears_in (f x) (map f v).
-  intro.
+  intro X.
   induction n.
   - inversion X.
   - dependent destruction X; simpl.
@@ -145,7 +145,7 @@ Defined.
 
 Fixpoint funct_Repeats {A B : Type} {n : nat} (f : A -> B) (v : Vector.t A n) :
        Repeats v -> Repeats (map f v).
-  intro.
+  intro X.
   induction v.
   - inversion X.
   - dependent destruction X; simpl.
@@ -332,9 +332,9 @@ Lemma not_Appears_in_tl {A : Type} {n : nat} (x y : A) (v : Vector.t A n) :
       (Appears_in x (cons A y n v) -> False) ->
       (Appears_in x v) -> False.
 Proof.
-  intros.
+  intros H X.
   pose (ai_later x y v X).
-  apply H. 
+  apply H.
   assumption.
 Defined.
 
