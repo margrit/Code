@@ -1,4 +1,4 @@
-(*Load Word_Prop.*)
+
 (* --------------------------------------------------------------------------*)
 
 (** * Die groesseren "Zerlegungs"-Lemmata fuer inits *)

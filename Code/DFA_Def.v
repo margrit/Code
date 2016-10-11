@@ -19,8 +19,8 @@
  Diese Komponenten werden nachfolgend definiert. *)
 
 Require Import Fin.
-Load Words.
 Load Pigeonhole_vector.
+Load Words.
 
 Section Definitions.
 

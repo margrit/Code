@@ -10,7 +10,8 @@ Die Beweise sind in die einzelnen Teilbeweise unterteilt und dies wird durch die
 -, +, * Sichtbar gemacht. Um mehr als 3 Ebenen zu schachteln, werden die gleichen Zeichen
 wiederverwendet, nur dass sie mit einer geschweiften Klammer umrahmt sind.
 *)
-Load DFA_Def.
+Load DFA_cons.
+
 
 Section Transitions.
 
