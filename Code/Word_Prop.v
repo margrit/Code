@@ -58,6 +58,8 @@ Fixpoint map_word {A B : Type} (f : A -> B) (w : @Word A) : @Word B :=
     | snoc w' x => snoc (map_word f w') (f x)
   end.
 
+(** Map-Funktion ist laengenerhaltend. *)
+
 Lemma map_length_w {A B : Type} : forall (f : A -> B) (w : @Word A),
       word_length (map_word f w) = word_length w.
 Proof.
@@ -253,8 +255,8 @@ Defined.
 
 (** Ein Problem, dass sich hierbei ergibt ist, dass die Typen von Listen und Woertern auf unterschiedlich
  arbeitende Konstruktoren aufbauen. Die Liste wird von hinten nach vorn aufgebaut, indem das 
- naechste Zeichen vorn angehaengt wird und der Aufbau eines Wortes ist entgegengesetzt. Wenn man
- die Umwandlung von einer Liste in ein Wort eins zu eins implementiert, erhaelt man die Funktion, die in
+ naechste Zeichen vorn angehaengt wird und der Aufbau eines Wortes ist entgegengesetzt. Wenn 
+ die Umwandlung von einer Liste in ein Wort eins zu eins implementiert wird, entsteht die Funktion, die in
  [list_to_word] beschrieben ist.*)
 
 Fixpoint list_to_word_simple {A : Type} (l : list A) : @Word A :=
@@ -279,7 +281,7 @@ Proof.
     reflexivity.
 Defined.
 
-(** Um eine Liste mithilfe von [list_to_word_simple] in ein Wort unter Beachtung der Reihenfolge umzuwandeln,
+(** Um eine Liste mit Hilfe von [list_to_word_simple] in ein Wort unter Beachtung der Reihenfolge umzuwandeln,
  koennen zwei verschiedene Ansaetze verwendet werden. Die Liste wird zuerst in ein Wort umgewandelt
 und anschliessend wird die Reihenfolge mit [word_reverse] geaendert oder die Liste wird zuerst mit [rev]
 umgedreht und anschliessend in ein Wort umgewandelt. Da jeweils zwei Antihomomorphismen hintereinander
@@ -581,7 +583,7 @@ Fixpoint inits_l {X : Type} (l : list X) : list (list X) :=
     | x :: xs => nil :: map (cons x) (inits_l xs)
   end.
 
-(* die fuer PL_w benutzte benutzte Variante *)
+(* Die fuer das Pumping_Lemma_Word benutzte Variante *)
 
 Fixpoint inits_w {X : Type} (w : @Word X) : Word2 :=
   match w with

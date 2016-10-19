@@ -1,12 +1,12 @@
 Require Import Fin.
 Require Import Arith.
 
-
-(* We need some Extensions to the Vectors.Fin library, first of all *)
-(* versions of to_nat and of_nat with strong sums *) 
-
 (** Es werden zuerst noch ein paar Erweiterungen zur Vectors.Fin Bibliothek
- benoetigt. Als erstes eine Version von [to_nat] und [of_nat] mit festen Summen*)
+ benoetigt. Als erstes eine Version von [to_nat] und [of_nat] mit konstruktiven
+ Existenzquantoren bzw. abhaengige Summen. *)
+
+(** Wenn p kleiner als n ist, dann wird das p-te Element von Fin.t n  angegeben,oder
+ ein Zeugen, dass p groesser als die Kardinalitaet von Fin.t n ist. *)
 
 Fixpoint of_nat' (p n : nat) : (t n) + { m : nat & p = n + m }.
   induction n.
@@ -30,6 +30,9 @@ Fixpoint of_nat' (p n : nat) : (t n) + { m : nat & p = n + m }.
         simpl.
         reflexivity.
 Defined.
+
+(** Wenn p kleiner als n ist, dann wird das p-te Element von Fin.t n mit einem Beweis, dass
+ p < n angegeben, oder ein Zeuge, dass p groesser als die Kardinalitaet von Fin.t n ist. *)
 
 Fixpoint of_nat'' (p n : nat) : ((t n) * (p < n)) + { m : nat & p = n + m }.
   induction n.
@@ -60,6 +63,8 @@ Fixpoint of_nat'' (p n : nat) : ((t n) * (p < n)) + { m : nat & p = n + m }.
         reflexivity.
 Defined.
 
+(** Das i-te Element von Fin.t n, mit einem Beweis, dass dies kleiner ist als die
+ Kardinalitaet von Fin.t n. *)
 
 Fixpoint to_nat' {m : nat} (n : t m) {struct n} : {i : nat & i < m} :=
   match n in (t n0) return {i : nat & i < n0} with
@@ -69,6 +74,7 @@ Fixpoint to_nat' {m : nat} (n : t m) {struct n} : {i : nat & i < m} :=
       existT (fun i0 : nat => i0 < S n0) (S i) (lt_n_S i n0 P)
   end.
 
+(** Gleichheit der Elemente von Fin.t ist entscheidbar. *)
 
 Theorem fin_eq_dec {n : nat} (a b : @Fin.t n): (a = b) + ~(a = b).
 Proof.
@@ -97,7 +103,7 @@ Defined.
 (** Lemmata zur Typanpassung *)
 
 Definition n_plus_0 (n : nat) : (n + 0 = n) := eq_sym (plus_n_O n).
-
+  
 Lemma fin_pl0 {n : nat} (p : @Fin.t (n + 0)) : @Fin.t n.
 Proof.
   rewrite <- (eq_sym (plus_n_O n)).
@@ -106,14 +112,14 @@ Defined.
 
 Lemma S_plus_1 (n : nat) : (S n = n + 1).
 Proof.
-  rewrite <- plus_n_Sm. 
+  rewrite <- plus_n_Sm.
   rewrite n_plus_0.
   reflexivity.
 Defined.
 
 Lemma fin_S_pl1 {n : nat} (p : @Fin.t (n + 1)) : @Fin.t (S n).
 Proof.
-  rewrite <- plus_n_Sm in p. 
+  rewrite <- plus_n_Sm in p.
   rewrite n_plus_0 in p.
   exact p.
 Defined.
