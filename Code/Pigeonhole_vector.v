@@ -12,13 +12,13 @@ Inductive Appears_in {X : Type} (a : X): forall {n : nat}, (Vector.t X n) -> Typ
   | ai_here  {m} : forall (v : Vector.t X m), Appears_in a (cons X a m v)
   | ai_later {m} : forall b (v : Vector.t X m), Appears_in a v -> Appears_in a (cons X b m v).
 
-(** Vorkommen von Wiederholungen in einer Liste *)
+(** Vorkommen von Wiederholungen in einer Liste. *)
 
 Inductive Repeats {X : Type} : forall {n : nat}, Vector.t X n -> Type :=
   | rp_ext  {m} : forall x : X, forall v : Vector.t X m, Repeats v -> Repeats (cons X x m v)
   | rp_intr {m} : forall x : X, forall v : Vector.t X m, Appears_in x v -> Repeats (cons X x m v).
 
-(** Entscheidbarkeit von Appears und Repeats *)
+(** Entscheidbarkeit von Appears und Repeats. *)
 
 Theorem dec_Appears_in : forall {A : Type}
        (d : forall a a': A, (a = a') + ((a = a') -> False))
@@ -219,7 +219,7 @@ Defined.
 
 
 (** Wenn ein Element, das schon in der Liste vorkommt, eingefuegt wird,
- dann widerholt es sich. *)
+ dann wiederholt es sich. *)
 
 Lemma ins_app_Repeats {A : Type} {n : nat}:
       forall (x : A) (v : Vector.t A n) (f : @Fin.t (S n)),
@@ -278,8 +278,9 @@ Defined.
 
 (** Das Einfuegen eines Elements erhaelt vorhandene Wiederholungen. *)
 
-Lemma ins_pres_rep {A : Type} {n : nat} (x : A) : forall (v : Vector.t A n)
-      (f: @Fin.t (S n)), Repeats v -> Repeats (insert_at v f x).
+Lemma ins_pres_rep {A : Type} {n : nat} (x : A) :
+      forall (v : Vector.t A n) (f: @Fin.t (S n)),
+      Repeats v -> Repeats (insert_at v f x).
 Proof.
   intros v f r.
   dependent induction v.

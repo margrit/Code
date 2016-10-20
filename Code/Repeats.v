@@ -1,4 +1,3 @@
-(** Quelle: https://github.com/wjzz/PumpingLemma/blob/master/Repeats.v *)
 
 Require Import List.
 (* Load Word_Prop. *)
@@ -72,8 +71,6 @@ Proof.
     rewrite w_eq_w1'xw2'.
     reflexivity.
 Defined.
-
-(*-------- Das Lemma ist zusaetzlich --------*)
 
 (** Wenn x das Suffix vom ersten Teilwort w1 und Praefix vom zweitem Teilwort
  w2 ist, dann kommt x in der Konkatenation w1 x w2 vor. *)

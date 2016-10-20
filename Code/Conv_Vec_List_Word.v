@@ -70,7 +70,6 @@ Proof.
     exact a.
 Defined.
 
-
 (** Pigeonhole fuer Listen *)
 
 Lemma pigeonhole_l: forall {n} (l : list (@Fin.t n)), length l > n ->

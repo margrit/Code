@@ -50,7 +50,7 @@ Fixpoint word_reverse {A : Type} (w : @Word A) : @Word A  :=
     | snoc w' x  => concat_word (snoc eps x) (word_reverse w')
   end.
 
-(** Map-Funktion auf Woertern (Word ist ein Funktor) *)
+(** Map-Funktion auf Woertern (Word ist ein Funktor). *)
 
 Fixpoint map_word {A B : Type} (f : A -> B) (w : @Word A) : @Word B :=
   match w with
@@ -58,7 +58,7 @@ Fixpoint map_word {A B : Type} (f : A -> B) (w : @Word A) : @Word B :=
     | snoc w' x => snoc (map_word f w') (f x)
   end.
 
-(** Map-Funktion ist laengenerhaltend. *)
+(** Die Map-Funktion ist laengenerhaltend. *)
 
 Lemma map_length_w {A B : Type} : forall (f : A -> B) (w : @Word A),
       word_length (map_word f w) = word_length w.
@@ -254,10 +254,10 @@ Defined.
 (**  * Eine Liste in ein Wort umwandeln.*)
 
 (** Ein Problem, dass sich hierbei ergibt ist, dass die Typen von Listen und Woertern auf unterschiedlich
- arbeitende Konstruktoren aufbauen. Die Liste wird von hinten nach vorn aufgebaut, indem das 
+ arbeitenden Konstruktoren aufbauen. Die Liste wird von hinten nach vorn aufgebaut, indem das 
  naechste Zeichen vorn angehaengt wird und der Aufbau eines Wortes ist entgegengesetzt. Wenn 
  die Umwandlung von einer Liste in ein Wort eins zu eins implementiert wird, entsteht die Funktion, die in
- [list_to_word] beschrieben ist.*)
+ [list_to_word_simple] beschrieben ist.*)
 
 Fixpoint list_to_word_simple {A : Type} (l : list A) : @Word A :=
   match l with

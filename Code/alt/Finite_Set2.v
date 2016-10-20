@@ -1,7 +1,4 @@
-(* "Design"-Fragen: - Benutzung von "assumption" oder lieber das praezisere "exact hypname"?
-                    - Benutzung von "induction" immer oder
-                      lieber "destruct" wenn Induktion gar nicht benoetigt wird? 
-
+(* 
    Ich habe dort, wo dependent induction oder destruction vorhommt/kam, Alternativen hingeschrieben, 
    die Schemata aus der Fin-Bibliothek benutzen; so koennten wir auf "Program" verzichten.
 *)
@@ -345,7 +342,7 @@ Proof.
     pose (sumIsoLeft _ _ Y isoXF) as isoSumXYSumFY.   
     apply (transIso' _ _ (t m) isoSumXYSumFY).
     apply (transIso' _ _ (t m) (sumFalseIso Y)).
-    assumption.    
+    exact isoYtm.
   + intros X Y isoXtSn isoYtm.
     pose (sumIsoLeft _ _ Y isoXtSn) as isoSumXYSumtSnY.
     apply (transIso' _ _ (t (S n + m)) isoSumXYSumtSnY).
