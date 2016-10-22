@@ -26,7 +26,6 @@ Proof.
     + left.
       apply ai_here_l.
     + apply IHxs in X0.
-       inversion H1.
        destruct X0.
       * { left.
            apply ai_later_l.
@@ -69,10 +68,10 @@ Proof.
         }
   - induction xs.
     + simpl.
-      exact xInys.
+       exact xInys.
     + simpl.
-      apply ai_later_l.
-      exact IHxs.
+       apply ai_later_l.
+       exact IHxs.
 Defined.
 
 (** Wenn x in einer Liste vorkommt, dann gibt es eine Zerlegung in zwei

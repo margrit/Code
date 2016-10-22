@@ -1,22 +1,20 @@
-(* Hier kommen die cons Sachen rein, woraus man Übungsaufgaben basteln kann*)
-
 Load DFA_Def.
 
-(** Erweiterte Überführungsfunktion [delta_hat_cons], wird hier nicht weiter verwendet,
- da die Verfahren in der Vorlesung über den [snoc] Konstruktor definiert wurden. Es wäre als eine
- Übungsaufgabe denkbar, dass kleine Beispiele mit dem [cons] Konstruktor zu lösen sind.*)
+(** Die Erweiterte Ueberfuehrungsfunktion [delta_hat_cons] fuer Listen. *)
+
 Fixpoint delta_hat_cons (q : Q) (w : list Sigma) : Q :=
   match w with
     | nil             => q
     | cons h w' => delta_hat_cons (delta q h) w'
   end.
 
-(** Siehe [delta_hat_Lemma, nur auf Listen statt Wörtern.]*)
+(** Siehe [delta_hat_Lemma], nur auf Listen statt Woertern. *)
+
 Lemma delta_hat_cons_Lemma (q : Q) (a : Sigma) (l : list Sigma) :
-  delta_hat_cons q (l ++ (a :: nil)) = delta (delta_hat_cons q l) a.
+      delta_hat_cons q (l ++ (a :: nil)) = delta (delta_hat_cons q l) a.
 Proof.
-generalize q.
-induction l.
+  generalize q.
+  induction l.
   - simpl.
     reflexivity.
   - simpl.
@@ -25,9 +23,10 @@ induction l.
     reflexivity.
 Defined.
 
-(** Die Abarbeitung einer, aus zwei Teillisten bestehenden Liste.*)
+(** Die Abarbeitung einer, aus zwei Teillisten bestehenden Liste. *)
+
 Theorem delta_hat_cons_app : forall xs ys : list Sigma, forall q : Q,
-  delta_hat_cons q (xs ++ ys) = delta_hat_cons (delta_hat_cons q xs) ys.
+       delta_hat_cons q (xs ++ ys) = delta_hat_cons (delta_hat_cons q xs) ys.
 Proof.
   induction xs.
   - simpl.
@@ -42,12 +41,13 @@ Defined.
 beschreiben den gleichen Sachverhalt. Die Liste kann durch [delta_hat_cons] direkt abgearbeitet
 werden. Bei [delta_hat] muss die Liste durch [list_to_word] in ein Wort umgewandelt werden,
 da der Eingabetyp [Word] erwartet wird. Die Abbildung in die andere Richtung kann man mit
-[word_to_list] analog definieren.*)
+[word_to_list] analog definieren. *)
+
 Lemma delta_hat_cons_snoc (q : Q) (l : list Sigma) :
-  delta_hat_cons q l = delta_hat q (list_to_word l).
+      delta_hat_cons q l = delta_hat q (list_to_word l).
 Proof.
-generalize q.
-induction l.
+  generalize q.
+  induction l.
   - simpl.
     reflexivity.
   - simpl.
@@ -58,10 +58,10 @@ induction l.
 Defined.
 
 Lemma delta_hat_snoc_cons (q : Q) (w : @Word Sigma) :
-  delta_hat q w = delta_hat_cons q (word_to_list w).
+      delta_hat q w = delta_hat_cons q (word_to_list w).
 Proof.
-generalize q.
-induction w.
+  generalize q.
+  induction w.
   - simpl.
     reflexivity.
   - simpl.
@@ -71,17 +71,19 @@ induction w.
     reflexivity.
 Defined.
 
-(** Die von einem endlichen Automaten beschriebene Sprachen definiert durch [is_accepting].*)
-Definition Lang_delta_cons (w : list Sigma) :=
-  is_accepting (delta_hat_cons q0 w).
+(** Die von einem endlichen Automaten beschriebene Sprachen definiert durch [Lang_delta_cons]. *)
 
-(** Die Funktionen [Lang_delta] und [Lang_delta_cons] beschreiben die gleichen Sprachen.*)
+Definition Lang_delta_cons (w : list Sigma) :=
+           is_accepting (delta_hat_cons q0 w).
+
+(** Die Funktionen [Lang_delta] und [Lang_delta_cons] beschreiben die gleichen Sprachen. *)
+
 Lemma Lang_delta_Lemma (w : @Word Sigma) :
-  Lang_delta w = Lang_delta_cons (word_to_list w).
+      Lang_delta w = Lang_delta_cons (word_to_list w).
 Proof.
-unfold Lang_delta.
-unfold Lang_delta_cons.
-induction w.
+  unfold Lang_delta.
+  unfold Lang_delta_cons.
+  induction w.
   - simpl.
     reflexivity.
   - generalize q0.

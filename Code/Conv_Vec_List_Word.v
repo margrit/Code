@@ -6,12 +6,12 @@ Load Pigeonhole_vector.
 
 (*--------------------------------------------------------------------------------------------*)
 
-(* Conversion fuer Listen *)
+(** *Conversion fuer Listen *)
 
 (*--------------------------------------------------------------------------------------------*)
 
 (* Vorbereitung *)
-(*[to_list] und [of_list] sind aus der Vector Bibliothek und wandeln Vektoren in Listen
+(** [to_list] und [of_list] sind aus der Vector Bibliothek und wandeln Vektoren in Listen
  um und anders herum. *)
 
 (** Umwandlung von Vektoren in Listen. *)
@@ -89,7 +89,7 @@ Defined.
 
 (*--------------------------------------------------------------------------------------------*)
 
-(* Conversion fuer Woerter *)
+(** *Conversion fuer Woerter *)
 
 (*--------------------------------------------------------------------------------------------*)
 
@@ -167,7 +167,7 @@ Proof.
 Defined.
 
 
-(* Pigeonhole fuer Woerter *)
+(** Pigeonhole fuer Woerter *)
 
 Lemma pigeonhole_w: forall {n} (w : @Word (@Fin.t n)),
       word_length w > n -> Repeats_Word w.
