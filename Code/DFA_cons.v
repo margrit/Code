@@ -1,6 +1,6 @@
 Load DFA_Def.
 
-(** Die Erweiterte Ueberfuehrungsfunktion [delta_hat_cons] fuer Listen. *)
+(** Die erweiterte Ueberfuehrungsfunktion [delta_hat_cons] fuer Listen. *)
 
 Fixpoint delta_hat_cons (q : Q) (w : list Sigma) : Q :=
   match w with
@@ -23,7 +23,7 @@ Proof.
     reflexivity.
 Defined.
 
-(** Die Abarbeitung einer, aus zwei Teillisten bestehenden Liste. *)
+(** Die Abarbeitung einer aus zwei Teillisten bestehenden Liste. *)
 
 Theorem delta_hat_cons_app : forall xs ys : list Sigma, forall q : Q,
        delta_hat_cons q (xs ++ ys) = delta_hat_cons (delta_hat_cons q xs) ys.
@@ -38,10 +38,10 @@ Proof.
 Defined.
 
 (** Die Funktionen [delta_hat] und [delta_hat_cons] angewendet auf ein Wort bzw. eine Liste
-beschreiben den gleichen Sachverhalt. Die Liste kann durch [delta_hat_cons] direkt abgearbeitet
+beschreiben, den gleichen Sachverhalt. Die Liste kann durch [delta_hat_cons] direkt abgearbeitet
 werden. Bei [delta_hat] muss die Liste durch [list_to_word] in ein Wort umgewandelt werden,
-da der Eingabetyp [Word] erwartet wird. Die Abbildung in die andere Richtung kann man mit
-[word_to_list] analog definieren. *)
+da der Eingabetyp [Word] erwartet wird. Die Abbildung in die andere Richtung kann mit
+[word_to_list] analog definiert werden. *)
 
 Lemma delta_hat_cons_snoc (q : Q) (l : list Sigma) :
       delta_hat_cons q l = delta_hat q (list_to_word l).
@@ -71,12 +71,12 @@ Proof.
     reflexivity.
 Defined.
 
-(** Die von einem endlichen Automaten beschriebene Sprachen definiert durch [Lang_delta_cons]. *)
+(** Die von einem endlichen Automaten beschriebene Sprache definiert durch [Lang_delta_cons]. *)
 
 Definition Lang_delta_cons (w : list Sigma) :=
            is_accepting (delta_hat_cons q0 w).
 
-(** Die Funktionen [Lang_delta] und [Lang_delta_cons] beschreiben die gleichen Sprachen. *)
+(** Die Funktionen [Lang_delta] und [Lang_delta_cons] beschreiben die gleiche Sprache. *)
 
 Lemma Lang_delta_Lemma (w : @Word Sigma) :
       Lang_delta w = Lang_delta_cons (word_to_list w).

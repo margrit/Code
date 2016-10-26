@@ -1,12 +1,12 @@
 
 (* --------------------------------------------------------------------------*)
 
-(** * Die groesseren "Zerlegungs"-Lemmata fuer inits *)
+(** Die groesseren "Zerlegungs"-Lemmata fuer inits *)
 
 (* --------------------------------------------------------------------------*)
 
 (** Vorbereitung fuer das PL,
-    um von einer Zerlegung von [inits w] auf eine Zerlegung von [w]
+    um von einer Zerlegung von [inits w], auf eine Zerlegung von [w]
     mit den benoetigten Eigenschaften schliessen zu koennen. *)
 
 Lemma inits_diff_w {A : Type} (w : @Word A) :
@@ -229,7 +229,7 @@ Proof.
 
 Defined.
 
-(** Zusammenfassen der beiden vorhergehenden Lemmata. *)
+(** Zusammenfassung der beiden vorhergehenden Lemmata. *)
 
 Lemma w_decomp_of_initsw_decomp {A : Type} (w : @Word A):
       forall (p1 p2 : @Word A)
@@ -254,4 +254,3 @@ Proof.
 
 Defined.
 
-(*Eval compute in ( w_decomp_of_initsw_decomp(snoc (snoc (snoc eps 1)2)3)).*)

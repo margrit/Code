@@ -38,7 +38,7 @@ Require Import Words.
 Import DTS_Example.
 Import Ex_Prop.
 
-(** Durch der oben gegebenen Definition lassen sich zwei Sprachen definieren, die mit
+(** Durch die oben gegebenen Definitionen lassen sich zwei Sprachen definieren, die mit
  einer geraden Anzahl an Eingaben [even_press] und die mit einer ungeraden Anzahl
  an Eingaben [odd_press]. *)
 
@@ -48,11 +48,11 @@ Inductive even_press : @Word Sigma -> Type :=
 with odd_press : @Word Sigma -> Type :=
   | snoc_odd {w : @Word Sigma} {a : Sigma} : even_press w -> odd_press (snoc w a).
 
-(** Beweis, dass die Sprache des [DTS_Example] = [odd_press] ist indem die folgenden
+(** Beweis, dass die Sprache des [DTS_Example] = [odd_press] ist, indem die folgenden
  Implikationen gezeigt werden.
  - forall w, Lang_delta w -> odd_press w
  - forall w, odd_press w -> Lang_delta w
- Dazu wird ein typwertiges Prädikat benoetigt, um zu wissen, in welchem Zustand sich
+ Dazu wird ein typwertiges Praedikat benoetigt, um zu wissen in welchem Zustand sich
  der Automat nach der Eingabe befindet. *)
 
 Lemma finish_input : forall w,
@@ -95,7 +95,7 @@ Proof.
     exact (IHw X0 X).
 Defined.
 
-(** Jetzt koennen beide Richtungen der Aequivalenz gezeitgt werden.
+(** Jetzt koennen beide Richtungen der Aequivalenz gezeigt werden.
  - forall w, Lang_delta w -> odd_press w
  - forall w, odd_press w -> Lang_delta w *)
 
@@ -124,8 +124,8 @@ Proof.
     exact I.
 Defined.
 
-(** Aequivalenz zwischen odd_press und Lang_delta. Die Sprache die von dem 
-Toggle Automaten akzeptiert wird besteht genau aus den Woertern, deren Laenge
+(** Aequivalenz zwischen odd_press und Lang_delta. Die Sprache die von dem
+Toggle Automaten akzeptiert wird, besteht genau aus den Woertern deren Laenge
 ungerade ist. *)
 
 Require Import Equivalences.
@@ -143,6 +143,8 @@ End Lang_Toggle.
 Require Import FiniteClass.
 Require Import Fin.
 Require Import Program.
+
+(** Die Zustandsmenge ist endlich. *)
 
 Instance Q_Finite : Finite Q := {
   card := 2;
@@ -162,6 +164,8 @@ Proof.
   - intro x.
     destruct x;reflexivity.
 Qed.
+
+(** Das Eingabealphabet ist endlich. *)
 
 Instance Sigma_Finite : Finite Sigma := {
   card := 1;

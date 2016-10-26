@@ -10,7 +10,7 @@ Require Import List.
  Da sowohl Listen als auch Woerter fuer die Darstellung benoetigt werden, muessen die Typen
  ineinander ueberfuehrbar sein. *)
 
-(** * Definition von Woertern: *)
+(** Definition von Woertern: *)
 Inductive Word {A : Type} : Type:=
   | eps   : @Word A
   | snoc : @Word A -> A -> @Word A.
@@ -20,13 +20,13 @@ Inductive Word {A : Type} : Type:=
 Notation "[ ]" := eps.
 Notation "[ x ; .. ; y ]" := (snoc ( .. (snoc eps x) .. ) y).
 
-(** ** Grundoperationen auf dem Typ [Word]: *)
+(** Grundoperationen auf dem Typ [Word]: *)
 
-(** Einheit der Word-Monade: *)
+(** Einheit der [Word]-Monade. *)
 
 Definition unit_w {A : Type} (a : A) : @Word A := snoc eps a.
 
-(** Berechnung der Wortlaenge: *)
+(** Berechnung der Wortlaenge. *)
 
 Fixpoint word_length {A : Type} (w : @Word A) : nat :=
   match w with
@@ -34,7 +34,7 @@ Fixpoint word_length {A : Type} (w : @Word A) : nat :=
     | snoc w' x => S (word_length w')
   end.
 
-(** Verknuepfung zweier Woerter: *)
+(** Verknuepfung zweier Woerter. *)
 
 Fixpoint concat_word {A : Type} (w1 w2 : @Word A) : @Word A :=
   match w2 with
@@ -42,7 +42,7 @@ Fixpoint concat_word {A : Type} (w1 w2 : @Word A) : @Word A :=
     | snoc w x => snoc (concat_word w1 w) x
   end.
 
-(** Ein Wort umdrehen: *)
+(** Ein Wort umdrehen. *)
 
 Fixpoint word_reverse {A : Type} (w : @Word A) : @Word A  :=
   match w with
@@ -50,7 +50,7 @@ Fixpoint word_reverse {A : Type} (w : @Word A) : @Word A  :=
     | snoc w' x  => concat_word (snoc eps x) (word_reverse w')
   end.
 
-(** Map-Funktion auf Woertern (Word ist ein Funktor). *)
+(** Map-Funktion auf Woertern ([Word] ist ein Funktor). *)
 
 Fixpoint map_word {A B : Type} (f : A -> B) (w : @Word A) : @Word B :=
   match w with
@@ -72,16 +72,16 @@ Proof.
     reflexivity.
 Defined.
 
-(** * Definition von Listen *)
+(** Definition von Listen: *)
 
 (** In der Standardbibliothek befinden sich bereits Listenoperationen wie [concat] und [rev],
  die analog zu [concat_word] und [word_reverse] arbeiten. Zusaetzlich werden noch weitere
  Eigenschaften benoetigt, die nachfolgend gezeigt werden. *)
 
-(** ** Eigenschaften von [concat] und [rev] ueber Listen: *)
+(** Eigenschaften von [concat] und [rev] ueber Listen: *)
 
 (** Die leere Liste [nil] ist rechtsneutral bzgl. der Konkatenation. (Per Definition ist [nil] auch
-linksneutral.)*)
+linksneutral.) *)
 
 Lemma concat_nil {A : Type} (ls : list A) : (ls ++ nil) = ls.
 Proof.
@@ -143,7 +143,7 @@ Defined.
 (** Analog zum Typen [list] werden diese Eigenschaften ebenfalls fuer die Operationen auf [Word]
  bewiesen.*)
 
-(** ** Eigenschaften von [concat_word] und [word_reverse].*)
+(** Eigenschaften von [concat_word] und [word_reverse].*)
 
 (** Das leere Wort [eps] ist linksneutral bzgl. der Konkatenation. (Per Definition ist [eps] auch
 rechtsneutral.)*)
@@ -243,19 +243,19 @@ Proof.
   exact revEq.
 Defined.
 
-(** Somit ist [Word] als Monoid mit [concat_word] als assoziativer Konkatenation 
- und [eps] als neutralem Element definiert. Bei [list] erhalten wir die gleichen Eigenschaften 
- durch [concat] als assoziative Konkatenation und [nil] als neutrales Element bzgl. der 
+(** Somit ist [Word] als Monoid mit [concat_word] als assoziative Konkatenation
+ und [eps] als neutrales Element definiert. Bei [list] erhalten wir die gleichen Eigenschaften
+ durch [concat] als assoziative Konkatenation und [nil] als neutrales Element bzgl. der
  Konkatenation.
 
  Diese Eigenschaften von Listen und Woertern ermoeglichen weitere Schlussfolgerungen
  bzgl. der Ueberfuehrung von Listen in Woertern und anders herum. *)
 
-(**  * Eine Liste in ein Wort umwandeln.*)
+(** Eine Liste in ein Wort umwandeln:*)
 
-(** Ein Problem, dass sich hierbei ergibt ist, dass die Typen von Listen und Woertern auf unterschiedlich
- arbeitenden Konstruktoren aufbauen. Die Liste wird von hinten nach vorn aufgebaut, indem das 
- naechste Zeichen vorn angehaengt wird und der Aufbau eines Wortes ist entgegengesetzt. Wenn 
+(** Ein Problem das sich hierbei ergibt, ist dass die Typen von Listen und Woertern auf unterschiedlich
+ arbeitenden Konstruktoren aufbauen. Die Liste wird von hinten nach vorn aufgebaut, indem das
+ naechste Zeichen vorn angehaengt wird und der Aufbau eines Wortes ist entgegengesetzt. Wenn
  die Umwandlung von einer Liste in ein Wort eins zu eins implementiert wird, entsteht die Funktion, die in
  [list_to_word_simple] beschrieben ist.*)
 
@@ -364,11 +364,11 @@ Proof.
   reflexivity.
 Defined.
 
-(** * Ein Wort in eine Liste umwandeln: *)
+(** Ein Wort in eine Liste umwandeln: *)
 
-(** Wie auch schon bei der Umwandlung von einer Liste in ein Wort, besteht das Problem mit der
- Reihenfolge aufgrund der Konstruktoren auch hier. Die eins zu eins Implementierung der Umwandlung
-liefert die Funktion [word_to_list_simple].*)
+(** Wie auch schon bei der Umwandlung von einer Liste in ein Wort, besteht auch hier das
+ Problem mit der Reihenfolge aufgrund der Konstruktoren. Die eins zu eins Implementierung
+ der Umwandlung liefert die Funktion [word_to_list_simple].*)
 
 Fixpoint word_to_list_simple {A : Type} (w : @Word A) : list A :=
   match w with
@@ -468,7 +468,7 @@ Proof.
   reflexivity.
 Defined.
 
-(** [list_to_word_simple] und [word_to_list_simple*] sind zueinander inverse Isomorphismen.*)
+(** [list_to_word_simple] und [word_to_list_simple] sind zueinander inverse Isomorphismen.*)
 
 Lemma list_word_list_simple {A : Type} (l : list A) :
       word_to_list_simple (list_to_word_simple l) = l.
@@ -516,7 +516,7 @@ Proof.
   apply word_reverse_involutiv.
 Defined.
 
-(** Weitere Lemmata zu Word-List und List-Word-Umwandlungen *)
+(** Weitere Lemmata zu Word-List und List-Word-Umwandlungen. *)
 
 Lemma lw_pres_eq {A} (l : list A) : forall (w : @Word A),
       l = word_to_list w -> list_to_word l = w.
@@ -558,7 +558,7 @@ Defined.
 
 (* --------------------------------------------------------------------------*)
 
-(** ** Inits und Tails *)
+(** Inits und Tails: *)
 
 (* --------------------------------------------------------------------------*)
 
@@ -575,7 +575,7 @@ Fixpoint tails_w {X : Type} (w : @Word X) : Word2 :=
     | snoc xs x => snoc (map_word (fun w => snoc w x) (tails_w xs)) eps
   end.
 
-(** *** Verschiedene inits-Varianten *)
+(** Verschiedene inits-Varianten: *)
 
 Fixpoint inits_l {X : Type} (l : list X) : list (list X) :=
   match l with
@@ -603,16 +603,8 @@ Fixpoint inits_w''{X : Type} (w : @Word X) : Word2 :=
                               (inits_w w'))
   end.
 
-(* Beispiele: *)
-Eval compute in (inits_w (snoc (snoc ( snoc eps 1 ) 2) 3)).
-Eval compute in (tails_w (snoc (snoc ( snoc eps 1 ) 2) 3)).
-Eval compute in (inits_l nil : list (list nat)).
-
-
 Definition inits_list_w {X : Type} (w : @Word X) : list (@Word X) :=
            map (list_to_word) (inits_l (word_to_list w)).
-
-Eval compute in (inits_list_w (snoc (snoc ( snoc eps 1 ) 2) 3)).
 
 Fixpoint removelast_w {A} (w : @Word A) :=
   match w with
@@ -622,7 +614,7 @@ Fixpoint removelast_w {A} (w : @Word A) :=
 
 (* --------------------------------------------------------------------------*)
 
-(** *** Lemmata zu inits, concat, map *)
+(** Lemmata zu inits, concat und map: *)
 
 (* --------------------------------------------------------------------------*)
 

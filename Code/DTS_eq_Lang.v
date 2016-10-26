@@ -2,9 +2,8 @@ Require DTS_Def.
 Require Import Program.
 Require Import Words.
 
-(* BEMERKUNG, was in der Datei alles passiert !!! 
-- eventuell oben oder in der Bewertung??
-*)
+(** Um zu zeigen, dass [Lang_delta] und [Lang_Conf] die gleichen Sprachen beschreiben,
+ werden zunaechst noch ein paar Lemmata ueber Gleichheit benoetigt.*)
 
 Module DTS_eq_Lang  (DTS : DTS_Def.DTS_Par).
 Import DTS.
@@ -53,13 +52,13 @@ Proof.
   exact e.
 Defined.
 
-(**  *[Lang_delta] und [Lang_Conf] beschreiben die gleichen Sprachen.*)
+(**  [Lang_delta] und [Lang_Conf] beschreiben die gleichen Sprachen.*)
 
-(** Um zu zeigen, dass [Lang_delta] und [Lang_Conf] die Aequivalent zueinander sind, muss sowohl
+(** Um zu zeigen, dass [Lang_delta] und [Lang_Conf]  aequivalent zueinander sind, muss sowohl
 [Lang_delta] w -> [Lang_Conf] w als auch [Lang_Conf] w -> [Lang_delta] w gezeigt werden. Dazu
-sind eine Reihe von Hilfslemmata norwendig.*)
+sind eine Reihe von Lemmata notwendig.*)
 
-(** Hilfslemmata fuer [Lang_delta_Lang_Conf]*)
+(** Lemmata fuer [Lang_delta_Lang_Conf]*)
 Lemma delta_hat_Conf_reverse (w : @Word Sigma) : forall (q : Q),
       Conf_rel (q, (word_reverse w)) (delta_hat q (word_reverse w), eps).
 Proof.
@@ -94,7 +93,7 @@ Proof.
   - exact (delta_hat_Conf w q0).
 Qed.
 
-(** Hilfslemmata fuer [Lang_Conf_Lang_delta].*)
+(** Lemmata fuer [Lang_Conf_Lang_delta].*)
 (** Die vollstaendige Abarbeitung eines umgedrehten Wortes.*)
 Lemma Conf_delta_hat_reverse (w : @Word Sigma) : forall (q p : Q),
       Conf_rel (q, word_reverse w) (p, eps) ->

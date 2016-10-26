@@ -1,11 +1,3 @@
-(* Quelle: https://github.com/wjzz/PumpingLemma/blob/master/Dfa.v *)
-
-(* TODO-Frage: Wie waere anstatt ausschliesslich einer Zerlegung der Beweise
-               in elementare Schritte eine "paedagogische" Illustration, wie Beweise
-               in mehreren Etappen verkuerzt werden koennen? *)
-
-
-
 Require Import Arith.
 
 Load DFA_Def.
@@ -15,11 +7,11 @@ Load Conv_Vec_List_Word.
 
 (*--------------------------------------------------------------------------------------------*)
 
-(** ** Vorbereitung *)
+(** Vorbereitung *)
 
 (*--------------------------------------------------------------------------------------------*)
 
-(** Aufblaehen eines Wortes. *)
+(** Aufblaehen eines Wortes: *)
 
 Fixpoint pump_w (n : nat) (w : @Word Sigma) : @Word Sigma :=
   match n with
@@ -28,7 +20,7 @@ Fixpoint pump_w (n : nat) (w : @Word Sigma) : @Word Sigma :=
   end.
 
 (** Das Aufblaehen des Wortes veraendert den Zustand, in dem sich der Automat
- nach dar Abarbeitung befindet, nicht. *)
+ nach der Abarbeitung befindet, nicht. *)
 
 Theorem pump_loop: forall n : nat, forall q : Q, forall xs : @Word Sigma,
       delta_hat q xs = q -> delta_hat q (pump_w n xs) = q.
@@ -50,7 +42,7 @@ Defined.
 
 (*--------------------------------------------------------------------------------------------*)
 
-(** ** Das Pumping-Lemma *)
+(** Das Pumping-Lemma: *)
 
 (*--------------------------------------------------------------------------------------------*)
 
@@ -186,17 +178,17 @@ Proof.
 
     intro k.
 
-    (** Zunaechst benutzen wir das Lemma [delta_hat_app], das 
-        Verhalten von delta_hat auf verketteten Woertern beschreibt,
+    (** Zunaechst benutzen wir das Lemma [delta_hat_app], dass das
+        Verhalten von delta_hat auf verketteten Woertern beschreibt
         und koennen dann die Hypothese verwenden, die besagt, dass nach
-        der Abarbeitung der Eingabe [x] von [q0] aus der sich 
+        der Abarbeitung der Eingabe [x] von [q0] sich der
         wiederholende Zustand [q_rp] ergibt. *)
 
     repeat rewrite delta_hat_app.
     rewrite dhq0x_eq_qrp.
 
-    (** Nun koennen wir benutzen, dass bei Abarbeitung des Worts [xy] von
-       [q0] aus ebenfalls q_rp erreicht wird und damit ebenso bei Abarbeitung 
+    (** Nun koennen wir benutzen, dass bei Abarbeitung des Wortes [xy] von
+       [q0] aus ebenfalls q_rp erreicht wird und damit ebenso bei Abarbeitung
        des Worts [y] von Zustand [q_rp] selbst aus. *)
 
     pose dhq0xy_eq_qrp as dhq0xy_eq_dhq0x.
@@ -206,16 +198,16 @@ Proof.
     rewrite delta_hat_app in dhq0xy_eq_dhq0x.
     rewrite dhq0x_eq_qrp in dhq0xy_eq_dhq0x.
 
-    (** Jetzt koennen wir das Lemma [pump_loop] anwenden, und 
+    (** Jetzt koennen wir das Lemma [pump_loop] anwenden und
         erhalten damit die Hypothese, dass bei beliebigen
-        Wiederholungen des Teilworts [y] von [q_rp] aus wiederum
+        Wiederholungen des Teilworts [y] von [q_rp] aus, wiederum
         [q_rp] erreicht wird.  *)
 
     apply (pump_loop k) in dhq0xy_eq_dhq0x as pump_y.
     rewrite pump_y.
 
     (** Es bleibt lediglich zu zeigen, dass bei Eingabe des Teilworts [z] von
-        [q_rp] aus wiederum ein Endzustand erreicht wird, was sich durch
+        [q_rp] aus, wiederum ein Endzustand erreicht wird, was durch
         die Gleichheit von [q_rp] und [delta_hat q0 x y] sowie
         von [xyz] und [w] moeglich ist. *)
 

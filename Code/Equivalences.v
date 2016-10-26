@@ -1,3 +1,5 @@
+(** Module ueber logische Aequivalenzen und Isomorphismen*)
+
 Module Type Logical_EQ.
 Parameter A : Type.
 Parameter B : Type.

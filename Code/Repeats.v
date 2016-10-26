@@ -5,22 +5,22 @@ Require Import List.
 
 (*---------------------------------------------------------------------------*)
 
-(** * Appears *)
+(** Appears *)
 
 (*---------------------------------------------------------------------------*)
 
-(** Vorkommen von x in einem Word. *)
+(** Vorkommen von x in einem Wort: *)
 
-Inductive Appears_Word {X : Type} (a : X) : @Word X -> Type :=
-  | ai_here_w : forall w, Appears_Word a (snoc w a)
-  | ai_there_w : forall b w, Appears_Word a w -> Appears_Word a (snoc w b).
+Inductive Appears_w {X : Type} (a : X) : @Word X -> Type :=
+  | ai_here_w : forall w, Appears_w a (snoc w a)
+  | ai_there_w : forall b w, Appears_w a w -> Appears_w a (snoc w b).
 
 (** Wenn x in w1 oder w2 vorkommt, dann kommt x auch in der
  Konkatenation der Woerter vor. *)
 
 Lemma app_Appears_w : forall {X : Type} (w1 w2 : @Word X) (x : X),
-      Appears_Word x w1 + Appears_Word x w2
-      -> Appears_Word x (concat_word w1 w2).
+      Appears_w x w1 + Appears_w x w2
+      -> Appears_w x (concat_word w1 w2).
 Proof.
   intros X w1 w2 x H.
   destruct H as [xInw1 | xInw2].
@@ -55,7 +55,7 @@ Defined.
  Teilwoertern (w1 w2), wobei x das Suffix von w1 und das Praefix von w2 ist. *)
 
 Lemma Appears_app_split_w : forall {X : Type} (x : X) (w : @Word X),
-      Appears_Word x w ->
+      Appears_w x w ->
       { w1 : @Word X & { w2 : @Word X & w = concat_word (snoc w1 x) w2 } }.
 Proof.
   intros X x w A.
@@ -77,7 +77,7 @@ Defined.
 
 Lemma Appears_app_split_rev_w {X : Type} (x : X) (w : @Word X) :
       { w1 : @Word X & { w2 : @Word X & w = concat_word (snoc w1 x) w2 } }
-      -> Appears_Word x w.
+      -> Appears_w x w.
 Proof.
   intro ex_decomp.
   destruct ex_decomp as [w1 [w2 w_eq_w1xw2]].
@@ -95,24 +95,24 @@ Defined.
 
 (*---------------------------------------------------------------------------*)
 
-(** * Repeats *)
+(** Repeats *)
 
 (*---------------------------------------------------------------------------*)
 
-(** Mehrfaches Vorkommen von x in einem Wort. *)
+(** Mehrfaches Vorkommen von x in einem Wort: *)
 
-Inductive Repeats_Word {X : Type} : @Word X -> Type :=
+Inductive Repeats_w {X : Type} : @Word X -> Type :=
   (* extend *)
   | rp_intr_w : forall (x : X) (w : @Word X), 
-               Appears_Word x w -> Repeats_Word (snoc w x)
+               Appears_w x w -> Repeats_w (snoc w x)
   | rp_ext_w : forall (x : X) (w : @Word X),
-               Repeats_Word w -> Repeats_Word (snoc w x).
+               Repeats_w w -> Repeats_w (snoc w x).
 
 (** Wenn x mehrfach in einem Wort vorkommt, dann gibt es eine Zerlegung in
  drei Teilwoerter, wobei x Suffix von den ersten beiden Teilwoertern ist. *)
 
 Lemma Repeats_decomp_w : forall X : Type, forall w : @Word X,
-      Repeats_Word w ->
+      Repeats_w w ->
       { x : X &
       { xs : @Word X &
       { ys : @Word X &
@@ -130,7 +130,7 @@ Proof.
     rewrite w_eq_w1'xw2'.
     simpl.
     reflexivity.
-  - destruct IHRepeats_Word as [x'  [xs'  [ys' [zs' w_eq_xs'x'ys'x'zs']]]].
+  - destruct IHRepeats_w as [x'  [xs'  [ys' [zs' w_eq_xs'x'ys'x'zs']]]].
     exists x'.
     exists xs'.
     exists ys'.
@@ -140,7 +140,7 @@ Proof.
     reflexivity.
 Defined.
 
-(** Wenn es eine Zerlegung in drei Teilwoerter, wobei x Suffix von den ersten
+(** Wenn es eine Zerlegung in drei Teilwoerter gibt, wobei x Suffix von den ersten
  beiden Teilwoertern ist, dann kommt x mehrfach in einem Wort vor. *)
 
 Lemma Repeats_decomp_rev_w {X : Type} : forall w : @Word X,
@@ -149,7 +149,7 @@ Lemma Repeats_decomp_rev_w {X : Type} : forall w : @Word X,
       { ys : @Word X &
       { zs : @Word X &
       w = concat_word (concat_word (snoc xs x) (snoc ys x)) zs } } } }
-      -> Repeats_Word w.
+      -> Repeats_w w.
 Proof.
   intros w decomp_w.
 

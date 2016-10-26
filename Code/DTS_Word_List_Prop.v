@@ -1,5 +1,5 @@
 Require DTS_Def.
-Require DTS_cons_Prop.
+Require Export DTS_cons_Prop.
 Require Import Program.
 Import Word_Prop.
 
@@ -10,11 +10,13 @@ Module DTS_List_Word_Prop := DTS_cons_Prop.DTS_cons_Fun DTS.
 Import DTS_Word_List_Prop.
 Import DTS_List_Word_Prop.
 Import DTS.
+
 (** Die Funktionen [delta_hat] und [delta_hat_cons] angewendet auf ein Wort bzw. eine Liste
 beschreiben den gleichen Sachverhalt. Die Liste kann durch [delta_hat_cons] direkt abgearbeitet
 werden. Bei [delta_hat] muss die Liste durch [list_to_word] in ein Wort umgewandelt werden,
 da der Eingabetyp [Word] erwartet wird. Die Abbildung in die andere Richtung kann man mit
 [word_to_list] analog definieren.*)
+
 Lemma delta_hat_cons_snoc (q : Q) (l : list Sigma) :
       delta_hat_cons q l = delta_hat q (list_to_word l).
 Proof.
@@ -44,6 +46,7 @@ Proof.
 Defined.
 
 (** Die Funktionen [Lang_delta] und [Lang_delta_cons] beschreiben die gleichen Sprachen.*)
+
 Lemma Lang_delta_Lemma (w : @Word Sigma) :
       Lang_delta w = Lang_delta_cons (word_to_list w).
 Proof.

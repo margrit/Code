@@ -3,13 +3,13 @@
 (* Load Word_Prop.*)
 Require Import List.
 
-(** Vorkommen von x in einer Liste. *)
+(** Vorkommen von x in einer Liste: *)
 
 Inductive Appears_l {X : Type} (a : X) : list X -> Type :=
   | ai_here_l : forall l, Appears_l a (a :: l)
   | ai_later_l : forall b l, Appears_l a l -> Appears_l a (b :: l).
 
-(** Wenn x der Konkatenation zweier Listen vorkommt, dann kommt x in
+(** Wenn x in der Konkatenation zweier Listen vorkommt, dann kommt x in
 der ersten oder zweiten Teilliste vor. *)
 
 Lemma Appears_l_app : forall {X : Type} (xs ys : list X) (x : X),
@@ -36,7 +36,7 @@ Proof.
         }
 Qed.
 
-(** Liste verknuepft einer Liste mit der leeren Liste ergibt die urspruengliche Liste. *)
+(** Eine Liste verknuepft mit der leeren Liste ergibt die urspruengliche Liste. *)
 
 Lemma app_l_nil : forall {X : Type} (l : list X),
       l ++ nil = l.
@@ -49,7 +49,7 @@ Proof.
     reflexivity.
 Qed.
 
-(* Wenn x in Liste xs oder Liste ys vorkommt,
+(** Wenn x in einer Liste xs oder einer Liste ys vorkommt,
 dann kommt x auch in der Konkatenation der Listen vor. *)
 
 Lemma app_Appears_l : forall {X : Type} (xs ys : list X) (x : X),
@@ -96,14 +96,14 @@ Proof.
     reflexivity.
 Defined.
 
-(** Wiederholung von x in einer Liste. *)
+(** Wiederholung von x in einer Liste: *)
 
 Inductive Repeats_l {X : Type} : list X -> Type :=
   | rp_ext_l : forall x : X, forall l : list X, Repeats_l l -> Repeats_l (x :: l)
   | rp_intr_l : forall x : X, forall l : list X, Appears_l x l -> Repeats_l (x :: l).
 
 (** Wenn es eine Wiederholung von x in einer Liste gibt, so gibt es eine
- Zerledung in drei Teillisten, wobei x Praefix von der zweiten und dritten
+ Zerlegung in drei Teillisten, wobei x Praefix von der zweiten und dritten
  Teilliste ist. *)
 
 Lemma Repeats_l_decomp : forall X : Type, forall l : list X,
@@ -155,7 +155,7 @@ Proof.
     reflexivity.
 Defined.
 
-(** Map Funktion auf eine List bestehend aus zwei Teillisten. *)
+(** Map Funktion auf eine Liste bestehend aus zwei Teillisten: *)
 
 Lemma map_dec_2_l : forall X Y :Type, forall f : X -> Y, forall l : list X,
       forall xs ys : list Y,
@@ -238,7 +238,7 @@ Proof.
         }
 Defined.
 
-(** Map Funktion auf eine List bestehend aus drei Teillisten. *)
+(** Map Funktion auf eine Liste bestehend aus drei Teillisten: *)
 
 Lemma map_decomp_3_l : forall X Y : Type, forall f : X -> Y, forall l : list X,
       forall xs ys zs : list Y,

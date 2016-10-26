@@ -1,4 +1,3 @@
-(* Hier kommen die cons Sachen rein, woraus man Uebungsaufgaben basteln kann *)
 Require DTS_Def.
 Require Import List.
 
@@ -27,7 +26,7 @@ Definition delta := delta.
 Definition is_accepting := is_accepting.
 Definition q0 := q0.
 
-(** Erweiterte Ueberführungsfunktion [delta_hat_cons], wird hier nicht weiter verwendet,
+(** Erweiterte Ueberfuehrungsfunktion [delta_hat_cons], wird hier nicht weiter verwendet,
  da die Verfahren in der Vorlesung ueber den [snoc] Konstruktor definiert wurden. Es waere als eine
  Uebungsaufgabe denkbar, dass kleine Beispiele mit dem [cons] Konstruktor zu loesen sind. *)
 Fixpoint delta_hat_cons (q : Q) (l : list Sigma) : Q :=
@@ -50,7 +49,7 @@ Proof.
     reflexivity.
 Defined.
 
-(** Die Abarbeitung einer, aus zwei Teillisten bestehenden Liste. *)
+(** Die Abarbeitung einer aus zwei Teillisten bestehenden Liste. *)
 Theorem delta_hat_cons_app : forall xs ys : list Sigma, forall q : Q,
       delta_hat_cons q (xs ++ ys) = delta_hat_cons (delta_hat_cons q xs) ys.
 Proof.
@@ -63,14 +62,14 @@ Proof.
     apply IHxs.
 Defined.
 
-(** Die von einem endlichen Automaten beschriebene Sprachen definiert durch [is_accepting].*)
+(** Die von einem endlichen Automaten beschriebene Sprache definiert durch [is_accepting].*)
 Definition Lang_delta_cons (l : list Sigma) :=
            is_accepting (delta_hat_cons q0 l).
 
 (** Der Typ der Konfigurationen eines DTS, Conf = Q x @Word Sigma*.*)
 Definition Conf := Q * (list Sigma) : Type.
 
-(** Ein einzelner Konfigurationsschritt. Ausgehend von einer Konfiguration, einem Zeichen a
+(** Ein einzelner Konfigurationsschritt: Ausgehend von einer Konfiguration, einem Zeichen a
 aus Sigma und einem Wort w, wird das Zeichen durch [delta] abgearbeitet und fuehrt zur
 nachfolgenden Konfiguration.*)
 (* Hilfsrelation [Conf_step] *)
@@ -78,7 +77,7 @@ Inductive Conf_step : Conf -> Conf -> Type :=
  | one_step : forall (q : Q) (a : Sigma) (l : list Sigma),
                         Conf_step (q, (a :: l)) (delta q a, l).
 
-(** Die reflexiv-transitive Hülle von Conf_rel_DFA_step um die eigentliche Konfigurations-
+(** Die reflexiv-transitive Huelle von Conf_rel_DFA_step um die eigentliche Konfigurations-
 uebergangsrelation zu beschreiben.*)
 Inductive Conf_rel' : Conf -> Conf -> Type :=
   | refl  : forall (K : Conf), Conf_rel' K K
@@ -86,7 +85,7 @@ Inductive Conf_rel' : Conf -> Conf -> Type :=
 
 Definition Conf_rel := Conf_rel'.
 
-(** Die von einem deterministischen Transitionssystems beschriebene Sprachen definiert 
+(** Die von einem deterministischen Transitionssystems beschriebene Sprache definiert 
 durch [Conf_rel].*)
 Definition Lang_Conf (l : list Sigma) : Type :=
            {p : Q & (is_accepting p * Conf_rel (q0, l) (p, nil))%type}.

@@ -6,19 +6,25 @@ Require Import Decidable.
 Require Import Program.
 Require Import Structures.Equalities.
 
-(** Vorkommen von x in einer Liste. *)
+(** Vorkommen von x in einem Vektor: *)
 
 Inductive Appears_in {X : Type} (a : X): forall {n : nat}, (Vector.t X n) -> Type :=
   | ai_here  {m} : forall (v : Vector.t X m), Appears_in a (cons X a m v)
   | ai_later {m} : forall b (v : Vector.t X m), Appears_in a v -> Appears_in a (cons X b m v).
 
-(** Vorkommen von Wiederholungen in einer Liste. *)
+(*Inductive ABC := A|B|C.
+Definition B_in_ABC := @ai_later ABC B 2 A (cons ABC B 1(cons ABC C 0 (nil ABC)))(@ai_here ABC B 1 (cons ABC C 0 (nil ABC))).*)
+
+(** Vorkommen von Wiederholungen in einem Vektor: *)
 
 Inductive Repeats {X : Type} : forall {n : nat}, Vector.t X n -> Type :=
   | rp_ext  {m} : forall x : X, forall v : Vector.t X m, Repeats v -> Repeats (cons X x m v)
   | rp_intr {m} : forall x : X, forall v : Vector.t X m, Appears_in x v -> Repeats (cons X x m v).
 
-(** Entscheidbarkeit von Appears und Repeats. *)
+
+(*  Check rp_intr B (cons ABC A 2 (cons ABC B 1 (cons ABC C 0 (nil ABC)))) B_in_ABC.*)
+
+(** Entscheidbarkeit von Appears und Repeats: *)
 
 Theorem dec_Appears_in : forall {A : Type}
        (d : forall a a': A, (a = a') + ((a = a') -> False))
@@ -83,7 +89,7 @@ Proof.
         }
 Defined.
 
-(** Lemmata mit Gleichheit *)
+(** Lemmata mit Gleichheit: *)
 
 Lemma eq_app : forall (A B : Type) (f : A -> B) (x y  : A), x = y -> (f x = f y).
 Proof.
@@ -128,7 +134,7 @@ Proof.
   apply fin_eq_dec.
 Defined. 
 
-(** "Funktorialitaets" Lemmata *)
+(** "Funktorialitaets" Lemmata: *)
 
 Fixpoint funct_Appears_in {A B : Type} {n : nat} (f : A -> B)
        (x : A) (v : Vector.t A n) :
@@ -157,7 +163,7 @@ Fixpoint funct_Repeats {A B : Type} {n : nat} (f : A -> B) (v : Vector.t A n) :
       assumption.
 Defined.
 
-(**  *Lemmata zum Einfuegen von Elementen *)
+(**  Lemmata zum Einfuegen von Elementen: *)
 
 (** Einfuegen von a in v an der Position p. *)
 
@@ -194,7 +200,7 @@ Proof.
       assumption.
 Defined.
 
-(** Einfuegen in eine leere Liste *)
+(** Einfuegen in eine leere Liste: *)
 
 Lemma insert_nil {A : Type} :
       forall (x : A) (v : Vector.t A 0) (f : @Fin.t 1),
@@ -208,7 +214,7 @@ Proof.
   - inversion f.
 Defined. 
 
-(** Anhaengen an eine leere Liste *)
+(** Anhaengen an eine leere Liste: *)
 
 Lemma append_nil {A : Type} {n : nat} :
       forall (x : A) (v : Vector.t A n), append (nil A) v = v.
@@ -218,7 +224,7 @@ Proof.
 Defined.
 
 
-(** Wenn ein Element, das schon in der Liste vorkommt, eingefuegt wird,
+(** Wenn ein Element das schon in dem Vektor vorkommt eingefuegt wird,
  dann wiederholt es sich. *)
 
 Lemma ins_app_Repeats {A : Type} {n : nat}:
@@ -252,7 +258,7 @@ Proof.
 Defined.
 
 
-(** Map von FS auf einen Vektor *)
+(** Map von FS auf einen Vektor: *)
 
 Definition map_fs {n m : nat} (v : Vector.t (@Fin.t n) m) := map Fin.FS v.
 
@@ -312,7 +318,7 @@ Proof.
   dependent destruction ap.
   - exists v.
     exists Fin.F1.
-    cbn.
+    compute.
     reflexivity.
   - dependent destruction n.
     + inversion ap.
@@ -327,7 +333,7 @@ Proof.
 Defined.
 
 
-(** Entfernen des Kopfelements erhaelt Nicht-Enthaltensein. *)
+(** Entfernen des Kopfelements erhaelt Nicht-Enthaltensein: *)
 
 Lemma not_Appears_in_tl {A : Type} {n : nat} (x y : A) (v : Vector.t A n) :
       (Appears_in x (cons A y n v) -> False) ->
@@ -366,7 +372,7 @@ Defined.
 
 (*-------------------------------------------------------------------------------------------*)
 
-(** Das Taubenschlag-Prinzip *)
+(** Das Taubenschlag-Prinzip: *)
 
 (*-------------------------------------------------------------------------------------------*)
 

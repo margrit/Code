@@ -1,12 +1,12 @@
 
 (* --------------------------------------------------------------------------*)
 
-(** * Die groesseren "Zerlegungs"-Lemmata fuer map *)
+(** Die groesseren "Zerlegungs"-Lemmata fuer map *)
 
 (* --------------------------------------------------------------------------*)
 
 (** Vorbereitung fuer das PL,
-    um von einer Zerlegung von [trace w] auf eine Zerlegung von [inits w]
+    um von einer Zerlegung von [trace w], auf eine Zerlegung von [inits w]
     schliessen zu koennen. *)
 
 

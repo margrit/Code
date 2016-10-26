@@ -6,7 +6,7 @@ Load Pigeonhole_vector.
 
 (*--------------------------------------------------------------------------------------------*)
 
-(** *Conversion fuer Listen *)
+(** Conversion fuer Listen *)
 
 (*--------------------------------------------------------------------------------------------*)
 
@@ -70,7 +70,7 @@ Proof.
     exact a.
 Defined.
 
-(** Pigeonhole fuer Listen *)
+(** Pigeonhole fuer Listen. *)
 
 Lemma pigeonhole_l: forall {n} (l : list (@Fin.t n)), length l > n ->
       Repeats_l l.
@@ -89,13 +89,13 @@ Defined.
 
 (*--------------------------------------------------------------------------------------------*)
 
-(** *Conversion fuer Woerter *)
+(** Conversion fuer Woerter *)
 
 (*--------------------------------------------------------------------------------------------*)
 
 (* Vorbereitung *)
 
-(** Umwandlung zwischen Vektoren und Woerter. *)
+(** Umwandlung zwischen Vektoren und Woertern. *)
 
 Definition to_word {A} {n} (v : Vector.t A n) := list_to_word (to_list v).
 
@@ -115,13 +115,13 @@ Proof.
   apply word_list_word.
 Defined.
 
-(** Aus einem Beweis aus [Repeats_l] kann ein Beweis fuer [Repeats_Word]
- abgeleitet werden. Dies ist sowohl fuer die Eingabe von Listen als auch Woerter
+(** Aus einem Beweis aus [Repeats_l] kann ein Beweis fuer [Repeats_w]
+ abgeleitet werden. Dies ist sowohl fuer die Eingabe von Listen als auch fuer Woerter
  der Fall, was in den Lemmata [lw_pres_repeats] und [wl_pres_repeats] gezeigt
  wird. *)
 
 Lemma lw_pres_repeats {A} (l : list A) :
-      Repeats_l l -> Repeats_Word (list_to_word l).
+      Repeats_l l -> Repeats_w (list_to_word l).
 Proof.
   intro rp_l.
 
@@ -159,18 +159,17 @@ Proof.
 Defined.
 
 Lemma wl_pres_repeats {A} (w : @Word A) :
-      Repeats_l (word_to_list w) -> Repeats_Word w.
+      Repeats_l (word_to_list w) -> Repeats_w w.
 Proof.
   rewrite <- (word_list_word w).
   rewrite list_word_list.
   apply lw_pres_repeats.
 Defined.
 
-
-(** Pigeonhole fuer Woerter *)
+(** Pigeonhole fuer Woerter. *)
 
 Lemma pigeonhole_w: forall {n} (w : @Word (@Fin.t n)),
-      word_length w > n -> Repeats_Word w.
+      word_length w > n -> Repeats_w w.
 Proof.
   intros n w w_len.
   pose (word_to_list w) as w_as_l.

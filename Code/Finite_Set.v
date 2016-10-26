@@ -617,8 +617,3 @@ Proof.
     apply (transIso (prodIsoRight (Fin.t n) IHm)).
     exact (vectProdIso (Fin.t n) m).
 Defined.
-
-(* for any n, Vector.t _ n is a functor *)
-(*
-Definition mapVector ... tbc 
-*)

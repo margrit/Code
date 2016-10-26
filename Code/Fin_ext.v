@@ -5,8 +5,8 @@ Require Import Arith.
  benoetigt. Als erstes eine Version von [to_nat] und [of_nat] mit konstruktiven
  Existenzquantoren bzw. abhaengige Summen. *)
 
-(** Wenn p kleiner als n ist, dann wird das p-te Element von Fin.t n  angegeben,oder
- ein Zeugen, dass p groesser als die Kardinalitaet von Fin.t n ist. *)
+(** Wenn p kleiner als n ist, dann wird das p-te Element von Fin.t n  angegeben, oder
+ ein Zeuge, dass p groesser als die Kardinalitaet von Fin.t n ist. *)
 
 Fixpoint of_nat' (p n : nat) : (t n) + { m : nat & p = n + m }.
   induction n.
@@ -100,7 +100,7 @@ Proof.
         assumption.
 Defined.
 
-(** Lemmata zur Typanpassung *)
+(** Lemmata zur Typanpassung: *)
 
 Definition n_plus_0 (n : nat) : (n + 0 = n) := eq_sym (plus_n_O n).
   
